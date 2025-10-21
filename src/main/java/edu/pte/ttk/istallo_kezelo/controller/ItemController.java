@@ -60,16 +60,16 @@ public class ItemController {
 
     // Tétel frissítése
     @PatchMapping("/{id}")
-    public ItemDTO updateItem(@PathVariable Long id, @RequestBody Item item) {
-        Item updated = itemService.updateItem(id, item);
-        return toDTO(updated);
+    public ResponseEntity<String> updateItem(@PathVariable Long id, @RequestBody Item item) {
+        itemService.updateItem(id, item);
+        return ResponseEntity.ok("Tétel sikeresen frissítve.");
     }
 
     // Tétel törlése
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteItem(@PathVariable Long id) {
+    public ResponseEntity<String> deleteItem(@PathVariable Long id) {
         itemService.deleteItem(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Tétel sikeresen törölve.");
     }
         
     private ItemDTO toDTO(Item item) {

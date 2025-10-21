@@ -3,7 +3,7 @@ package edu.pte.ttk.istallo_kezelo.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.pte.ttk.istallo_kezelo.dto.HorsetreatmentDTO;
+import edu.pte.ttk.istallo_kezelo.dto.HorseTreatmentDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
 import edu.pte.ttk.istallo_kezelo.service.HorseTreatmentService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,7 +30,7 @@ public class HorseTreatmentController {
 
     // Kezelés hozzáadása lóhoz
     @PostMapping()
-    public HorsetreatmentDTO addTreatmentToHorse(@RequestBody HorsetreatmentDTO dto) {
+    public HorseTreatmentDTO addTreatmentToHorse(@RequestBody HorseTreatmentDTO dto) {
         HorseTreatment link = horseTreatmentService.addTreatmentToHorse(dto.treatmentId, dto.horseId);
         return toDTO(link);
     }
@@ -37,7 +38,7 @@ public class HorseTreatmentController {
 
     // Összes link lekérdezése
     @GetMapping()
-    public List<HorsetreatmentDTO> getAllHorseTreatments() {
+    public List<HorseTreatmentDTO> getAllHorseTreatments() {
         List<HorseTreatment> links = horseTreatmentService.getAllHorseTreatments();
         return links.stream().map(this::toDTO).toList();
     }
@@ -45,29 +46,41 @@ public class HorseTreatmentController {
 
     // Link lekérdezése id alapján
     @GetMapping("/{id}")
-    public HorsetreatmentDTO getHorsetreatmentById(@PathVariable Long id) {
+    public HorseTreatmentDTO getHorsetreatmentById(@PathVariable Long id) {
         return toDTO(horseTreatmentService.getHorseTreatmentById(id));
     }
     
     // Egy ló minden kezelésének lekérdezése ló id alapján
-    @GetMapping("/byHorse/{horseId}")
-    public List<HorsetreatmentDTO> getHorseTreatmentsByHorseid(@PathVariable Long horseId) {
+    @GetMapping("/byHorseId/{horseId}")
+    public List<HorseTreatmentDTO> getHorseTreatmentsByHorseid(@PathVariable Long horseId) {
         List<HorseTreatment> links = horseTreatmentService.getTreatmentsForHorse(horseId);
         return links.stream().map(this::toDTO).toList();
     }
 
-    // Kezelés eltávolítása lótól
-    @DeleteMapping("/{id}")
-    public void removeHorseTreatment(@PathVariable Long id){
-        HorseTreatment link = horseTreatmentService.getHorseTreatmentById(id);
-        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getTreatmentId(), link.getHorse().getId());
+    // Kezelt lovak lekérdezése kezelés id alapján
+    @GetMapping("/byTreatmentId/{treatmentId}")
+    public List<HorseTreatmentDTO> getHorseTreatmentsbyTreatmentId(@PathVariable Long treatmentId){
+        List<HorseTreatment> links = horseTreatmentService.getHorsesByTreatment(treatmentId);
+        return links.stream().map(this::toDTO).toList();
     }
     
 
-    private HorsetreatmentDTO toDTO(HorseTreatment link){
-        HorsetreatmentDTO dto = new HorsetreatmentDTO();
+    // Kezelés eltávolítása lótól
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> removeHorseTreatment(@PathVariable Long id){
+        HorseTreatment link = horseTreatmentService.getHorseTreatmentById(id);
+        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getTreatmentId(), link.getHorse().getId());
+        return ResponseEntity.ok("Link sikeresen törölve.");
+    }
+    
+
+    private HorseTreatmentDTO toDTO(HorseTreatment link){
+        HorseTreatmentDTO dto = new HorseTreatmentDTO();
         dto.horseId = link.getHorse().getId();
         dto.treatmentId = link.getTreatment().getTreatmentId();
+        dto.treatmentName = link.getTreatment().getTreatmentName();
+        dto.horseName = link.getHorse().getHorseName();
+        dto.date = link.getTreatment().getDate();
         return dto;
     }
 

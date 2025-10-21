@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -60,8 +59,8 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése dátum alaján
-    @GetMapping("/byDate")
-    public List<FarrierAppDTO> getFarrierAppsByDate(@RequestParam LocalDate date) {
+    @GetMapping("/byDate/{date}")
+    public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date);
         return ((List<FarrierApp>) farrierApps).stream()
                 .map(this::toDTO)
@@ -69,8 +68,8 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése patkolókovács neve alaján
-    @GetMapping("/byFarrierName")
-    public List<FarrierAppDTO> getFarrierAppsByFarrierName(@RequestParam String farrierName) {
+    @GetMapping("/byFarrierName/{farrierName}")
+    public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName);
         return ((List<FarrierApp>) farrierApps).stream()
                 .map(this::toDTO)
@@ -78,8 +77,8 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése ló neve alaján
-    @GetMapping("/byHorseName")
-    public List<FarrierAppDTO> getFarrierAppsByHorseName(@RequestParam String horseName) {
+    @GetMapping("/byHorseName/{horseName}")
+    public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName);
         return ((List<FarrierApp>)  farrierApps).stream()
                 .map(this::toDTO)
@@ -87,8 +86,8 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése ló id alaján
-    @GetMapping("/byHorseId")
-    public List<FarrierAppDTO> getFarrierAppsByHorseId(@RequestParam Long horseId) {
+    @GetMapping("/byHorseId/{horseId}")
+    public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId) {
         Iterable<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId);
         return ((List<FarrierApp>) farrierApps).stream()
                 .map(this::toDTO)
@@ -97,8 +96,9 @@ public class FarrierAppController {
 
     // Patkolás frissítése
     @PatchMapping("/{id}")
-    public void updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto) {
+    public ResponseEntity<String> updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto) {
         farrierAppService.updateFarrierApp(id, dto);
+        return ResponseEntity.ok("Patkolás sikeresen frissítve.");
     }
     
     // Patkolás törlése

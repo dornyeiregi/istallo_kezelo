@@ -58,8 +58,8 @@ public class UserController {
 
     
     // Felhasználó lekérdezése felhasználónév alapján
-    @GetMapping("/username")
-    public UserDTO getUserByUsername(@RequestParam String username){
+    @GetMapping("/byUsername/{username}")
+    public UserDTO getUserByUsername(@PathVariable String username){
         User user = userService.getUserByUsername(username);
         if (user == null){
             throw new RuntimeException("Felhasználó nem található.");
@@ -68,8 +68,8 @@ public class UserController {
     }
 
     // Felhasználó lekérdezése név alapján
-    @GetMapping("/fullName")
-    public UserDTO getUserByFullName(@RequestParam String lName, String fName) {
+    @GetMapping("/byFullName/{lName}/{fName}")
+    public UserDTO getUserByFullName(@PathVariable String lName, @PathVariable String fName) {
         User user = userService.getUserByFullName(lName, fName);
         if (user == null) {
             throw new RuntimeException("Felhasználó nem található.");
@@ -78,8 +78,8 @@ public class UserController {
     }
     
     // Felhasználó lekérdezése ló neve alapján
-    @GetMapping("/horseName")
-    public UserDTO getUserbyHorseName(@RequestParam String horseName){
+    @GetMapping("/byHorseName/{horseName}")
+    public UserDTO getUserbyHorseName(@PathVariable String horseName){
         User user = userService.getUserByHorseName(horseName);
         if (user == null) {
             throw new RuntimeException("Felhasználó nem található.");

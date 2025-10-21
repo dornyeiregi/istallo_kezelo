@@ -72,16 +72,16 @@ public class ShotController {
     
     // Oltás frissítése
     @PatchMapping("/{shotId}")
-    public ResponseEntity<Void> updateShot (@PathVariable Long shotId, @RequestBody ShotDTO dto){
+    public ResponseEntity<String> updateShot (@PathVariable Long shotId, @RequestBody ShotDTO dto){
         shotService.updateShot(shotId, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Oltás sikeresen frissítve.");
     }
 
     // Oltás törlése
     @DeleteMapping("/{shotId}")
-    public ResponseEntity<Void> deleteShot(@PathVariable Long shotId){
+    public ResponseEntity<String> deleteShot(@PathVariable Long shotId){
         shotService.deleteShotById(shotId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Oltás sikeresen törölve.");
     }
 
 

@@ -20,4 +20,6 @@ public interface HorseTreatmentRepository extends JpaRepository<HorseTreatment, 
     void deleteByTreatment_TreatmentIdAndHorse_Id(Long treatmentId, Long horseId);
 
     List<HorseTreatment> findByHorse_horseName(String horseName);
+
+    List<HorseTreatment> findByTreatment_TreatmentId(Long treatmentId);
 }

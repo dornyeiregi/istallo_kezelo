@@ -127,7 +127,7 @@ public class FeedSchedService {
         feedSchedRepository.deleteById(id);
     }
 
-    // Add horse to feed schedule
+    // Ló hozzáadása etetési naplóhoz
     @Transactional
     public void addHorseToFeedSched(Long feedSchedId, Long horseId) {
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)

@@ -9,6 +9,7 @@ import edu.pte.ttk.istallo_kezelo.service.FeedSchedItemService;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,9 +63,10 @@ public class FeedSchedItemController {
 
     // Link törlése
     @DeleteMapping("/{id}")
-    public void removeItemFromFeedSched(@PathVariable Long id) {
+    public ResponseEntity<String> removeItemFromFeedSched(@PathVariable Long id) {
         FeedSchedItem link = feedSchedItemService.getFeedSchedItemById(id);
         feedSchedItemService.removeItemFromFeedSched(link.getFeedSched().getFeedSchedid(), link.getItem().getItemId());
+        return ResponseEntity.ok("Link sikeresen törölve.");
     }
 
     private FeedSchedItemDTO toDTO(FeedSchedItem feedSchedItem) {

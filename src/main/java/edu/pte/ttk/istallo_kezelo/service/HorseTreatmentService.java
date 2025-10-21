@@ -62,6 +62,11 @@ public class HorseTreatmentService {
         return horseTreatmentRepository.findByHorse_Id(horseId);
     }
 
+    // Kezelt lovak lekérdezése kezelés id alapján
+    public List<HorseTreatment> getHorsesByTreatment(Long treatmentId) {
+        return horseTreatmentRepository.findByTreatment_TreatmentId(treatmentId);
+    }
+
     // Kezelés eltávolítása lótól
     @Transactional
     public void removeTreatmentFromHorse(Long treatmentId, Long horseId){

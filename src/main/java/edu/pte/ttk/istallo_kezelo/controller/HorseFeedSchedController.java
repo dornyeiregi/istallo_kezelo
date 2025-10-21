@@ -9,6 +9,7 @@ import edu.pte.ttk.istallo_kezelo.service.HorseFeedSchedService;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,14 +51,14 @@ public class HorseFeedSchedController {
     }
 
     // Összes ló lekérdezése etetési naplóhoz
-    @GetMapping("/byFeedSched/{feedSchedId}")
+    @GetMapping("/byFeedSchedId/{feedSchedId}")
     public List<HorseFeedSchedDTO> getHorsesForFeedSched(@PathVariable Long feedSchedId){
         List<HorseFeedSched> links = horseFeedSchedService.getHorsesForFeedSChed(feedSchedId);
         return links.stream().map(this::toDTO).toList();
     }
 
     // Lóhoz tartozó összes etetési napló lekérdezése
-    @GetMapping("/byHorse/{horseId}")
+    @GetMapping("/byHorseId/{horseId}")
     public List<HorseFeedSchedDTO> getFeedSchedsForHorse(@PathVariable Long horseId){
         List<HorseFeedSched> links = horseFeedSchedService.getFeedSchedsForHorse(horseId);
         return links.stream().map(this::toDTO).toList();
@@ -65,9 +66,10 @@ public class HorseFeedSchedController {
 
     // Ló eltávolítása etetési naplóból
     @DeleteMapping("/{id}")
-    public void removeHorseFromFeedSched(@PathVariable Long id){
+    public ResponseEntity<String> removeHorseFromFeedSched(@PathVariable Long id){
         HorseFeedSched link = horseFeedSchedService.getHorseFeedSchedById(id);
         horseFeedSchedService.removeHorseFromFeedSched(link.getFeedSched().getFeedSchedid(), link.getHorse().getId());
+        return ResponseEntity.ok("Link sikeresen törölve.");
     }
     
 

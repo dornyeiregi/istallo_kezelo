@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 
@@ -47,14 +48,14 @@ public class HorseShotController {
     }
 
     // Oltáshoz tartozó összes ló lekérdezése
-    @GetMapping("/byShot/{shotId}")
+    @GetMapping("/byShotId/{shotId}")
     public List<HorseShotDTO> getMethodName(@PathVariable Long shotId) {
         List<HorseShot> links = horseShotService.getHorseForShot(shotId);
         return links.stream().map(this::toDtO).toList();
     }
     
     // Lóhoz tartozó összes oltás lekérdezése
-    @GetMapping("/byHorse/{horseId}")
+    @GetMapping("/byHorseId/{horseId}")
     public List<HorseShotDTO> getShotsOfHorse(@PathVariable Long horseId) {
         List<HorseShot> links = horseShotService.getShotsForHorse(horseId);
         return links.stream().map(this::toDtO).toList();
@@ -62,9 +63,10 @@ public class HorseShotController {
 
     // Oltás eltávolítása lóból
     @DeleteMapping("/{id}")
-    public void removeHorseShot(@PathVariable Long id){
+    public ResponseEntity<String> removeHorseShot(@PathVariable Long id){
         HorseShot link = horseShotService.getHorseShotById(id);
         horseShotService.removeShotFromHorse(link.getShot().getShotId(), link.getHorse().getId());
+        return ResponseEntity.ok("Link sikeresen törölve.");
     }
 
 

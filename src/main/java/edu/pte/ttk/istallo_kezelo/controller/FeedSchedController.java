@@ -48,7 +48,7 @@ public class FeedSchedController {
     public FeedSchedDTO getFeedSchedById(@PathVariable Long id) {
         FeedSched feedSched = feedSchedService.getFeedSchedById(id);
         if (feedSched == null) {
-            throw new RuntimeException("Feeding schedule not found");
+            throw new RuntimeException("Etetési napló nem található.");
         }
         return toDTO(feedSched);
     }
@@ -61,30 +61,30 @@ public class FeedSchedController {
             .map(this::toDTO).toList();
     }
 
-    /* 
+    
     // Etetési naplók lekérdezése ló neve alapján
-    @GetMapping("/byHorseName")
+    @GetMapping("/byHorseName/{horseName}")
     public List<FeedSchedDTO> getFeedSchedsByHorseName(@PathVariable String horseName) {
         List<FeedSched> feedScheds = feedSchedService.getFeedSchedByHorseName(horseName);
         return feedScheds.stream()
             .map(this::toDTO).toList();
     }
-    */
+    
 
     
     // Etetési napló frissítése
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> updateFeedSched(@PathVariable Long id, @RequestBody FeedSchedDTO dto) {
+    public ResponseEntity<String> updateFeedSched(@PathVariable Long id, @RequestBody FeedSchedDTO dto) {
         feedSchedService.updateFeedSched(id, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Etetési napló sikeresen frissítve.");
     }
 
 
     // Etetési napló törlése
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFeedSched(@PathVariable Long id){
+    public ResponseEntity<String> deleteFeedSched(@PathVariable Long id){
         feedSchedService.deleteFeedSched(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Etetési napló sikeresen törölve.");
     }
     
 

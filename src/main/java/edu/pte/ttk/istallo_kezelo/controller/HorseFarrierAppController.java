@@ -2,6 +2,7 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseFarrierAppDTO;
@@ -39,14 +40,14 @@ public class HorseFarrierAppController {
     }
 
     // Összes ló lekérdezése patkolás id alapján
-    @GetMapping("/byFarrierApp/{farrierAppId}")
+    @GetMapping("/byFarrierAppId/{farrierAppId}")
     public List<HorseFarrierAppDTO> getHorsesForFarrierApp(@PathVariable Long farrierAppId) {
         List<HorseFarrierApp> links = horseFarrierAppService.getHorsesForFarrierApp(farrierAppId);
         return links.stream().map(this::toDTO).toList();
     }
 
     // Összes patkolás lekérdezése ló id alapján
-    @GetMapping("/byHorse/{horseId}")
+    @GetMapping("/byHorseId/{horseId}")
     public List<HorseFarrierAppDTO> getFarrierAppsForHorse(@PathVariable Long horseId) {
         List<HorseFarrierApp> links = horseFarrierAppService.getFarrierAppsForHorse(horseId);
         return links.stream().map(this::toDTO).toList();
@@ -54,9 +55,10 @@ public class HorseFarrierAppController {
 
     // Link törlése
     @DeleteMapping("/{id}")
-    public void removeHorseFromFarrierApp(@PathVariable Long id) {
+    public ResponseEntity<String> removeHorseFromFarrierApp(@PathVariable Long id) {
         HorseFarrierApp link = horseFarrierAppService.getHorseFarrierAppById(id);
         horseFarrierAppService.removeHorseFromFarrierApp(link.getFarrierApp().getId(), link.getHorse().getId());
+        return ResponseEntity.ok("Link sikeresen törölve.");
     }
 
     private HorseFarrierAppDTO toDTO(HorseFarrierApp link) {

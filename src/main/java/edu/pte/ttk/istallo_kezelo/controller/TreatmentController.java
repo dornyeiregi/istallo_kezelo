@@ -56,33 +56,33 @@ public class TreatmentController {
     }
 
     // Egy ló minden kezelésének lekérdezése ló id alapján
-    @GetMapping("/horseId/{horseId}")
+    @GetMapping("/byHorseId/{horseId}")
     public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId);
         return treatments.stream().map(this::toDTO).toList();
     }
 
-    /*
+    
     // Egy ló minden kezelésének lekérdezése ló neve alapján
-    @GetMapping("/horseName/{horsename}")
+    @GetMapping("/byHorseName/{horseName}")
     public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName);
         return treatments.stream().map(this::toDTO).toList();
     }
-    */
+    
     
     // Kezelés frissítése
     @PatchMapping("/{treatmentId}")
-    public ResponseEntity<Void> updateTreatment(@PathVariable Long treatmentId, @RequestBody TreatmentDTO dto){
+    public ResponseEntity<String> updateTreatment(@PathVariable Long treatmentId, @RequestBody TreatmentDTO dto){
         treatmentService.updateTreatment(treatmentId, dto);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Kezelés sikeresen frissítve.");
     }
 
     // Kezelés törlése
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTreatment(@PathVariable Long id){
-        treatmentService.deleteTreatmentById(id);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{treatmentId}")
+    public ResponseEntity<String> deleteTreatment(@PathVariable Long treatmentId){
+        treatmentService.deleteTreatmentById(treatmentId);
+        return ResponseEntity.ok("Kezelés sikeresen törölve.");
     }
 
     private TreatmentDTO toDTO(Treatment treatment){

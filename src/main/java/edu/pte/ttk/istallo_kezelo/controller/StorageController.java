@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -56,14 +57,16 @@ public class StorageController {
 
     // Tároló frissítése
     @PatchMapping("/{id}")
-    public StorageDTO updateStorage(@PathVariable Long id, @RequestBody StorageDTO dto){
-        return toDTO(storageService.updateStorage(id, dto));
+    public ResponseEntity<String> updateStorage(@PathVariable Long id, @RequestBody StorageDTO dto){
+        storageService.updateStorage(id, dto);
+        return ResponseEntity.ok("Tároló sikeresen frissítve.");
     }
     
     // Tároló törlése
     @DeleteMapping("/{id}")
-    public void deleteStorage(@PathVariable Long id){
+    public ResponseEntity<String> deleteStorage(@PathVariable Long id){
         storageService.deleteStorage(id);
+        return ResponseEntity.ok("Tároló sikeresen törölve.");
     }
 
     private StorageDTO toDTO(Storage storage){

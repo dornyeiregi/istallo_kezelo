@@ -31,10 +31,10 @@ public class HorseController {
     @PostMapping
     public HorseDTO createHorse(@RequestBody HorseDTO dto) {
         User owner = userService.getUserById(dto.ownerId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
 
         Stable stable = stableService.getStableById(dto.stableId)
-                .orElseThrow(() -> new RuntimeException("Stable not found"));
+                .orElseThrow(() -> new RuntimeException("Istálló nem található."));
 
         Horse horse = new Horse();
         horse.setHorseName(dto.horseName);
@@ -62,16 +62,16 @@ public class HorseController {
     @GetMapping("/{id}")
     public HorseDTO getHorseById(@PathVariable Long id) {
         Horse horse = horseService.getHorseById(id)
-            .orElseThrow(() -> new RuntimeException("Horse not found"));
+            .orElseThrow(() -> new RuntimeException("Ló nem található."));
         return toDTO(horse);
     }
 
     // Ló lekérdezése név alapján
-    @GetMapping("/name")
-    public HorseDTO getHorseByName (@RequestParam String horseName) {
+    @GetMapping("/byName/{horseName}")
+    public HorseDTO getHorseByName (@PathVariable String horseName) {
         Horse horse = horseService.getHorseByName(horseName);
         if (horse == null) {
-            throw new RuntimeException("Horse not found");
+            throw new RuntimeException("Ló nem található.");
         }
         return toDTO(horse);
     }
@@ -120,7 +120,7 @@ public class HorseController {
      */
 
     // Felhasználó összes lovának lekérdezése felhasználó id alapján
-    @GetMapping("/owner/{ownerId}")
+    @GetMapping("/byOwnerId/{ownerId}")
     public List<HorseDTO> getHorsesByOwner(@PathVariable Long ownerId) {
         if (userService.getUserById(ownerId) == null) {
             throw new RuntimeException("Felhasználó nem található.");
@@ -133,8 +133,8 @@ public class HorseController {
     }
 
     // Felhasználó összes lovának lekérdezése felhasználó neve alapján
-    @GetMapping("/owner")
-    public List<HorseDTO> getHorsesByOwnerName(@RequestParam String lName, @RequestParam String fName) {
+    @GetMapping("/byOwnerName/{lName}/{fName}")
+    public List<HorseDTO> getHorsesByOwnerName(@PathVariable String lName, @PathVariable String fName) {
         User owner = userService.getUserByFullName(lName, fName);
         if (owner == null) {
             throw new RuntimeException("Felhasználó nem található.");
@@ -146,7 +146,7 @@ public class HorseController {
     }
 
     // Istállóban lévő összes ló lekérdezése istálló id alapján
-    @GetMapping("/stable/{stableId}")
+    @GetMapping("/byStableId/{stableId}")
     public List<HorseDTO> getHorsesByStableId(@PathVariable Long stableId){
         if (stableService.getStableById(stableId) == null) {
             throw new RuntimeException("Istálló nem található.");
@@ -159,8 +159,8 @@ public class HorseController {
     }
 
     // Istállóban lévő összes ló lekérdezése istálló név alapján
-    @GetMapping("/stable")
-    public List<HorseDTO> getHorsesByStableName(@RequestParam String stableName) {
+    @GetMapping("/byStableName/{stableName}")
+    public List<HorseDTO> getHorsesByStableName(@PathVariable String stableName) {
         Stable stable = stableService.getStableByName(stableName);
         if(stable == null){
             throw new RuntimeException("Istálló nem található.");
