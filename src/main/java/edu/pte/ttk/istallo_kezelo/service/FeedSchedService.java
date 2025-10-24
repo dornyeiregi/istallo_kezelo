@@ -33,18 +33,18 @@ public class FeedSchedService {
     @Transactional
     public FeedSched createFeedSched(FeedSchedDTO dto) {
         FeedSched feedSched = new FeedSched();
-        feedSched.setFeedTime(dto.feedTime);
-        feedSched.setDescription(dto.description);
+        feedSched.setFeedTime(dto.getFeedTime());
+        feedSched.setDescription(dto.getDescription());
         feedSched = feedSchedRepository.save(feedSched);
 
-        if (dto.horseIds != null) {
-            for (Long horseId : dto.horseIds) {
+        if (dto.getHorseIds() != null) {
+            for (Long horseId : dto.getHorseIds()) {
                 addHorseToFeedSched(feedSched.getFeedSchedid(), horseId);
             }
         }
 
-        if (dto.itemIds != null) {
-            for (Long itemId : dto.itemIds) {
+        if (dto.getItemIds() != null) {
+            for (Long itemId : dto.getItemIds()) {
                 addItemToFeedSched(feedSched.getFeedSchedid(), itemId);
             }
         }
@@ -80,18 +80,18 @@ public class FeedSchedService {
         FeedSched existingFeedSched = feedSchedRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
 
-        if (dto.feedTime != null) {
-            existingFeedSched.setFeedTime(dto.feedTime);
+        if (dto.getFeedTime() != null) {
+            existingFeedSched.setFeedTime(dto.getFeedTime());
         }
 
-        if (dto.description != null) {
-            existingFeedSched.setDescription(dto.description);
+        if (dto.getDescription() != null) {
+            existingFeedSched.setDescription(dto.getDescription());
         }
 
-        if (dto.horseIds != null) {
+        if (dto.getHorseIds() != null) {
             existingFeedSched.getHorseFeedScheds().clear();
 
-            for(Long horseId : dto.horseIds){
+            for(Long horseId : dto.getHorseIds()){
                 Horse horse = horseRepository.findById(horseId)
                     .orElseThrow(() -> new RuntimeException("Ló nem található."));
 
@@ -103,10 +103,10 @@ public class FeedSchedService {
             }
         }
 
-        if (dto.itemIds != null) {
+        if (dto.getItemIds() != null) {
             existingFeedSched.getFeedSchedItems().clear();
 
-            for (Long itemId : dto.itemIds) {
+            for (Long itemId : dto.getItemIds()) {
                 Item item = itemRepository.findById(itemId)
                     .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
 

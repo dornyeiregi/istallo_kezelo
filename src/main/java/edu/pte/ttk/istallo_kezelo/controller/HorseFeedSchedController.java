@@ -32,7 +32,7 @@ public class HorseFeedSchedController {
     // Ló hozzáadása etetési naplóhoz
     @PostMapping()
     public HorseFeedSchedDTO addHorseToFeedSched(@RequestBody HorseFeedSchedDTO dto){
-        HorseFeedSched link = horseFeedSchedService.addHorseToFeedSched(dto.feedSchedId, dto.horseId);
+        HorseFeedSched link = horseFeedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), dto.getHorseId());
         return toDTO(link);
     }
 
@@ -75,10 +75,10 @@ public class HorseFeedSchedController {
 
     private HorseFeedSchedDTO toDTO(HorseFeedSched horseFeedSched){
         HorseFeedSchedDTO dto = new HorseFeedSchedDTO();
-        dto.horseId = horseFeedSched.getHorse().getId();
-        dto.feedSchedId = horseFeedSched.getFeedSched().getFeedSchedid();
-        dto.feedDescription = horseFeedSched.getFeedSched().getDescription();
-        dto.horseName = horseFeedSched.getHorse().getHorseName();
+        dto.setHorseId(horseFeedSched.getHorse().getId());
+        dto.setFeedSchedId(horseFeedSched.getFeedSched().getFeedSchedid());
+        dto.setFeedDescription(horseFeedSched.getFeedSched().getDescription());
+        dto.setHorseName(horseFeedSched.getHorse().getHorseName());
         return dto;
     }
 }

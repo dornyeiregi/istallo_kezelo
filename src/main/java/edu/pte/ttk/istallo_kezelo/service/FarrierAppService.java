@@ -28,15 +28,15 @@ public class FarrierAppService {
     @Transactional
     public FarrierApp createFarrierApp(FarrierAppDTO dto) {
         FarrierApp farrierApp = new FarrierApp();
-        farrierApp.setAppointmentDate(dto.appointmentDate);
-        farrierApp.setFarrierName(dto.farrierName);
-        farrierApp.setFarrierPhone(dto.farrierPhone);
-        farrierApp.setShoes(dto.shoes);
+        farrierApp.setAppointmentDate(dto.getAppointmentDate());
+        farrierApp.setFarrierName(dto.getFarrierName());
+        farrierApp.setFarrierPhone(dto.getFarrierPhone());
+        farrierApp.setShoes(dto.getShoes());
 
         farrierApp = farrierAppRepository.save(farrierApp);
 
-        if (dto.horseIds != null) {
-            for (Long horseId : dto.horseIds) {
+        if (dto.getHorseIds() != null) {
+            for (Long horseId : dto.getHorseIds()) {
                 addHorseToFarrierApp(farrierApp.getId(), horseId);
             }
         }
@@ -71,7 +71,7 @@ public class FarrierAppService {
     }
 
     // Patkolás lekérdezése ló id alaján
-    public Iterable<FarrierApp> getFarrierAppByHorseId(Long horseId) {
+    public List<FarrierApp> getFarrierAppByHorseId(Long horseId) {
         return farrierAppRepository.findAll().stream()
                 .filter(app -> app.getHorses_done().stream()
                         .anyMatch(horseApp -> horseApp.getHorse().getId().equals(horseId)))
@@ -85,22 +85,22 @@ public class FarrierAppService {
         FarrierApp existingFarrierApp = farrierAppRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található"));
         
-        if(dto.appointmentDate != null) {
-            existingFarrierApp.setAppointmentDate(dto.appointmentDate);
+        if(dto.getAppointmentDate() != null) {
+            existingFarrierApp.setAppointmentDate(dto.getAppointmentDate());
         }
-        if(dto.farrierName != null) {
-            existingFarrierApp.setFarrierName(dto.farrierName);
+        if(dto.getFarrierName() != null) {
+            existingFarrierApp.setFarrierName(dto.getFarrierName());
         }
-        if(dto.farrierPhone != null) {
-            existingFarrierApp.setFarrierPhone(dto.farrierPhone);
+        if(dto.getFarrierPhone() != null) {
+            existingFarrierApp.setFarrierPhone(dto.getFarrierPhone());
         }
-        if(dto.shoes != null) {
-            existingFarrierApp.setShoes(dto.shoes);
+        if(dto.getShoes() != null) {
+            existingFarrierApp.setShoes(dto.getShoes());
         }
-        if(dto.horseIds != null) {
+        if(dto.getHorseIds() != null) {
             existingFarrierApp.getHorses_done().clear();
 
-            for(Long horseId : dto.horseIds) {
+            for(Long horseId : dto.getHorseIds()) {
                 Horse horse = horseRepository.findById(horseId)
                     .orElseThrow(() -> new RuntimeException("Ló nem található"));
 

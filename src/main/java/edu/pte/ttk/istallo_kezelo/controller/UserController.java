@@ -28,12 +28,12 @@ public class UserController {
     @PostMapping
     public UserDTO createUser(@RequestBody UserDTO dto) {
         User user = new User();
-        user.setUsername(dto.username);
-        user.setUserLname(dto.userLname);
-        user.setUserFname(dto.userFname);
-        user.setEmail(dto.email);
-        user.setPhone(dto.phone);
-        user.setUserType(dto.userType);
+        user.setUsername(dto.getUsername());
+        user.setUserLname(dto.getUserLname());
+        user.setUserFname(dto.getUserFname());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setUserType(dto.getUserType());
 
         User savedUser = userService.saveUser(user);
 
@@ -43,8 +43,7 @@ public class UserController {
     // Összes felhasználó lekérdezése       
     @GetMapping
     public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers().stream()
-        .map(this::toDTO).toList();
+        return userService.getAllUsers().stream().map(this::toDTO).toList();
     }
     
 
@@ -136,12 +135,12 @@ public class UserController {
         User existingUser = userService.getUserById(id)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
 
-        if (dto.userType != null) {existingUser.setUserType(dto.userType);};
-        if (dto.userLname != null) { existingUser.setUserLname(dto.userLname);};
-        if (dto.userFname != null) {existingUser.setUserFname(dto.userFname);};
-        if (dto.email != null) { existingUser.setEmail(dto.email);}
-        if (dto.phone != null) { existingUser.setPhone(dto.phone);};
-        if (dto.username != null) {existingUser.setUsername(dto.username);};
+        if (dto.getUserType() != null) {existingUser.setUserType(dto.getUserType());};
+        if (dto.getUserLname() != null) { existingUser.setUserLname(dto.getUserLname());};
+        if (dto.getUserFname() != null) {existingUser.setUserFname(dto.getUserFname());};
+        if (dto.getEmail() != null) { existingUser.setEmail(dto.getEmail());}
+        if (dto.getPhone() != null) { existingUser.setPhone(dto.getPhone());};
+        if (dto.getUsername() != null) {existingUser.setUsername(dto.getUsername());};
 
         User savedUser = userService.saveUser(existingUser);
         return toDTO(savedUser);
@@ -157,13 +156,13 @@ public class UserController {
 
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.id = user.getId();
-        dto.username = user.getUsername();
-        dto.userLname = user.getUserLname();
-        dto.userFname = user.getUserFname();
-        dto.email = user.getEmail();
-        dto.phone = user.getPhone();
-        dto.userType = user.getUserType();
+        dto.setId(user.getId());
+        dto.setUsername(user.getUsername());
+        dto.setUserLname(user.getUserLname());
+        dto.setUserFname(user.getUserFname());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setUserType(user.getUserType());
         return dto;
     }
 

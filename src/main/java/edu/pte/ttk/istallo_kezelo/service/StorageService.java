@@ -24,12 +24,12 @@ public class StorageService {
     // Új tároló hozzáadása
     @Transactional
     public Storage createStorage(StorageDTO dto){
-        Item item = itemRepository.findById(dto.itemId)
+        Item item = itemRepository.findById(dto.getItemId())
             .orElseThrow(() -> new RuntimeException("Tétel nem található."));
 
         Storage storage = new Storage();
-        storage.setAmountInUse(dto.amountInUse);
-        storage.setAmountStored(dto.amountStored);
+        storage.setAmountInUse(dto.getAmountInUse());
+        storage.setAmountStored(dto.getAmountStored());
         storage.setItem(item);
 
         return storageRepository.save(storage);
@@ -57,11 +57,11 @@ public class StorageService {
         Storage existingStorage = storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
         
-        if (dto.amountInUse != null) {
-            existingStorage.setAmountInUse(dto.amountInUse);
+        if (dto.getAmountInUse() != null) {
+            existingStorage.setAmountInUse(dto.getAmountInUse());
         }
-        if (dto.amountStored != null) {
-            existingStorage.setAmountStored(dto.amountStored);
+        if (dto.getAmountStored() != null) {
+            existingStorage.setAmountStored(dto.getAmountStored());
         }
         // nem lehet a tételt frissíteni
         

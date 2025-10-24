@@ -1,6 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.model;
 
-import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +22,7 @@ public class FarrierApp {
     private String farrierPhone;
 
     @Column(name = "date", nullable = false)
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
 
     @Column(name = "shoes", nullable = false)
     private Boolean shoes;
@@ -47,7 +47,7 @@ public class FarrierApp {
         return farrierPhone;
     }
 
-    public Date getAppointmentDate() {
+    public LocalDate getAppointmentDate() {
         return appointmentDate;
     }
 
@@ -69,7 +69,7 @@ public class FarrierApp {
         this.farrierPhone = farrierPhone;
     }
 
-    public void setAppointmentDate(Date appointmentDate) {
+    public void setAppointmentDate(LocalDate appointmentDate) {
         this.appointmentDate = appointmentDate;
     }
 

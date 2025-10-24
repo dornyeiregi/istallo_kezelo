@@ -58,17 +58,17 @@ public class ShotService {
         Shot shot = shotRepository.findById(shotId)
                 .orElseThrow(() -> new RuntimeException("Oltás nem található."));
 
-        if (updatedShot.shotName != null) {
-            shot.setShotName(updatedShot.shotName);
+        if (updatedShot.getShotName() != null) {
+            shot.setShotName(updatedShot.getShotName());
         }
-        if (updatedShot.date != null) {
-            shot.setDate(updatedShot.date);
+        if (updatedShot.getDate() != null) {
+            shot.setDate(updatedShot.getDate());
         }
-        if (updatedShot.frequencyUnit != null) {
-            shot.setFrequencyUnit(updatedShot.frequencyUnit);
+        if (updatedShot.getFrequencyUnit() != null) {
+            shot.setFrequencyUnit(updatedShot.getFrequencyUnit());
         }
-        if (updatedShot.frequencyValue != null) {
-            shot.setFrequencyValue(updatedShot.frequencyValue);
+        if (updatedShot.getFrequencyValue() != null) {
+            shot.setFrequencyValue(updatedShot.getFrequencyValue());
         }
 
         return shotRepository.save(shot);

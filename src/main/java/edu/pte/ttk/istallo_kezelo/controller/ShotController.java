@@ -32,10 +32,10 @@ public class ShotController {
     @PostMapping()
     public ShotDTO createShot(@RequestBody ShotDTO dto) {
         Shot shot = new Shot();
-        shot.setDate(dto.date);
-        shot.setShotName(dto.shotName);
-        shot.setFrequencyUnit(dto.frequencyUnit);
-        shot.setFrequencyValue(dto.frequencyValue);
+        shot.setDate(dto.getDate());
+        shot.setShotName(dto.getShotName());
+        shot.setFrequencyUnit(dto.getFrequencyUnit());
+        shot.setFrequencyValue(dto.getFrequencyValue());
 
         Shot savedShot = shotService.saveShot(shot);
 
@@ -45,9 +45,8 @@ public class ShotController {
     // Összes oltás lekérdezése
     @GetMapping()
     public List<ShotDTO> getAllShots() {
-        Iterable<Shot> shots = shotService.getAllShots();
-        return ((List<Shot>) shots).stream()
-            .map(this::toDTO).toList();
+        List<Shot> shots = shotService.getAllShots();
+        return (shots).stream().map(this::toDTO).toList();
     }
 
     // Oltás lekérdezése id alapján
@@ -87,12 +86,12 @@ public class ShotController {
 
     private ShotDTO toDTO(Shot shot){
         ShotDTO dto = new ShotDTO();
-        dto.shotName = shot.getShotName();
-        dto.date = shot.getDate();
-        dto.frequencyUnit = shot.getFrequencyUnit();
-        dto.frequencyValue = shot.getFrequencyValue();
-        dto.horseIds = shot.getHorses_treated().stream()
-            .map(hs -> hs.getHorse().getId()).toList();
+        dto.setShotName(shot.getShotName());
+        dto.setDate(shot.getDate());
+        dto.setFrequencyUnit(shot.getFrequencyUnit());
+        dto.setFrequencyValue(shot.getFrequencyValue());
+        dto.setHorseIds(shot.getHorses_treated().stream()
+            .map(hs -> hs.getHorse().getId()).toList());
         return dto;
     }
     

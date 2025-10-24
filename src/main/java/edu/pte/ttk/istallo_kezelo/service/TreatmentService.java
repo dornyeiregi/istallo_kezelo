@@ -58,14 +58,14 @@ public class TreatmentService {
         Treatment treatment = treatmentRepository.findById(treatmentId)
                 .orElseThrow(() -> new RuntimeException("Kezelés nem található."));
 
-        if (updatedTreatment.treatmentName != null) {
-            treatment.setTreatmentName(updatedTreatment.treatmentName);
+        if (updatedTreatment.getTreatmentName() != null) {
+            treatment.setTreatmentName(updatedTreatment.getTreatmentName());
         }
-        if (updatedTreatment.description != null) {
-            treatment.setDescription(updatedTreatment.description);
+        if (updatedTreatment.getDescription() != null) {
+            treatment.setDescription(updatedTreatment.getDescription());
         }
-        if (updatedTreatment.date != null) {
-            treatment.setDate(updatedTreatment.date);
+        if (updatedTreatment.getDate() != null) {
+            treatment.setDate(updatedTreatment.getDate());
         }
 
         return treatmentRepository.save(treatment);

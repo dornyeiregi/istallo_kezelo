@@ -29,7 +29,7 @@ public class FeedSchedItemController {
     // Tétel hozzáadása etetési naplóhoz
     @PostMapping()
     public FeedSchedItemDTO addItemToFeedSched(@RequestBody FeedSchedItemDTO dto) {
-        FeedSchedItem link = feedSchedItemService.addItemToFeedSched(dto.feedSchedId, dto.itemId);
+        FeedSchedItem link = feedSchedItemService.addItemToFeedSched(dto.getFeedSchedId(), dto.getItemId());
         return toDTO(link);
     }
 
@@ -71,10 +71,10 @@ public class FeedSchedItemController {
 
     private FeedSchedItemDTO toDTO(FeedSchedItem feedSchedItem) {
         FeedSchedItemDTO dto = new FeedSchedItemDTO();
-        dto.feedSchedId = feedSchedItem.getFeedSched().getFeedSchedid();
-        dto.itemId = feedSchedItem.getItem().getItemId();
-        dto.feedDescription = feedSchedItem.getFeedSched().getDescription();
-        dto.itemName = feedSchedItem.getItem().getName();
+        dto.setFeedSchedId(feedSchedItem.getFeedSched().getFeedSchedid());
+        dto.setItemId(feedSchedItem.getItem().getItemId());
+        dto.setFeedDescription(feedSchedItem.getFeedSched().getDescription());
+        dto.setItemName(feedSchedItem.getItem().getName());
         return dto;
     }
 }

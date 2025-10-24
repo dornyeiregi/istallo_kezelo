@@ -3,7 +3,9 @@ package edu.pte.ttk.istallo_kezelo.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
 import edu.pte.ttk.istallo_kezelo.dto.StableDTO;
+import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.service.StableService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +36,7 @@ public class StableController {
     @PostMapping
     public StableDTO createStable(@RequestBody StableDTO dto){
         Stable stable = new Stable();
-        stable.setStableName(dto.stableName);
+        stable.setStableName(dto.getStableName());
         
         Stable savedStable = stableService.saveStable(stable);
 
@@ -44,8 +46,7 @@ public class StableController {
     // Összes istálló lekérdezése
     @GetMapping
     public List<StableDTO> getAllStables(){
-        return stableService.getAllStables().stream()
-        .map(this::toDTO).toList();
+        return stableService.getAllStables().stream().map(this::toDTO).toList();
     }
 
     // Istálló lekérdezése id alapján
@@ -73,7 +74,7 @@ public class StableController {
         Stable existingStable = stableService.getStableById(id)
             .orElseThrow(() -> new RuntimeException("Istálló nem található."));
 
-        if(dto.stableName != null) {existingStable.setStableName(dto.stableName);}
+        if(dto.getStableName() != null) {existingStable.setStableName(dto.getStableName());}
         
         Stable savedStable = stableService.saveStable(existingStable);
 
@@ -91,8 +92,25 @@ public class StableController {
 
     private StableDTO toDTO(Stable stable){
         StableDTO dto = new StableDTO();
-        dto.stableName = stable.getStableName();
-        //dto.horses = stable.getHorsesInStable();
+        dto.setStableName(stable.getStableName());
+        dto.setHorses(stable.getHorsesInStable().stream().map(this::toHorseDTO).toList());
         return dto;
     }
+
+    private HorseDTO toHorseDTO(Horse horse){
+        HorseDTO dto = new HorseDTO();
+        dto.setHorseName(horse.getHorseName());
+        dto.setDob(horse.getDob());
+        dto.setSex(horse.getSex());
+        dto.setOwnerName(horse.getOwner().getUserLname() + " "
+            + horse.getOwner().getUserFname());
+        dto.setOwnerId(horse.getOwner().getId());
+        dto.setStableName(horse.getStable().getStableName());
+        dto.setStableId(horse.getStable().getStableId());
+        dto.setMicrochipNum(horse.getMicrochipNum());
+        dto.setPassportNum(horse.getPassportNum());
+        dto.setAdditional(horse.getAdditional());
+        return dto;
+    }
+
 }

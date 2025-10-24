@@ -32,9 +32,9 @@ public class ItemController {
     @PostMapping
     public ItemDTO createItem(@RequestBody ItemDTO dto) {
         Item item = new Item();
-        item.setName(dto.name);
-        item.setItemType(dto.itemType);
-        item.setItemCategory(dto.itemCategory);
+        item.setName(dto.getName());
+        item.setItemType(dto.getItemType());
+        item.setItemCategory(dto.getItemCategory());
 
         Item saved = itemService.createItem(item);
         return toDTO(saved);
@@ -43,9 +43,7 @@ public class ItemController {
     // Összes tétel lekérdezése
     @GetMapping()
     public List<ItemDTO> getAllItems() {
-        return itemService.getAllItems().stream()
-            .map(this::toDTO)
-            .toList();
+        return itemService.getAllItems().stream().map(this::toDTO).toList();
     }
 
     // Tétel lekérdezése id alapján
@@ -74,10 +72,10 @@ public class ItemController {
         
     private ItemDTO toDTO(Item item) {
         ItemDTO dto = new ItemDTO();
-        dto.id = item.getItemId();
-        dto.name = item.getName();
-        dto.itemType = item.getItemType();
-        dto.itemCategory = item.getItemCategory();
+        dto.setId(item.getItemId());
+        dto.setName(item.getName());
+        dto.setItemType(item.getItemType());
+        dto.setItemCategory(item.getItemCategory());
         return dto;
     }
 }

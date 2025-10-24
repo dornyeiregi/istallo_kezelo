@@ -30,21 +30,21 @@ public class HorseController {
     // Új ló létrehozása
     @PostMapping
     public HorseDTO createHorse(@RequestBody HorseDTO dto) {
-        User owner = userService.getUserById(dto.ownerId)
+        User owner = userService.getUserById(dto.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
 
-        Stable stable = stableService.getStableById(dto.stableId)
+        Stable stable = stableService.getStableById(dto.getStableId())
                 .orElseThrow(() -> new RuntimeException("Istálló nem található."));
 
         Horse horse = new Horse();
-        horse.setHorseName(dto.horseName);
-        horse.setDob(dto.dob);
-        horse.setSex(dto.sex);
+        horse.setHorseName(dto.getHorseName());
+        horse.setDob(dto.getDob());
+        horse.setSex(dto.getSex());
         horse.setOwner(owner);
         horse.setStable(stable);
-        horse.setMicrochipNum(dto.microchipNum);
-        horse.setPassportNum(dto.passportNum);
-        horse.setAdditional(dto.additional);
+        horse.setMicrochipNum(dto.getMicrochipNum());
+        horse.setPassportNum(dto.getPassportNum());
+        horse.setAdditional(dto.getAdditional());
 
         Horse savedHorse = horseService.saveHorse(horse);
 
@@ -54,8 +54,7 @@ public class HorseController {
     // Összes ló lekérdezése
     @GetMapping
     public List<HorseDTO> getAllHorses() {
-        return horseService.getAllHorses().stream()
-        .map(this::toDTO).toList();
+        return horseService.getAllHorses().stream().map(this::toDTO).toList();
     }
 
     // Ló lekérdezése id alapján
@@ -82,21 +81,21 @@ public class HorseController {
         Horse existingHorse = horseService.getHorseById(id)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
 
-        if (dto.horseName != null) {existingHorse.setHorseName(dto.horseName);}
-        if(dto.dob != null) {existingHorse.setDob(dto.dob);}
-        if(dto.sex != null) {existingHorse.setSex(dto.sex);}
-        if(dto.microchipNum != null) {existingHorse.setMicrochipNum(dto.microchipNum);}
-        if(dto.passportNum != null) {existingHorse.setPassportNum(dto.passportNum);}
-        if(dto.additional != null) {existingHorse.setAdditional(dto.additional);}
+        if (dto.getHorseName() != null) {existingHorse.setHorseName(dto.getHorseName());}
+        if(dto.getDob() != null) {existingHorse.setDob(dto.getDob());}
+        if(dto.getSex() != null) {existingHorse.setSex(dto.getSex());}
+        if(dto.getMicrochipNum() != null) {existingHorse.setMicrochipNum(dto.getMicrochipNum());}
+        if(dto.getPassportNum() != null) {existingHorse.setPassportNum(dto.getPassportNum());}
+        if(dto.getAdditional() != null) {existingHorse.setAdditional(dto.getAdditional());}
 
-        if (dto.ownerId != null) {
-            User newOwner = userService.getUserById(dto.ownerId)
+        if (dto.getOwnerId() != null) {
+            User newOwner = userService.getUserById(dto.getOwnerId())
                 .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
             existingHorse.setOwner(newOwner);
         }
 
-        if (dto.stableId != null) {
-            Stable newStable = stableService.getStableById(dto.stableId)
+        if (dto.getStableId() != null) {
+            Stable newStable = stableService.getStableById(dto.getStableId())
                 .orElseThrow(() -> new RuntimeException("Istálló nem található."));
             existingHorse.setStable(newStable);
         }
@@ -127,8 +126,7 @@ public class HorseController {
         } else {
             return horseService.getAllHorses().stream()
                 .filter(horse -> horse.getOwner().getId().equals(ownerId))
-                .map(this::toDTO)
-                .toList();
+                .map(this::toDTO).toList();
         }
     }
 
@@ -141,8 +139,7 @@ public class HorseController {
         }
         return horseService.getAllHorses().stream()
             .filter(horse -> horse.getOwner().getId().equals(owner.getId()))
-            .map(this::toDTO)
-            .toList();
+            .map(this::toDTO).toList();
     }
 
     // Istállóban lévő összes ló lekérdezése istálló id alapján
@@ -153,8 +150,7 @@ public class HorseController {
         } else {
             return horseService.getAllHorses().stream()
                 .filter(horse -> horse.getStable().getStableId().equals(stableId))
-                .map(this::toDTO)
-                .toList();
+                .map(this::toDTO).toList();
         }
     }
 
@@ -174,17 +170,17 @@ public class HorseController {
 
     private HorseDTO toDTO(Horse horse){
         HorseDTO dto = new HorseDTO();
-        dto.horseName = horse.getHorseName();
-        dto.dob = horse.getDob();
-        dto.sex = horse.getSex();
-        dto.ownerName = horse.getOwner().getUserLname() + " "
-            + horse.getOwner().getUserFname();
-        dto.ownerId = horse.getOwner().getId();
-        dto.stableName = horse.getStable().getStableName();
-        dto.stableId = horse.getStable().getStableId();
-        dto.microchipNum = horse.getMicrochipNum();
-        dto.passportNum = horse.getPassportNum();
-        dto.additional = horse.getAdditional();
+        dto.setHorseName(horse.getHorseName());
+        dto.setDob(horse.getDob());
+        dto.setSex(horse.getSex());
+        dto.setOwnerName(horse.getOwner().getUserLname() + " "
+            + horse.getOwner().getUserFname());
+        dto.setOwnerId(horse.getOwner().getId());
+        dto.setStableName(horse.getStable().getStableName());
+        dto.setStableId(horse.getStable().getStableId());
+        dto.setMicrochipNum(horse.getMicrochipNum());
+        dto.setPassportNum(horse.getPassportNum());
+        dto.setAdditional(horse.getAdditional());
         return dto;
     }
 }

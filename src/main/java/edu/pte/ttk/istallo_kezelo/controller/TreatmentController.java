@@ -32,9 +32,9 @@ public class TreatmentController {
     @PostMapping()
     public TreatmentDTO createTreatment(@RequestBody TreatmentDTO dto) {
         Treatment treatment = new Treatment();
-        treatment.setTreatmentName(dto.treatmentName);
-        treatment.setDescription(dto.description);
-        treatment.setDate(dto.date);
+        treatment.setTreatmentName(dto.getTreatmentName());
+        treatment.setDescription(dto.getDescription());
+        treatment.setDate(dto.getDate());
 
         Treatment savedTreatment = treatmentService.saveTreatment(treatment);
 
@@ -44,9 +44,8 @@ public class TreatmentController {
     // Összes kezelés lekérdezése
     @GetMapping()
     public List<TreatmentDTO> getAllTreatments() {
-        Iterable<Treatment> treatments = treatmentService.getAllTreatments();
-        return ((List<Treatment>)treatments).stream()
-            .map(this::toDTO).toList();
+        List<Treatment> treatments = treatmentService.getAllTreatments();
+        return treatments.stream().map(this::toDTO).toList();
     }
 
     // Kezelés lekérdezése id alapján
@@ -87,10 +86,10 @@ public class TreatmentController {
 
     private TreatmentDTO toDTO(Treatment treatment){
         TreatmentDTO dto = new TreatmentDTO();
-        dto.treatmentId = treatment.getTreatmentId();
-        dto.treatmentName = treatment.getTreatmentName();
-        dto.description = treatment.getDescription();
-        dto.date = treatment.getDate();
+        dto.setTreatmentId(treatment.getTreatmentId());
+        dto.setTreatmentName(treatment.getTreatmentName());
+        dto.setDescription(treatment.getDescription());
+        dto.setDate(treatment.getDate());
         return dto;
     }
 }

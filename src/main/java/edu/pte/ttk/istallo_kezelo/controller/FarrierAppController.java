@@ -42,10 +42,8 @@ public class FarrierAppController {
     // Összes patkolás lekérdezése
     @GetMapping
     public List<FarrierAppDTO> getAllFarrierApps() {
-        Iterable<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps();
-        return ((List<FarrierApp>) farrierApps).stream()
-                .map(this::toDTO)
-                .toList();
+        List<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps();
+        return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése id alaján
@@ -62,36 +60,28 @@ public class FarrierAppController {
     @GetMapping("/byDate/{date}")
     public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date);
-        return ((List<FarrierApp>) farrierApps).stream()
-                .map(this::toDTO)
-                .toList();
+        return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése patkolókovács neve alaján
     @GetMapping("/byFarrierName/{farrierName}")
     public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName);
-        return ((List<FarrierApp>) farrierApps).stream()
-                .map(this::toDTO)
-                .toList();
+        return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló neve alaján
     @GetMapping("/byHorseName/{horseName}")
     public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName);
-        return ((List<FarrierApp>)  farrierApps).stream()
-                .map(this::toDTO)
-                .toList();
+        return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló id alaján
     @GetMapping("/byHorseId/{horseId}")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId) {
-        Iterable<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId);
-        return ((List<FarrierApp>) farrierApps).stream()
-                .map(this::toDTO)
-                .toList();
+        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId);
+        return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás frissítése
@@ -110,13 +100,12 @@ public class FarrierAppController {
 
     private FarrierAppDTO toDTO(FarrierApp farrierApp) {
         FarrierAppDTO dto = new FarrierAppDTO();
-        dto.appointmentDate = farrierApp.getAppointmentDate();
-        dto.farrierPhone = farrierApp.getFarrierPhone();
-        dto.farrierName = farrierApp.getFarrierName();
-        dto.shoes = farrierApp.getShoes();
-        dto.horseIds = farrierApp.getHorses_done().stream()
-                .map(hfa -> hfa.getHorse().getId())
-                .toList();
+        dto.setAppointmentDate(farrierApp.getAppointmentDate());
+        dto.setFarrierPhone(farrierApp.getFarrierPhone());
+        dto.setFarrierName(farrierApp.getFarrierName());
+        dto.setShoes(farrierApp.getShoes());
+        dto.setHorseIds(farrierApp.getHorses_done().stream()
+                .map(hfa -> hfa.getHorse().getId()).toList());
         return dto;
     }
 

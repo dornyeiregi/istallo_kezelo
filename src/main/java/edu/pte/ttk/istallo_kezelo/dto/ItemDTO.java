@@ -2,10 +2,16 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import edu.pte.ttk.istallo_kezelo.model.ItemCategory;
 import edu.pte.ttk.istallo_kezelo.model.ItemType;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class ItemDTO {
-    public Long id;
-    public String name;
-    public ItemType itemType;
-    public ItemCategory itemCategory;
+    private Long id;
+    private String name;
+    private ItemType itemType;
+    private ItemCategory itemCategory;
 }

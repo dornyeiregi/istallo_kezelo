@@ -38,9 +38,8 @@ public class FeedSchedController {
     // Összes etetési napló lekérdezése
     @GetMapping
     public List<FeedSchedDTO> getAllFeedScheds() {
-        Iterable<FeedSched> feedScheds = feedSchedService.getAllFeedScheds();
-        return ((List<FeedSched>) feedScheds).stream()
-            .map(this::toDTO).toList();
+        List<FeedSched> feedScheds = feedSchedService.getAllFeedScheds();
+        return feedScheds.stream().map(this::toDTO).toList();
     }
 
     // Etetési napló lekérdezése id alapján
@@ -57,8 +56,7 @@ public class FeedSchedController {
     @GetMapping("/byHorse/{horseId}")
     public List<FeedSchedDTO> getFeedSchedsByHorseId(@PathVariable Long horseId) {
         List<FeedSched> feedScheds = feedSchedService.getFeedSchedByHorseId(horseId);
-        return feedScheds.stream()
-            .map(this::toDTO).toList();
+        return feedScheds.stream().map(this::toDTO).toList();
     }
 
     
@@ -66,8 +64,7 @@ public class FeedSchedController {
     @GetMapping("/byHorseName/{horseName}")
     public List<FeedSchedDTO> getFeedSchedsByHorseName(@PathVariable String horseName) {
         List<FeedSched> feedScheds = feedSchedService.getFeedSchedByHorseName(horseName);
-        return feedScheds.stream()
-            .map(this::toDTO).toList();
+        return feedScheds.stream().map(this::toDTO).toList();
     }
     
 
@@ -90,12 +87,12 @@ public class FeedSchedController {
 
     private FeedSchedDTO toDTO(FeedSched feedSched) {
         FeedSchedDTO dto = new FeedSchedDTO();
-        dto.feedTime = feedSched.getFeedTime();
-        dto.description = feedSched.getDescription();
-        dto.horseIds = feedSched.getHorseFeedScheds().stream()
-            .map(hfs -> hfs.getHorse().getId()).toList();
-        dto.itemIds = feedSched.getFeedSchedItems().stream()
-            .map(fsi -> fsi.getItem().getItemId()).toList();
+        dto.setFeedTime(feedSched.getFeedTime());
+        dto.setDescription(feedSched.getDescription());
+        dto.setHorseIds(feedSched.getHorseFeedScheds().stream()
+            .map(hfs -> hfs.getHorse().getId()).toList());
+        dto.setItemIds(feedSched.getFeedSchedItems().stream()
+            .map(fsi -> fsi.getItem().getItemId()).toList());
         return dto;
     }
 }

@@ -22,7 +22,7 @@ public class HorseFarrierAppController {
     // Link létrehozása ló és patkolás között
     @PostMapping
     public HorseFarrierAppDTO addHorseToFarrierApp(@RequestBody HorseFarrierAppDTO dto) {
-        HorseFarrierApp link = horseFarrierAppService.addHorseToFarrierApp(dto.farrierAppId, dto.horseId);
+        HorseFarrierApp link = horseFarrierAppService.addHorseToFarrierApp(dto.getFarrierAppId(), dto.getHorseId());
         return toDTO(link);
     }
 
@@ -63,11 +63,11 @@ public class HorseFarrierAppController {
 
     private HorseFarrierAppDTO toDTO(HorseFarrierApp link) {
         HorseFarrierAppDTO dto = new HorseFarrierAppDTO();
-        dto.horseId = link.getHorse().getId();
-        dto.farrierAppId = link.getFarrierApp().getId();
-        dto.horseName = link.getHorse().getHorseName();
-        dto.appointmentDate = link.getFarrierApp().getAppointmentDate();
-        dto.shoes = link.getFarrierApp().getShoes();
+        dto.setHorseId(link.getHorse().getId());
+        dto.setFarrierAppId(link.getFarrierApp().getId());
+        dto.setHorseName(link.getHorse().getHorseName());
+        dto.setAppointmentDate(link.getFarrierApp().getAppointmentDate());
+        dto.setShoes(link.getFarrierApp().getShoes());
         return dto;
     }
 }

@@ -31,7 +31,7 @@ public class HorseTreatmentController {
     // Kezelés hozzáadása lóhoz
     @PostMapping()
     public HorseTreatmentDTO addTreatmentToHorse(@RequestBody HorseTreatmentDTO dto) {
-        HorseTreatment link = horseTreatmentService.addTreatmentToHorse(dto.treatmentId, dto.horseId);
+        HorseTreatment link = horseTreatmentService.addTreatmentToHorse(dto.getTreatmentId(), dto.getHorseId());
         return toDTO(link);
     }
 
@@ -76,11 +76,11 @@ public class HorseTreatmentController {
 
     private HorseTreatmentDTO toDTO(HorseTreatment link){
         HorseTreatmentDTO dto = new HorseTreatmentDTO();
-        dto.horseId = link.getHorse().getId();
-        dto.treatmentId = link.getTreatment().getTreatmentId();
-        dto.treatmentName = link.getTreatment().getTreatmentName();
-        dto.horseName = link.getHorse().getHorseName();
-        dto.date = link.getTreatment().getDate();
+        dto.setHorseId(link.getHorse().getId());
+        dto.setTreatmentId(link.getTreatment().getTreatmentId());
+        dto.setTreatmentName(link.getTreatment().getTreatmentName());
+        dto.setHorseName(link.getHorse().getHorseName());
+        dto.setDate(link.getTreatment().getDate());
         return dto;
     }
 

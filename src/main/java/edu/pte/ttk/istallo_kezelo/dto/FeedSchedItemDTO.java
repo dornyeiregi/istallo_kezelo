@@ -1,8 +1,15 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FeedSchedItemDTO {
-    public Long feedSchedId;
-    public Long itemId;
-    public String itemName;
-    public String feedDescription;
+    private Long feedSchedId;
+    private Long itemId;
+    private String itemName;
+    private String feedDescription;
 }

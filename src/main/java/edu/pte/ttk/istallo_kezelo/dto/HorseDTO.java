@@ -3,18 +3,22 @@ package edu.pte.ttk.istallo_kezelo.dto;
 import java.time.LocalDate;
 
 import edu.pte.ttk.istallo_kezelo.model.Sex;
-//import edu.pte.ttk.istallo_kezelo.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class HorseDTO {
-    public String horseName;
-    public LocalDate dob;
-    public Sex sex;
-    public String ownerName;
-    public Long ownerId;
-//    public User owner;
-    public String stableName;
-    public Long stableId;
-    public String microchipNum;
-    public String passportNum;
-    public String additional;
+    private String horseName;
+    private LocalDate dob;
+    private Sex sex;
+    private String ownerName;
+    private Long ownerId;
+    private String stableName;
+    private Long stableId;
+    private String microchipNum;
+    private String passportNum;
+    private String additional;
 }

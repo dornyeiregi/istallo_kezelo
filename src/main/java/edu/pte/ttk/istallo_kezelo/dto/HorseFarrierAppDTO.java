@@ -1,12 +1,19 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class HorseFarrierAppDTO {
-    public Long horseId;
-    public Long farrierAppId;
-    public String horseName;
-    public String farrierName;
-    public Date appointmentDate;
-    public Boolean shoes;
+    private Long horseId;
+    private Long farrierAppId;
+    private String horseName;
+    private String farrierName;
+    private LocalDate appointmentDate;
+    private Boolean shoes;
 }

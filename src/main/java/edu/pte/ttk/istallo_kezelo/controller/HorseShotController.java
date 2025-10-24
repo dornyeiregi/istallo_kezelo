@@ -30,7 +30,7 @@ public class HorseShotController {
     // Oltás hozzáadása lóhoz
     @PostMapping()
     public HorseShotDTO addShotToHorse(@RequestBody HorseShotDTO dto) {
-        HorseShot link = horseShotService.addShotToHorse(dto.shotId, dto.horseId);
+        HorseShot link = horseShotService.addShotToHorse(dto.getShotId(), dto.getHorseId());
         return toDtO(link);
     }
 
@@ -72,13 +72,13 @@ public class HorseShotController {
 
     private HorseShotDTO toDtO(HorseShot link){
         HorseShotDTO dto = new HorseShotDTO();
-        dto.shotId = link.getShot().getShotId();
-        dto.horseId = link.getHorse().getId();
-        dto.horseName = link.getHorse().getHorseName();
-        dto.shotName = link.getShot().getShotName();
-        dto.date = link.getShot().getDate();
-        dto.frequencyUnit = link.getShot().getFrequencyUnit();
-        dto.frequencyValue = link.getShot().getFrequencyValue();
+        dto.setShotId(link.getShot().getShotId());
+        dto.setHorseId(link.getHorse().getId());
+        dto.setHorseName(link.getHorse().getHorseName());
+        dto.setShotName(link.getShot().getShotName());
+        dto.setDate(link.getShot().getDate());
+        dto.setFrequencyUnit(link.getShot().getFrequencyUnit());
+        dto.setFrequencyValue(link.getShot().getFrequencyValue());
         return dto;
     }
 }

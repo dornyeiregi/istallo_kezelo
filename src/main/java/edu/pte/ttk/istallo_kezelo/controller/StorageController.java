@@ -39,8 +39,7 @@ public class StorageController {
     // Összes tároló lekérdezése
     @GetMapping()
     public List<StorageDTO> getAllStorages() {
-        return storageService.getAllStorages().stream()
-            .map(this::toDTO).toList();
+        return storageService.getAllStorages().stream().map(this::toDTO).toList();
     }
     
     // Tároló lekérdezése id alapján
@@ -71,9 +70,9 @@ public class StorageController {
 
     private StorageDTO toDTO(Storage storage){
         StorageDTO dto = new StorageDTO();
-        dto.amountInUse = storage.getAmountInUse();
-        dto.amountStored = storage.getAmountStored();
-        dto.itemId = storage.getItem().getItemId();
+        dto.setAmountInUse(storage.getAmountInUse());
+        dto.setAmountStored(storage.getAmountStored());
+        dto.setItemId(storage.getItem().getItemId());
         return dto;
     }
     

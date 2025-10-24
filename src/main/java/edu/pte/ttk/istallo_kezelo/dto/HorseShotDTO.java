@@ -2,12 +2,19 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class HorseShotDTO {
-    public Long horseId;
-    public Long shotId;
-    public String horseName;
-    public String shotName;
-    public LocalDate date;
-    public Integer frequencyValue;
-    public String frequencyUnit;
+    private Long horseId;
+    private Long shotId;
+    private String horseName;
+    private String shotName;
+    private LocalDate date;
+    private Integer frequencyValue;
+    private String frequencyUnit;
 }

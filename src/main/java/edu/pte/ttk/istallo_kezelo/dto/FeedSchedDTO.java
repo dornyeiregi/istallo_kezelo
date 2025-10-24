@@ -1,11 +1,18 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
 import edu.pte.ttk.istallo_kezelo.model.FeedTime;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class FeedSchedDTO {
-    public FeedTime feedTime;
-    public String description;
-    public List<Long> horseIds;
-    public List<Long> itemIds;
+    private FeedTime feedTime;
+    private String description;
+    private List<Long> horseIds;
+    private List<Long> itemIds;
 }
