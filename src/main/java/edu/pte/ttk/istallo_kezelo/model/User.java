@@ -31,6 +31,9 @@ public class User {
     @Column(name = "phone", nullable = true)
     private String phone;
 
+    @Column(name = "password_hash", nullable = false)
+    private String password;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
     private UserType userType;
@@ -72,6 +75,10 @@ public class User {
         return userType;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public List<Horse> getOwned_horses() {
         return ownedHorses;
     }
@@ -99,6 +106,10 @@ public class User {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void setUserType(UserType userType) {
