@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,54 +31,61 @@ public class ShotController {
     }
 
     // Új oltás létrehozása
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PostMapping()
-    public ShotDTO createShot(@RequestBody ShotDTO dto) {
+    public ShotDTO createShot(@RequestBody ShotDTO dto, Authentication auth) {
         Shot shot = new Shot();
         shot.setDate(dto.getDate());
         shot.setShotName(dto.getShotName());
         shot.setFrequencyUnit(dto.getFrequencyUnit());
         shot.setFrequencyValue(dto.getFrequencyValue());
 
-        Shot savedShot = shotService.saveShot(shot);
+        Shot savedShot = shotService.saveShot(shot, auth);
 
         return toDTO(savedShot);
     }
 
     // Összes oltás lekérdezése
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping()
-    public List<ShotDTO> getAllShots() {
-        List<Shot> shots = shotService.getAllShots();
+    public List<ShotDTO> getAllShots(Authentication auth) {
+        List<Shot> shots = shotService.getAllShots(auth);
         return (shots).stream().map(this::toDTO).toList();
     }
 
     // Oltás lekérdezése id alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/{shotId}")
-    public ShotDTO getShotById(@PathVariable Long shotId) {
-        return toDTO(shotService.getShotById(shotId));
+    public ShotDTO getShotById(@PathVariable Long shotId, Authentication auth) {
+        return toDTO(shotService.getShotById(shotId, auth));
     }
 
     // Ló összes oltásának lekérdezése id alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/horseId/{horseId}")
-    public List<ShotDTO> getAllShotsOfHorseById(@PathVariable Long horseId) {
-        List<Shot> shots = shotService.getShotsByHorseId(horseId);
+    public List<ShotDTO> getAllShotsOfHorseById(@PathVariable Long horseId, Authentication auth) {
+        List<Shot> shots = shotService.getShotsByHorseId(horseId, auth);
         return shots.stream().map(this::toDTO).toList(); 
     }
     
     // Ló összes oltásának lekérdezése ló neve alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/horseName/{horseName}")
-    public List<ShotDTO> getAllShotsOfHorseByName(@PathVariable String horseName) {
-        List<Shot> shots = shotService.getShotsByHorseName(horseName);
+    public List<ShotDTO> getAllShotsOfHorseByName(@PathVariable String horseName, Authentication auth) {
+        List<Shot> shots = shotService.getShotsByHorseName(horseName, auth);
         return shots.stream().map(this::toDTO).toList();
     }
     
     // Oltás frissítése
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PatchMapping("/{shotId}")
-    public ResponseEntity<String> updateShot (@PathVariable Long shotId, @RequestBody ShotDTO dto){
-        shotService.updateShot(shotId, dto);
+    public ResponseEntity<String> updateShot (@PathVariable Long shotId, @RequestBody ShotDTO dto, Authentication auth){
+        shotService.updateShot(shotId, dto, auth);
         return ResponseEntity.ok("Oltás sikeresen frissítve.");
     }
 
     // Oltás törlése
+    @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{shotId}")
     public ResponseEntity<String> deleteShot(@PathVariable Long shotId){
         shotService.deleteShotById(shotId);

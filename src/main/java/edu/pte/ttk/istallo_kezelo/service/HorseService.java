@@ -1,5 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,51 +22,100 @@ public class HorseService {
 
     // Új ló mentése
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Horse saveHorse(Horse horse) {
         return horseRepository.save(horse);
     }
 
     // Összes ló lekérdezése
-    public List<Horse> getAllHorses() {
-        return horseRepository.findAll();
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
+    public List<Horse> getAllHorses(Authentication auth) {
+        List<Horse> all = horseRepository.findAll();
+        return filterHorsesForOwner(all, auth);
     }
 
     // Ló lekérdezése id alapján
-    public Optional<Horse> getHorseById(Long id) {
-        return horseRepository.findById(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
+    public Optional<Horse> getHorseById(Long id, Authentication auth) {
+        Optional<Horse> horse = horseRepository.findById(id);
+        return horse.filter(h -> canAccessHorse(h, auth));
     }
 
     // Ló lekérdezése név alapján
-    public Horse getHorseByName(String horseName) {
-        return horseRepository.findByHorseName(horseName);
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
+    public Horse getHorseByName(String horseName, Authentication auth) {
+        Horse horse = horseRepository.findByHorseName(horseName);
+        if (horse == null) {
+            throw new RuntimeException("Ló nem található.");
+        }
+
+        if (!canAccessHorse(horse, auth)) {
+            throw new RuntimeException("Nincs jogosultságod megtekinteni ezt a lovat.");
+        }
+        return horse;
     }
 
 
     // Ló frissítése
     @Transactional
-    public Horse updateHorse(Long id, Horse updatedHorse) {
-        Optional<Horse> existingHorse = horseRepository.findById(id);
-        if (existingHorse.isPresent()) {
-            Horse horse = existingHorse.get();
-            horse.setHorseName(updatedHorse.getHorseName());
-            horse.setDob(updatedHorse.getDob());
-            horse.setSex(updatedHorse.getSex());
-            horse.setPassportNum(updatedHorse.getPassportNum());
-            horse.setMicrochipNum(updatedHorse.getMicrochipNum());
-            horse.setAdditional(updatedHorse.getAdditional());
-            horse.setStable(updatedHorse.getStable());
-            horse.setOwner(updatedHorse.getOwner());
-            return horseRepository.save(horse);
-        } else {
-            throw new RuntimeException("Ló nem található.");
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public Horse updateHorse(Long id, Horse updatedHorse, Authentication auth) {
+        Horse horse = horseRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Ló nem található."));
+
+        if (!canAccessHorse(horse, auth)) {
+            throw new RuntimeException("Nincs jogosultságod ennek a lónak a szerkesztéséhez.");
         }
+        horse.setHorseName(updatedHorse.getHorseName());
+        horse.setDob(updatedHorse.getDob());
+        horse.setSex(updatedHorse.getSex());
+        horse.setPassportNum(updatedHorse.getPassportNum());
+        horse.setMicrochipNum(updatedHorse.getMicrochipNum());
+        horse.setAdditional(updatedHorse.getAdditional());
+        horse.setStable(updatedHorse.getStable());
+        horse.setOwner(updatedHorse.getOwner());
+        return horseRepository.save(horse);
     }
 
 
     // Ló törlése
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteHorseById(Long id) {
         horseRepository.deleteById(id);
+    }
+
+    // Segédmetódus – OWNER csak a saját lovait láthatja
+    private List<Horse> filterHorsesForOwner(List<Horse> all, Authentication auth) {
+        if (auth == null) return all;
+
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        boolean isEmployee = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
+
+        if (isAdmin || isEmployee) {
+            return all;
+        }
+
+        String username = auth.getName();
+        return all.stream()
+                .filter(h -> h.getOwner() != null && h.getOwner().getUsername().equals(username))
+                .toList();
+    }
+
+    // Egyetlen ló elérhetőségének ellenőrzése
+    private boolean canAccessHorse(Horse horse, Authentication auth) {
+        if (auth == null) return false;
+
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+        boolean isEmployee = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
+        if (isAdmin || isEmployee) return true;
+
+        String username = auth.getName();
+        return horse.getOwner() != null && horse.getOwner().getUsername().equals(username);
     }
     
 }

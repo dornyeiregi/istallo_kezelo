@@ -6,85 +6,91 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.pte.ttk.istallo_kezelo.dto.TreatmentDTO;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.service.TreatmentService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/treatments")
 public class TreatmentController {
+
     private final TreatmentService treatmentService;
 
-    public TreatmentController(TreatmentService treatmentService){
+    public TreatmentController(TreatmentService treatmentService) {
         this.treatmentService = treatmentService;
     }
 
-    // Új kezelés hozzáadása
-    @PostMapping()
-    public TreatmentDTO createTreatment(@RequestBody TreatmentDTO dto) {
+    // Új kezelés létrehozása
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public TreatmentDTO createTreatment(@RequestBody TreatmentDTO dto, Authentication auth) {
         Treatment treatment = new Treatment();
         treatment.setTreatmentName(dto.getTreatmentName());
         treatment.setDescription(dto.getDescription());
         treatment.setDate(dto.getDate());
 
-        Treatment savedTreatment = treatmentService.saveTreatment(treatment);
-
-        return toDTO(savedTreatment);
+        Treatment saved = treatmentService.saveTreatment(treatment, auth);
+        return toDTO(saved);
     }
 
     // Összes kezelés lekérdezése
-    @GetMapping()
-    public List<TreatmentDTO> getAllTreatments() {
-        List<Treatment> treatments = treatmentService.getAllTreatments();
+    @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<TreatmentDTO> getAllTreatments(Authentication auth) {
+        List<Treatment> treatments = treatmentService.getAllTreatments(auth);
         return treatments.stream().map(this::toDTO).toList();
     }
 
-    // Kezelés lekérdezése id alapján
+    // Kezelés lekérdezése ID alapján
     @GetMapping("/{id}")
-    public TreatmentDTO getTreatmentById(@PathVariable Long id) {
-        return toDTO(treatmentService.getTreatmentById(id));
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public TreatmentDTO getTreatmentById(@PathVariable Long id, Authentication auth) {
+        Treatment treatment = treatmentService.getTreatmentById(id, auth);
+        return toDTO(treatment);
     }
 
-    // Egy ló minden kezelésének lekérdezése ló id alapján
+    // Egy ló minden kezelésének lekérdezése ló ID alapján
     @GetMapping("/byHorseId/{horseId}")
-    public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId) {
-        List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId, Authentication auth) {
+        List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId, auth);
         return treatments.stream().map(this::toDTO).toList();
     }
 
-    
-    // Egy ló minden kezelésének lekérdezése ló neve alapján
+    // Egy ló minden kezelésének lekérdezése ló név alapján
     @GetMapping("/byHorseName/{horseName}")
-    public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName) {
-        List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName, Authentication auth) {
+        List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName, auth);
         return treatments.stream().map(this::toDTO).toList();
     }
-    
-    
+
     // Kezelés frissítése
     @PatchMapping("/{treatmentId}")
-    public ResponseEntity<String> updateTreatment(@PathVariable Long treatmentId, @RequestBody TreatmentDTO dto){
-        treatmentService.updateTreatment(treatmentId, dto);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<String> updateTreatment(@PathVariable Long treatmentId, @RequestBody TreatmentDTO dto, Authentication auth) {
+        treatmentService.updateTreatment(treatmentId, dto, auth);
         return ResponseEntity.ok("Kezelés sikeresen frissítve.");
     }
 
     // Kezelés törlése
     @DeleteMapping("/{treatmentId}")
-    public ResponseEntity<String> deleteTreatment(@PathVariable Long treatmentId){
-        treatmentService.deleteTreatmentById(treatmentId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<String> deleteTreatment(@PathVariable Long treatmentId, Authentication auth) {
+        treatmentService.deleteTreatmentById(treatmentId, auth);
         return ResponseEntity.ok("Kezelés sikeresen törölve.");
     }
 
-    private TreatmentDTO toDTO(Treatment treatment){
+    private TreatmentDTO toDTO(Treatment treatment) {
         TreatmentDTO dto = new TreatmentDTO();
         dto.setTreatmentId(treatment.getTreatmentId());
         dto.setTreatmentName(treatment.getTreatmentName());

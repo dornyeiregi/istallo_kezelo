@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,6 +35,7 @@ public class StableController {
 
     // Új istálló létrehozása
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public StableDTO createStable(@RequestBody StableDTO dto){
         Stable stable = new Stable();
         stable.setStableName(dto.getStableName());
@@ -45,12 +47,14 @@ public class StableController {
     
     // Összes istálló lekérdezése
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<StableDTO> getAllStables(){
         return stableService.getAllStables().stream().map(this::toDTO).toList();
     }
 
     // Istálló lekérdezése id alapján
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StableDTO getStableByID(@PathVariable Long id) {
         Stable stable = stableService.getStableById(id)
             .orElseThrow(() -> new RuntimeException("Istálló nem található."));
@@ -62,6 +66,7 @@ public class StableController {
 
     // Istálló lekérdezése név alapján
     @GetMapping("/stableName")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StableDTO getStableByName(@RequestParam String stableName) {
         Stable stable = stableService.getStableByName(stableName);
 
@@ -70,6 +75,7 @@ public class StableController {
 
     // Istálló frissítése
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public StableDTO updateStablePartially(@PathVariable Long id, @RequestBody StableDTO dto){
         Stable existingStable = stableService.getStableById(id)
             .orElseThrow(() -> new RuntimeException("Istálló nem található."));
@@ -84,6 +90,7 @@ public class StableController {
 
     // Istálló törlése
     @DeleteMapping("/{stableId}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteStable(@PathVariable Long stableId){
         stableService.deleteStableById(stableId);
         return ResponseEntity.ok("Istálló sikeresen törölve.");

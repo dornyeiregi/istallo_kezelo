@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,6 +32,7 @@ public class StorageController {
 
     // Új tároló hozzáadása
     @PostMapping()
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public StorageDTO addStorage(@RequestBody StorageDTO dto) {
         Storage saved = storageService.createStorage(dto);
         return toDTO(saved);
@@ -38,24 +40,28 @@ public class StorageController {
 
     // Összes tároló lekérdezése
     @GetMapping()
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<StorageDTO> getAllStorages() {
         return storageService.getAllStorages().stream().map(this::toDTO).toList();
     }
     
     // Tároló lekérdezése id alapján
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StorageDTO getStorageById(@PathVariable Long id) {
         return toDTO(storageService.getStorageById(id));
     }
     
     // Tároló lekérdezése tárolt tétel alapján
     @GetMapping("/byItem/{itemId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StorageDTO getStorageByItemId(@PathVariable Long itemId) {
         return toDTO(storageService.getStorageByItemId(itemId));
     }
 
     // Tároló frissítése
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> updateStorage(@PathVariable Long id, @RequestBody StorageDTO dto){
         storageService.updateStorage(id, dto);
         return ResponseEntity.ok("Tároló sikeresen frissítve.");
@@ -63,6 +69,7 @@ public class StorageController {
     
     // Tároló törlése
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public ResponseEntity<String> deleteStorage(@PathVariable Long id){
         storageService.deleteStorage(id);
         return ResponseEntity.ok("Tároló sikeresen törölve.");

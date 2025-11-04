@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -33,23 +35,26 @@ public class FarrierAppController {
 
     // Új patkolás hozzáadása
     @PostMapping
-    public ResponseEntity<FarrierAppDTO> createFarrierApp(@RequestBody FarrierAppDTO dto) {
-        FarrierApp created = farrierAppService.createFarrierApp(dto);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<FarrierAppDTO> createFarrierApp(@RequestBody FarrierAppDTO dto, Authentication auth) {
+        FarrierApp created = farrierAppService.createFarrierApp(dto, auth);
         return ResponseEntity.ok(toDTO(created));
     }
 
 
     // Összes patkolás lekérdezése
     @GetMapping
-    public List<FarrierAppDTO> getAllFarrierApps() {
-        List<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps();
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<FarrierAppDTO> getAllFarrierApps(Authentication auth) {
+        List<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps(auth);
         return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése id alaján
     @GetMapping("/{id}")
-    public FarrierAppDTO getFarrierAppById(@PathVariable Long id) {
-        FarrierApp farrierApp = farrierAppService.getFarrierAppById(id);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public FarrierAppDTO getFarrierAppById(@PathVariable Long id, Authentication auth) {
+        FarrierApp farrierApp = farrierAppService.getFarrierAppById(id, auth);
         if (farrierApp == null) {
             throw new RuntimeException("Patkolás nem található.");
         }
@@ -58,41 +63,47 @@ public class FarrierAppController {
 
     // Patkolás lekérdezése dátum alaján
     @GetMapping("/byDate/{date}")
-    public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date, Authentication auth) {
+        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date, auth);
         return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése patkolókovács neve alaján
     @GetMapping("/byFarrierName/{farrierName}")
-    public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName, Authentication auth) {
+        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName, auth);
         return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló neve alaján
     @GetMapping("/byHorseName/{horseName}")
-    public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName, Authentication auth) {
+        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName, auth);
         return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló id alaján
     @GetMapping("/byHorseId/{horseId}")
-    public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
+        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId, auth);
         return farrierApps.stream().map(this::toDTO).toList();
     }
 
     // Patkolás frissítése
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto) {
-        farrierAppService.updateFarrierApp(id, dto);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<String> updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto, Authentication auth) {
+        farrierAppService.updateFarrierApp(id, dto, auth);
         return ResponseEntity.ok("Patkolás sikeresen frissítve.");
     }
     
     // Patkolás törlése
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteFarrierApp(@PathVariable Long id) {
         farrierAppService.deleteFarrierApp(id);
         return ResponseEntity.ok("Patkolás sikeresen törölve.");

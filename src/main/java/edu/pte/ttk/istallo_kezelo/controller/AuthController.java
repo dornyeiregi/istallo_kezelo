@@ -36,15 +36,15 @@ public class AuthController {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String jwt = jwtUtils.generateToken(userDetails.getUsername());
+        String jwt = jwtUtils.generateToken(userDetails);
+
+        User dbUser = userRepository.findByUsername(userDetails.getUsername());
 
         Map<String, Object> response = new HashMap<>();
         response.put("token", jwt);
         response.put("user", Map.of(
-            "username", userDetails.getUsername(),
-            "roles", userDetails.getAuthorities().stream()
-                .map(a -> a.getAuthority().replace("ROLE_", ""))
-                .toList()
+            "username", dbUser.getUsername(),
+            "userType", dbUser.getUserType().name()
         ));
 
         return ResponseEntity.ok(response);
@@ -87,7 +87,7 @@ public class AuthController {
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String jwt = jwtUtils.generateToken(userDetails.getUsername());
+        String jwt = jwtUtils.generateToken(userDetails);
 
         Map<String, Object> response = new HashMap<>();
         response.put("token", jwt);

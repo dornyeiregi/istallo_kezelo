@@ -6,6 +6,8 @@ import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class UserController {
     
     // Új felhasználó létrehozása
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public UserDTO createUser(@RequestBody UserDTO dto) {
         User user = new User();
         user.setUsername(dto.getUsername());
@@ -42,6 +45,7 @@ public class UserController {
     
     // Összes felhasználó lekérdezése       
     @GetMapping
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public List<UserDTO> getAllUsers() {
         return userService.getAllUsers().stream().map(this::toDTO).toList();
     }
@@ -49,8 +53,9 @@ public class UserController {
 
     // Felhasználó lekérdezése id alapján
     @GetMapping("/{id}")
-    public UserDTO getUserById(@PathVariable Long id){
-        User user = userService.getUserById(id)
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    public UserDTO getUserById(@PathVariable Long id, Authentication auth){
+        User user = userService.getUserById(id, auth)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
         return toDTO(user);
     }
@@ -58,8 +63,9 @@ public class UserController {
     
     // Felhasználó lekérdezése felhasználónév alapján
     @GetMapping("/byUsername/{username}")
-    public UserDTO getUserByUsername(@PathVariable String username){
-        User user = userService.getUserByUsername(username);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    public UserDTO getUserByUsername(@PathVariable String username, Authentication auth){
+        User user = userService.getUserByUsername(username, auth);
         if (user == null){
             throw new RuntimeException("Felhasználó nem található.");
         }
@@ -68,6 +74,7 @@ public class UserController {
 
     // Felhasználó lekérdezése név alapján
     @GetMapping("/byFullName/{lName}/{fName}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public UserDTO getUserByFullName(@PathVariable String lName, @PathVariable String fName) {
         User user = userService.getUserByFullName(lName, fName);
         if (user == null) {
@@ -78,6 +85,7 @@ public class UserController {
     
     // Felhasználó lekérdezése ló neve alapján
     @GetMapping("/byHorseName/{horseName}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public UserDTO getUserbyHorseName(@PathVariable String horseName){
         User user = userService.getUserByHorseName(horseName);
         if (user == null) {
@@ -131,8 +139,9 @@ public class UserController {
 
     // Felhasználó frissítése
     @PatchMapping("/{id}")
-    public UserDTO updateUserPartially(@PathVariable Long id, @RequestBody UserDTO dto){
-        User existingUser = userService.getUserById(id)
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    public UserDTO updateUserPartially(@PathVariable Long id, @RequestBody UserDTO dto, Authentication auth){
+        User existingUser = userService.getUserById(id, auth)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
 
         if (dto.getUserType() != null) {existingUser.setUserType(dto.getUserType());};
@@ -148,6 +157,7 @@ public class UserController {
 
     // Felhasználó törlése
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok("Felhasználó sikeresen törölve.");

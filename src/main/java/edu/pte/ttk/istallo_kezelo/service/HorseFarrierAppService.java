@@ -2,33 +2,42 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
+import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
+import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
 @Service
 public class HorseFarrierAppService {
     private final FarrierAppRepository farrierAppRepository;
     private final HorseRepository horseRepository;
     private final HorseFarrierAppRepository horseFarrierAppRepository;
+    private final UserRepository userRepository;
 
     public HorseFarrierAppService(FarrierAppRepository farrierAppRepository, 
                                   HorseRepository horseRepository, 
-                                  HorseFarrierAppRepository horseFarrierAppRepository) {
+                                  HorseFarrierAppRepository horseFarrierAppRepository,
+                                  UserRepository userRepository) {
         this.farrierAppRepository = farrierAppRepository;
         this.horseRepository = horseRepository;
         this.horseFarrierAppRepository = horseFarrierAppRepository;
+        this.userRepository = userRepository;
     }
 
     // Ló hozzáadása patkoláshoz
     @Transactional
-    public HorseFarrierApp addHorseToFarrierApp(Long farrierAppId, Long horseId){
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public HorseFarrierApp addHorseToFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
+        checkHorseOwnership(auth, horseId);
         FarrierApp app = farrierAppRepository.findById(farrierAppId)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található."));
 
@@ -49,29 +58,86 @@ public class HorseFarrierAppService {
 
     // Összes link lekérdezése
     @Transactional(readOnly = true)
-    public List<HorseFarrierApp> getAllHorseFarrierApps(){
-        return horseFarrierAppRepository.findAll();
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseFarrierApp> getAllHorseFarrierApps(Authentication auth){
+        List<HorseFarrierApp> all = horseFarrierAppRepository.findAll();
+        return filterHorseFarrierAppsForOwner(all, auth);
     }
 
     // Ló törlése patkolásból
     @Transactional
-    public void removeHorseFromFarrierApp(Long farrierAppId, Long horseId){
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public void removeHorseFromFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
+        checkHorseOwnership(auth, horseId);
         horseFarrierAppRepository.deleteByFarrierApp_IdAndHorse_Id(farrierAppId, horseId);
     }
 
     // Összes ló lekérdezése patkolás id alapján
-    public List<HorseFarrierApp> getHorsesForFarrierApp(Long farrierAppId){
-        return horseFarrierAppRepository.findByFarrierApp_Id(farrierAppId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseFarrierApp> getHorsesForFarrierApp(Long farrierAppId, Authentication auth){
+        List<HorseFarrierApp> all = horseFarrierAppRepository.findByFarrierApp_Id(farrierAppId);
+        return filterHorseFarrierAppsForOwner(all, auth);
     }
 
     // Összes patkolás lekérdezése ló id alapján
-    public List<HorseFarrierApp> getFarrierAppsForHorse(Long horseId){
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseFarrierApp> getFarrierAppsForHorse(Long horseId, Authentication auth){
+        checkHorseOwnership(auth, horseId);
         return horseFarrierAppRepository.findByHorse_Id(horseId);
     }
 
-    // Link lekérdezése id alapján
-    public HorseFarrierApp getHorseFarrierAppById(Long id){
-        return horseFarrierAppRepository.findById(id)
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public HorseFarrierApp getHorseFarrierAppById(Long id, Authentication auth){
+        HorseFarrierApp link = horseFarrierAppRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Link nem található."));
+
+        if (auth == null) {
+            return link;
+        }
+
+        boolean isAdmin = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return link;
+        }
+
+        String username = auth.getName();
+        if (!link.getHorse().getOwner().getUsername().equals(username)) {
+            throw new RuntimeException("Csak a saját lovadhoz tartozó patkolást érheted el.");
+        }
+
+        return link;
+    }
+
+    // Helper - OWNER csak a saját lovait módosíthatja
+    private void checkHorseOwnership(Authentication auth, Long horseId) {
+        if (auth == null) { return; }
+
+        String username = auth.getName();
+        User currentuser = userRepository.findByUsername(username);
+        Horse horse = horseRepository.findById(horseId)
+            .orElseThrow(() -> new RuntimeException("Ló nem található."));
+
+        boolean isAdmin = auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        if (!isAdmin && !horse.getOwner().getId().equals(currentuser.getId())) {
+            throw new RuntimeException("Csak saját lovaidhoz adhatsz vagy törölhetsz patkolást.");
+        }
+    }
+
+
+    // Helper – OWNER csak saját lovaihoz tartozó linket lásson
+    private List<HorseFarrierApp> filterHorseFarrierAppsForOwner(List<HorseFarrierApp> all, Authentication auth) {
+        if (auth == null) return all;
+
+        boolean isAdmin = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) return all;
+
+        String username = auth.getName();
+        return all.stream()
+                .filter(link -> link.getHorse().getOwner().getUsername().equals(username))
+                .toList();
     }
 }

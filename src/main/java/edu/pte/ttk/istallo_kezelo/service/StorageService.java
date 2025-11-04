@@ -2,6 +2,7 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class StorageService {
 
     // Új tároló hozzáadása
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Storage createStorage(StorageDTO dto){
         Item item = itemRepository.findById(dto.getItemId())
             .orElseThrow(() -> new RuntimeException("Tétel nem található."));
@@ -36,23 +38,27 @@ public class StorageService {
     }
 
     // Összes tároló lekérdezése
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<Storage> getAllStorages(){
         return storageRepository.findAll();
     }
 
     // Tároló lekérdezése id alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage getStorageById(Long id){
         return storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
     }
 
     // Tároló lekérdezése tárolt tétel alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage getStorageByItemId(Long itemId){
         return storageRepository.findByItem_ItemId(itemId);
     }
 
     // Tároló frissítése
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage updateStorage(Long id, StorageDTO dto){
         Storage existingStorage = storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
@@ -69,6 +75,7 @@ public class StorageService {
     }
 
     // Tároló törlése
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteStorage(Long id){
         storageRepository.deleteById(id);
     }

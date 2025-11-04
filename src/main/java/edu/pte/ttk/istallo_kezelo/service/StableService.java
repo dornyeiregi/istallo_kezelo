@@ -1,5 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,27 +21,32 @@ public class StableService {
 
     // Új istálló létrehozása
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Stable saveStable(Stable stable) {
         return stableRepository.save(stable);
     }
 
     // Összes istálló lekérdezése
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<Stable> getAllStables() {
         return stableRepository.findAll();
     }
 
     // Istálló lekérdezése id alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Optional<Stable> getStableById(Long id) {
         return stableRepository.findById(id);
     }
 
     // Istálló lekérdezése név alapján
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Stable getStableByName(String stableName) {
         return stableRepository.findByStableName(stableName);
     }
 
     // Istálló frissítése
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public Stable updateStable(Long id, Stable stableDetails) {
         Stable stable = stableRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Istálló nem található."));
@@ -51,6 +57,7 @@ public class StableService {
 
     // Istálló törlése
     @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteStableById(Long id) {
         stableRepository.deleteById(id);
     }

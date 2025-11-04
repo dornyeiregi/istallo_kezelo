@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,46 +32,52 @@ public class HorseTreatmentController {
 
     // Kezelés hozzáadása lóhoz
     @PostMapping()
-    public HorseTreatmentDTO addTreatmentToHorse(@RequestBody HorseTreatmentDTO dto) {
-        HorseTreatment link = horseTreatmentService.addTreatmentToHorse(dto.getTreatmentId(), dto.getHorseId());
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public HorseTreatmentDTO addTreatmentToHorse(@RequestBody HorseTreatmentDTO dto, Authentication auth) {
+        HorseTreatment link = horseTreatmentService.addTreatmentToHorse(dto.getTreatmentId(), dto.getHorseId(), auth);
         return toDTO(link);
     }
 
 
     // Összes link lekérdezése
     @GetMapping()
-    public List<HorseTreatmentDTO> getAllHorseTreatments() {
-        List<HorseTreatment> links = horseTreatmentService.getAllHorseTreatments();
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseTreatmentDTO> getAllHorseTreatments(Authentication auth) {
+        List<HorseTreatment> links = horseTreatmentService.getAllHorseTreatments(auth);
         return links.stream().map(this::toDTO).toList();
     }
 
 
     // Link lekérdezése id alapján
     @GetMapping("/{id}")
-    public HorseTreatmentDTO getHorsetreatmentById(@PathVariable Long id) {
-        return toDTO(horseTreatmentService.getHorseTreatmentById(id));
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public HorseTreatmentDTO getHorsetreatmentById(@PathVariable Long id, Authentication auth) {
+        return toDTO(horseTreatmentService.getHorseTreatmentById(id, auth));
     }
     
     // Egy ló minden kezelésének lekérdezése ló id alapján
     @GetMapping("/byHorseId/{horseId}")
-    public List<HorseTreatmentDTO> getHorseTreatmentsByHorseid(@PathVariable Long horseId) {
-        List<HorseTreatment> links = horseTreatmentService.getTreatmentsForHorse(horseId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseTreatmentDTO> getHorseTreatmentsByHorseid(@PathVariable Long horseId, Authentication auth) {
+        List<HorseTreatment> links = horseTreatmentService.getTreatmentsForHorse(horseId, auth);
         return links.stream().map(this::toDTO).toList();
     }
 
     // Kezelt lovak lekérdezése kezelés id alapján
     @GetMapping("/byTreatmentId/{treatmentId}")
-    public List<HorseTreatmentDTO> getHorseTreatmentsbyTreatmentId(@PathVariable Long treatmentId){
-        List<HorseTreatment> links = horseTreatmentService.getHorsesByTreatment(treatmentId);
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public List<HorseTreatmentDTO> getHorseTreatmentsbyTreatmentId(@PathVariable Long treatmentId, Authentication auth){
+        List<HorseTreatment> links = horseTreatmentService.getHorsesByTreatment(treatmentId, auth);
         return links.stream().map(this::toDTO).toList();
     }
     
 
     // Kezelés eltávolítása lótól
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> removeHorseTreatment(@PathVariable Long id){
-        HorseTreatment link = horseTreatmentService.getHorseTreatmentById(id);
-        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getTreatmentId(), link.getHorse().getId());
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public ResponseEntity<String> removeHorseTreatment(@PathVariable Long id, Authentication auth){
+        HorseTreatment link = horseTreatmentService.getHorseTreatmentById(id, auth);
+        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getTreatmentId(), link.getHorse().getId(), auth);
         return ResponseEntity.ok("Link sikeresen törölve.");
     }
     
