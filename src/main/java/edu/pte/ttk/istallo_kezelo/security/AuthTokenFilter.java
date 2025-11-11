@@ -29,54 +29,50 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-        
-        String path = request.getServletPath();
+protected void doFilterInternal(HttpServletRequest request,
+                                HttpServletResponse response,
+                                FilterChain filterChain)
+        throws ServletException, IOException {
 
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/test/")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+    String path = request.getServletPath();
 
-        try {
-            String jwt = parseJwt(request);
-            if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
-
-                // Felhasználónév és szerepkörök kinyerése a tokenből
-                String username = jwtUtils.getUsernameFromToken(jwt);
-                List<String> roles = jwtUtils.getRolesFromToken(jwt);
-
-                System.out.println("JWT érvényes: " + username + " (" + roles + ")");
-
-                // Felhasználó betöltése az adatbázisból
-                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                // A tokenben lévő szerepkörök Spring Security formátumra alakítása
-                List<GrantedAuthority> authorities = roles.stream()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
-
-                // Authentication objektum beállítása a SecurityContext-be
-                UsernamePasswordAuthenticationToken authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
-
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                System.out.println("Felhasználó hitelesítve: " + username + ", jogosultságok: " + authorities);
-            } else {
-                System.out.println("Érvénytelen vagy hiányzó JWT token.");
-            }
-
-        } catch (Exception e) {
-            System.out.println("Hiba a felhasználó hitelesítése közben: " + e.getMessage());
-        }
-
+    if (path.startsWith("/api/auth/") || path.startsWith("/api/test/")) {
         filterChain.doFilter(request, response);
+        return;
     }
+
+    try {
+        String jwt = parseJwt(request);
+
+        if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
+            String username = jwtUtils.getUsernameFromToken(jwt);
+            List<String> roles = jwtUtils.getRolesFromToken(jwt);
+
+            System.out.println("JWT érvényes: " + username + " (" + roles + ")");
+
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+            List<GrantedAuthority> authorities = roles.stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toList());
+
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            System.out.println("Felhasználó hitelesítve: " + username + ", jogosultságok: " + authorities);
+        }
+
+    } catch (Exception e) {
+        if (request.getRequestURI().startsWith("/api")) {
+            System.out.println("JWT ellenőrzési hiba: " + e.getMessage());
+        }
+    }
+    filterChain.doFilter(request, response);
+}
+
 
     // JWT token kinyerése az Authorization fejlécből
     private String parseJwt(HttpServletRequest request) {

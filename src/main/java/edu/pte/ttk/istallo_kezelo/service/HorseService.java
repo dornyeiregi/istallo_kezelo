@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
+import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
+import edu.pte.ttk.istallo_kezelo.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,9 +17,12 @@ import java.util.Optional;
 public class HorseService {
 
     private final HorseRepository horseRepository;
+    private final UserRepository userRepository;
 
-    public HorseService(HorseRepository horseRepository) {
+    public HorseService(HorseRepository horseRepository,
+                        UserRepository userRepository) {
         this.horseRepository = horseRepository; 
+        this.userRepository = userRepository;
     }
 
     // Új ló mentése
@@ -30,9 +35,14 @@ public class HorseService {
     // Összes ló lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public List<Horse> getAllHorses(Authentication auth) {
-        List<Horse> all = horseRepository.findAll();
-        return filterHorsesForOwner(all, auth);
+    User user = userRepository.findByUsername(auth.getName());
+    if (user.getUserType().name().equals("ADMIN") || user.getUserType().name().equals("EMPLOYEE")) {
+        return horseRepository.findAll();
+    } else {
+        return horseRepository.findByOwner(user);
     }
+}
+
 
     // Ló lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
@@ -86,23 +96,23 @@ public class HorseService {
     }
 
     // Segédmetódus – OWNER csak a saját lovait láthatja
-    private List<Horse> filterHorsesForOwner(List<Horse> all, Authentication auth) {
-        if (auth == null) return all;
+    // private List<Horse> filterHorsesForOwner(List<Horse> all, Authentication auth) {
+    //     if (auth == null) return all;
 
-        boolean isAdmin = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
-        boolean isEmployee = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
+    //     boolean isAdmin = auth.getAuthorities().stream()
+    //             .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+    //     boolean isEmployee = auth.getAuthorities().stream()
+    //             .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
 
-        if (isAdmin || isEmployee) {
-            return all;
-        }
+    //     if (isAdmin || isEmployee) {
+    //         return all;
+    //     }
 
-        String username = auth.getName();
-        return all.stream()
-                .filter(h -> h.getOwner() != null && h.getOwner().getUsername().equals(username))
-                .toList();
-    }
+    //     String username = auth.getName();
+    //     return all.stream()
+    //             .filter(h -> h.getOwner() != null && h.getOwner().getUsername().equals(username))
+    //             .toList();
+    // }
 
     // Egyetlen ló elérhetőségének ellenőrzése
     private boolean canAccessHorse(Horse horse, Authentication auth) {

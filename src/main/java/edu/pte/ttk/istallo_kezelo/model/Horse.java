@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import edu.pte.ttk.istallo_kezelo.config.EmptyStringToNullConverter;
 import jakarta.persistence.*;
 
 @Entity
@@ -30,6 +31,7 @@ public class Horse {
     @Column(name = "passport_num", nullable = true, unique = true)
     private String passportNum;
 
+    @Convert(converter = EmptyStringToNullConverter.class)
     @Column(name = "microchip_num", nullable = true, unique = true)
     private String microchipNum;
 

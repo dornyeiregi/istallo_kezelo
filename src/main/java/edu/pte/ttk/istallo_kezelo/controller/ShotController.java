@@ -87,8 +87,8 @@ public class ShotController {
     // Oltás törlése
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{shotId}")
-    public ResponseEntity<String> deleteShot(@PathVariable Long shotId){
-        shotService.deleteShotById(shotId);
+    public ResponseEntity<String> deleteShot(@PathVariable Long shotId, Authentication auth){
+        shotService.deleteShotById(shotId, auth);
         return ResponseEntity.ok("Oltás sikeresen törölve.");
     }
 
