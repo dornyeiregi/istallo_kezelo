@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StorageDTO {
+    private Long storageId;
     private Double amountInUse;
     private Double amountStored;
     private Long itemId;

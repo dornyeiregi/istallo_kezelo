@@ -69,9 +69,8 @@ public class HorseService {
     // Ló frissítése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public Horse updateHorse(Long id, Horse updatedHorse, Authentication auth) {
-        Horse horse = horseRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Ló nem található."));
+    public Horse updateHorse(String horseName, Horse updatedHorse, Authentication auth) {
+        Horse horse = horseRepository.findByHorseName(horseName);
 
         if (!canAccessHorse(horse, auth)) {
             throw new RuntimeException("Nincs jogosultságod ennek a lónak a szerkesztéséhez.");
@@ -119,9 +118,9 @@ public class HorseService {
         if (auth == null) return false;
 
         boolean isAdmin = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ADMIN"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isEmployee = auth.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
+                .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
         if (isAdmin || isEmployee) return true;
 
         String username = auth.getName();

@@ -87,6 +87,7 @@ public class FeedSchedController {
 
     private FeedSchedDTO toDTO(FeedSched feedSched) {
         FeedSchedDTO dto = new FeedSchedDTO();
+        dto.setFeedSchedId(feedSched.getFeedSchedid());
         dto.setFeedTime(feedSched.getFeedTime());
         dto.setDescription(feedSched.getDescription());
         dto.setHorseIds(feedSched.getHorseFeedScheds().stream()

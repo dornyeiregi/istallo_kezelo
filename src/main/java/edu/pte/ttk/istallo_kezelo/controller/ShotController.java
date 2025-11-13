@@ -95,6 +95,7 @@ public class ShotController {
 
     private ShotDTO toDTO(Shot shot){
         ShotDTO dto = new ShotDTO();
+        dto.setShotId(shot.getShotId());
         dto.setShotName(shot.getShotName());
         dto.setDate(shot.getDate());
         dto.setFrequencyUnit(shot.getFrequencyUnit());

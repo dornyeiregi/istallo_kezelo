@@ -61,7 +61,7 @@ public class HorseController {
 
     // Összes ló lekérdezése
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('EMPLOYEE')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
     public List<HorseDTO> getAllHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream().map(this::toDTO).toList();
     }
@@ -127,7 +127,7 @@ public class HorseController {
 
     // Ló törlése
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<String> deleteHorse(@PathVariable Long id) {
         horseService.deleteHorseById(id);
         return ResponseEntity.ok("Ló sikeresen törölve.");
@@ -142,7 +142,7 @@ public class HorseController {
 
     // Felhasználó saját lovainak lekérése
     @GetMapping("/mine")
-    @PreAuthorize("hasAuthority('ADMIN') or hasAuthority('OWNER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER')")
     public List<HorseDTO> getMyHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream()
             .filter(h -> h.getOwner().getUsername().equals(auth.getName()))
@@ -152,7 +152,7 @@ public class HorseController {
 
     // Felhasználó összes lovának lekérdezése felhasználó id alapján
     @GetMapping("/byOwnerId/{ownerId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByOwner(@PathVariable Long ownerId, Authentication auth) {
         if (userService.getUserById(ownerId, auth) == null) {
             throw new RuntimeException("Felhasználó nem található.");
@@ -165,7 +165,7 @@ public class HorseController {
 
     // Felhasználó összes lovának lekérdezése felhasználó neve alapján
     @GetMapping("/byOwnerName/{lName}/{fName}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByOwnerName(@PathVariable String lName, @PathVariable String fName, Authentication auth) {
         User owner = userService.getUserByFullName(lName, fName);
         if (owner == null) {
@@ -178,7 +178,7 @@ public class HorseController {
 
     // Felhasználó összes lovának lekérdezése felhasználónév alapján
     @GetMapping("/byUsername/{username}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByUsername(@PathVariable String username, Authentication auth) {
         User owner = userService.getUserByUsername(username, auth);
         if (owner == null) {
@@ -192,7 +192,7 @@ public class HorseController {
 
     // Istállóban lévő összes ló lekérdezése istálló id alapján
     @GetMapping("/byStableId/{stableId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByStableId(@PathVariable Long stableId, Authentication auth){
         if (stableService.getStableById(stableId) == null) {
             throw new RuntimeException("Istálló nem található.");
@@ -205,7 +205,7 @@ public class HorseController {
 
     // Istállóban lévő összes ló lekérdezése istálló név alapján
     @GetMapping("/byStableName/{stableName}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByStableName(@PathVariable String stableName, Authentication auth) {
         Stable stable = stableService.getStableByName(stableName);
         if(stable == null){
@@ -220,6 +220,7 @@ public class HorseController {
 
     private HorseDTO toDTO(Horse horse){
         HorseDTO dto = new HorseDTO();
+        dto.setHorseId(horse.getId());
         dto.setHorseName(horse.getHorseName());
         dto.setDob(horse.getDob());
         dto.setSex(horse.getSex());

@@ -74,18 +74,23 @@ public class StableController {
     }
 
     // Istálló frissítése
-    @PatchMapping("/{id}")
+    @PatchMapping("/{stableId}")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public StableDTO updateStablePartially(@PathVariable Long id, @RequestBody StableDTO dto){
-        Stable existingStable = stableService.getStableById(id)
+    public StableDTO updateStablePartially(@PathVariable Long stableId, @RequestBody StableDTO dto) {
+        Stable existingStable = stableService.getStableById(stableId)
             .orElseThrow(() -> new RuntimeException("Istálló nem található."));
+        if (existingStable == null) {
+            throw new RuntimeException("Istálló nem található: " + stableId);
+        }
 
-        if(dto.getStableName() != null) {existingStable.setStableName(dto.getStableName());}
-        
+        if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
+            existingStable.setStableName(dto.getStableName());
+        }
+
         Stable savedStable = stableService.saveStable(existingStable);
-
         return toDTO(savedStable);
     }
+
 
 
     // Istálló törlése
@@ -99,6 +104,7 @@ public class StableController {
 
     private StableDTO toDTO(Stable stable){
         StableDTO dto = new StableDTO();
+        dto.setStableId(stable.getStableId());
         dto.setStableName(stable.getStableName());
         dto.setHorses(stable.getHorsesInStable().stream().map(this::toHorseDTO).toList());
         return dto;
@@ -106,6 +112,7 @@ public class StableController {
 
     private HorseDTO toHorseDTO(Horse horse){
         HorseDTO dto = new HorseDTO();
+        dto.setHorseId(horse.getId());
         dto.setHorseName(horse.getHorseName());
         dto.setDob(horse.getDob());
         dto.setSex(horse.getSex());

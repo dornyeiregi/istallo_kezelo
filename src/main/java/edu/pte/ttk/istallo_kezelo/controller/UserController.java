@@ -166,7 +166,7 @@ public class UserController {
 
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
+        dto.setUserId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setUserLname(user.getUserLname());
         dto.setUserFname(user.getUserFname());

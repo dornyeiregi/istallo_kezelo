@@ -111,6 +111,7 @@ public class FarrierAppController {
 
     private FarrierAppDTO toDTO(FarrierApp farrierApp) {
         FarrierAppDTO dto = new FarrierAppDTO();
+        dto.setFarrierAppId(farrierApp.getId());
         dto.setAppointmentDate(farrierApp.getAppointmentDate());
         dto.setFarrierPhone(farrierApp.getFarrierPhone());
         dto.setFarrierName(farrierApp.getFarrierName());

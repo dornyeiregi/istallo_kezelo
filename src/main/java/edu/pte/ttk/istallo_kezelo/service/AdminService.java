@@ -54,7 +54,7 @@ public class AdminService {
 
     private UserDTO toDTO(User user) {
         UserDTO dto = new UserDTO();
-        dto.setId(user.getId());
+        dto.setUserId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setUserType(user.getUserType());

@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class StableDTO {
+    private Long stableId;
     private String stableName;
     public List<HorseDTO> horses;
 }

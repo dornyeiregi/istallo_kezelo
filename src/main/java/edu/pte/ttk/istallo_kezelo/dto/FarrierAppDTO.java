@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FarrierAppDTO {
+    private Long farrierAppId;
     private String farrierName;
     private String farrierPhone;
     private LocalDate appointmentDate;

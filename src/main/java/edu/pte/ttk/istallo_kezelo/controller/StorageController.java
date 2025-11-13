@@ -77,6 +77,7 @@ public class StorageController {
 
     private StorageDTO toDTO(Storage storage){
         StorageDTO dto = new StorageDTO();
+        dto.setStorageId(storage.getStorageId());
         dto.setAmountInUse(storage.getAmountInUse());
         dto.setAmountStored(storage.getAmountStored());
         dto.setItemId(storage.getItem().getItemId());

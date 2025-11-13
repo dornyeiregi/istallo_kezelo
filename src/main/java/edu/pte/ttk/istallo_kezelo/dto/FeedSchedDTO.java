@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FeedSchedDTO {
+    private long feedSchedId;
     private FeedTime feedTime;
     private String description;
     private List<Long> horseIds;
