@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import java.util.List;
+import java.util.Map;
 
 
 @RestController
@@ -128,9 +129,9 @@ public class HorseController {
     // Ló törlése
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public ResponseEntity<String> deleteHorse(@PathVariable Long id) {
+    public ResponseEntity<Map<String, String>> deleteHorse(@PathVariable Long id) {
         horseService.deleteHorseById(id);
-        return ResponseEntity.ok("Ló sikeresen törölve.");
+        return ResponseEntity.ok(Map.of("message", "Ló sikeresen törölve."));
     }
 
 
