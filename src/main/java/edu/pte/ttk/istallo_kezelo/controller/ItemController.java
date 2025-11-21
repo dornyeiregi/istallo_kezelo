@@ -58,10 +58,11 @@ public class ItemController {
 
     // Tétel frissítése
     @PatchMapping("/{id}")
-    public ResponseEntity<String> updateItem(@PathVariable Long id, @RequestBody Item item) {
-        itemService.updateItem(id, item);
-        return ResponseEntity.ok("Tétel sikeresen frissítve.");
+    public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO dto) {
+        Item updated = itemService.updateItem(id, dto);
+        return ResponseEntity.ok(toDTO(updated));
     }
+
 
     // Tétel törlése
     @DeleteMapping("/{id}")

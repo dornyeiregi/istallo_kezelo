@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.pte.ttk.istallo_kezelo.dto.ItemDTO;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 
@@ -34,19 +35,27 @@ public class ItemService {
 
     // Tétel frissítése
     @Transactional
-    public Item updateItem(Long id, Item item) {
-        Item existingItem = itemRepository.findById(id).orElse(null);
-        if (existingItem == null) {
-            throw new RuntimeException("Tétel nem található.");
+    public Item updateItem(Long id, ItemDTO dto) {
+
+        Item existingItem = itemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Tétel nem található."));
+
+        // Csak azt frissítjük, amit a DTO tartalmaz
+        if (dto.getName() != null) {
+            existingItem.setName(dto.getName());
         }
-        if(item.getName() != null){
-        existingItem.setName(item.getName());}
-        if(item.getItemType() != null){
-        existingItem.setItemType(item.getItemType());}
-        if(item.getItemCategory() != null){
-        existingItem.setItemCategory(item.getItemCategory());}
+
+        if (dto.getItemType() != null) {
+            existingItem.setItemType(dto.getItemType());
+        }
+
+        if (dto.getItemCategory() != null) {
+            existingItem.setItemCategory(dto.getItemCategory());
+        }
+
         return itemRepository.save(existingItem);
     }
+
 
     // Tétel törlése
     @Transactional

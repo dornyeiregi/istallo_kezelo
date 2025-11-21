@@ -60,11 +60,14 @@ public class StorageController {
     }
 
     // Tároló frissítése
-    @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public ResponseEntity<String> updateStorage(@PathVariable Long id, @RequestBody StorageDTO dto){
-        storageService.updateStorage(id, dto);
-        return ResponseEntity.ok("Tároló sikeresen frissítve.");
+    @PatchMapping("/{id}")
+    public ResponseEntity<StorageDTO> updateStorage(
+            @PathVariable Long id,
+            @RequestBody StorageDTO dto) {
+
+        Storage updated = storageService.updateStorage(id, dto);
+        return ResponseEntity.ok(toDTO(updated));
     }
     
     // Tároló törlése
