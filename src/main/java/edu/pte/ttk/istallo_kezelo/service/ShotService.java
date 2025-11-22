@@ -38,13 +38,29 @@ public class ShotService {
     // Új oltás létrehozása
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public Shot saveShot(Shot shot, Authentication auth) {
-        if (auth != null && !isAdmin(auth)) {
-            for (HorseShot hs : shot.getHorses_treated()) {
-                checkHorseOwnership(auth, hs.getHorse().getId());
+    public Shot saveShot(Shot shot, List<Long> horseIds, Authentication auth) {
+
+        Shot saved = shotRepository.save(shot);
+
+        if (horseIds != null) {
+            for (Long horseId : horseIds) {
+
+                if (auth != null && !isAdmin(auth)) {
+                    checkHorseOwnership(auth, horseId);
+                }
+                Horse horse = horseRepository.findById(horseId)
+                    .orElseThrow(() -> new RuntimeException("Ló nem található: " + horseId));
+
+                HorseShot link = new HorseShot();
+                link.setHorse(horse);
+                link.setShot(saved);
+
+                horseShotRepository.save(link);
+
+                saved.getHorses_treated().add(link);
             }
         }
-        return shotRepository.save(shot);
+        return saved;
     }
 
     // Összes oltás lekérdezése

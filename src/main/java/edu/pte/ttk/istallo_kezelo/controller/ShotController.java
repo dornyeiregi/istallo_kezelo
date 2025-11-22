@@ -40,10 +40,11 @@ public class ShotController {
         shot.setFrequencyUnit(dto.getFrequencyUnit());
         shot.setFrequencyValue(dto.getFrequencyValue());
 
-        Shot savedShot = shotService.saveShot(shot, auth);
+        Shot savedShot = shotService.saveShot(shot, dto.getHorseIds(), auth);
 
         return toDTO(savedShot);
     }
+
 
     // Összes oltás lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
