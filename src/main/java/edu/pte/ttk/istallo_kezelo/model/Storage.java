@@ -9,7 +9,7 @@ public class Storage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "storage_id", nullable = false)
-    private Long storageId;
+    private Long id;
 
     @Column(name = "amount_in_use", nullable = false)
     private Double amountInUse;
@@ -24,8 +24,8 @@ public class Storage {
     // Constructors, getters, and setters
 
     //Getters
-    public Long getStorageId() {
-        return storageId;
+    public Long getId() {
+        return id;
     }
 
     public Double getAmountInUse() {
@@ -41,8 +41,8 @@ public class Storage {
     }
 
     //Setters
-    public void setStorageId(Long storageId) {
-        this.storageId = storageId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setAmountInUse(Double amountInUse) {

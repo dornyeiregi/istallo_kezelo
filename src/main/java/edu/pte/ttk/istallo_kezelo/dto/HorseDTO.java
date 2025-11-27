@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class HorseDTO {
-    private Long horseId;
+    private Long id;
     private String horseName;
     private LocalDate dob;
     private Sex sex;

@@ -13,7 +13,7 @@ public class Treatment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "treatment_id", nullable = false)
-    private Long treatmentId;
+    private Long id;
 
     @Column(name = "treatment_name", nullable = false)
     private String treatmentName;
@@ -31,8 +31,8 @@ public class Treatment {
 
 
     // Constructors, getters, and setters
-    public Long getTreatmentId() {
-        return treatmentId;
+    public Long getId() {
+        return id;
     }
 
     public String getTreatmentName() {

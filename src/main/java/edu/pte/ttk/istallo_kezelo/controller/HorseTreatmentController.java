@@ -77,7 +77,7 @@ public class HorseTreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<String> removeHorseTreatment(@PathVariable Long id, Authentication auth){
         HorseTreatment link = horseTreatmentService.getHorseTreatmentById(id, auth);
-        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getTreatmentId(), link.getHorse().getId(), auth);
+        horseTreatmentService.removeTreatmentFromHorse(link.getTreatment().getId(), link.getHorse().getId(), auth);
         return ResponseEntity.ok("Link sikeresen törölve.");
     }
     
@@ -85,7 +85,7 @@ public class HorseTreatmentController {
     private HorseTreatmentDTO toDTO(HorseTreatment link){
         HorseTreatmentDTO dto = new HorseTreatmentDTO();
         dto.setHorseId(link.getHorse().getId());
-        dto.setTreatmentId(link.getTreatment().getTreatmentId());
+        dto.setTreatmentId(link.getTreatment().getId());
         dto.setTreatmentName(link.getTreatment().getTreatmentName());
         dto.setHorseName(link.getHorse().getHorseName());
         dto.setDate(link.getTreatment().getDate());

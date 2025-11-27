@@ -80,10 +80,10 @@ public class StorageController {
 
     private StorageDTO toDTO(Storage storage){
         StorageDTO dto = new StorageDTO();
-        dto.setStorageId(storage.getStorageId());
+        dto.setStorageId(storage.getId());
         dto.setAmountInUse(storage.getAmountInUse());
         dto.setAmountStored(storage.getAmountStored());
-        dto.setItemId(storage.getItem().getItemId());
+        dto.setItemId(storage.getItem().getId());
         return dto;
     }
     

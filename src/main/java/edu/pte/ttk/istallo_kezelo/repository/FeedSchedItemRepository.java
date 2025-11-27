@@ -14,11 +14,11 @@ import edu.pte.ttk.istallo_kezelo.model.Item;
 @Repository
 public interface FeedSchedItemRepository extends JpaRepository<FeedSchedItem, Long> {
 
-    void deleteByFeedSched_FeedSchedidAndItem_ItemId(Long feedSchedId, Long itemId);
+    void deleteByFeedSched_IdAndItem_Id(Long feedSchedId, Long itemId);
 
     boolean existsByFeedSchedAndItem(FeedSched feedSched, Item item);
 
-    List<FeedSchedItem> findByFeedSched_FeedSchedid(Long feedSchedId);
+    List<FeedSchedItem> findByFeedSched_Id(Long feedSchedId);
 
-    List<FeedSchedItem> findByItem_ItemId(Long itemId);
+    List<FeedSchedItem> findByItem_Id(Long itemId);
 }

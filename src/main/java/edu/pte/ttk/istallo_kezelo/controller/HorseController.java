@@ -199,7 +199,7 @@ public class HorseController {
             throw new RuntimeException("Istálló nem található.");
         } else {
             return horseService.getAllHorses(auth).stream()
-                .filter(horse -> horse.getStable().getStableId().equals(stableId))
+                .filter(horse -> horse.getStable().getId().equals(stableId))
                 .map(this::toDTO).toList();
         }
     }
@@ -221,7 +221,7 @@ public class HorseController {
 
     private HorseDTO toDTO(Horse horse){
         HorseDTO dto = new HorseDTO();
-        dto.setHorseId(horse.getId());
+        dto.setId(horse.getId());
         dto.setHorseName(horse.getHorseName());
         dto.setDob(horse.getDob());
         dto.setSex(horse.getSex());
@@ -229,7 +229,7 @@ public class HorseController {
             + horse.getOwner().getUserFname());
         dto.setOwnerId(horse.getOwner().getId());
         dto.setStableName(horse.getStable().getStableName());
-        dto.setStableId(horse.getStable().getStableId());
+        dto.setStableId(horse.getStable().getId());
         dto.setMicrochipNum(horse.getMicrochipNum());
         dto.setPassportNum(horse.getPassportNum());
         dto.setAdditional(horse.getAdditional());

@@ -92,7 +92,7 @@ public class TreatmentController {
 
     private TreatmentDTO toDTO(Treatment treatment) {
         TreatmentDTO dto = new TreatmentDTO();
-        dto.setTreatmentId(treatment.getTreatmentId());
+        dto.setTreatmentId(treatment.getId());
         dto.setTreatmentName(treatment.getTreatmentName());
         dto.setDescription(treatment.getDescription());
         dto.setDate(treatment.getDate());

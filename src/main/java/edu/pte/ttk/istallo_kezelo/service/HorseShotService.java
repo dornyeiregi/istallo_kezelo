@@ -86,7 +86,7 @@ public class HorseShotService {
     // Oltáshoz tartozó összes ló lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseShot> getHorseForShot(Long shotId, Authentication auth) {
-        List<HorseShot> all = horseShotRepository.findByShot_ShotId(shotId);
+        List<HorseShot> all = horseShotRepository.findByShot_Id(shotId);
         return filterHorseShotsForOwner(all, auth);
     }
 
@@ -102,7 +102,7 @@ public class HorseShotService {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void removeShotFromHorse(Long shotId, Long horseId, Authentication auth) {
         checkHorseOwnership(auth, horseId);
-        horseShotRepository.deleteByShot_ShotIdAndHorse_Id(shotId, horseId);
+        horseShotRepository.deleteByShot_IdAndHorse_Id(shotId, horseId);
     }
 
     // Helper – OWNER csak a saját lovait módosíthatja

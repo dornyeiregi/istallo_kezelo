@@ -20,7 +20,4 @@ public interface HorseRepository extends JpaRepository<Horse, Long> {
 
     List<Horse> findByOwner(User user);
 
-
-
-
 }

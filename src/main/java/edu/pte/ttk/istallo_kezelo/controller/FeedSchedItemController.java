@@ -65,14 +65,14 @@ public class FeedSchedItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeItemFromFeedSched(@PathVariable Long id) {
         FeedSchedItem link = feedSchedItemService.getFeedSchedItemById(id);
-        feedSchedItemService.removeItemFromFeedSched(link.getFeedSched().getFeedSchedid(), link.getItem().getItemId());
+        feedSchedItemService.removeItemFromFeedSched(link.getFeedSched().getId(), link.getItem().getId());
         return ResponseEntity.ok("Link sikeresen törölve.");
     }
 
     private FeedSchedItemDTO toDTO(FeedSchedItem feedSchedItem) {
         FeedSchedItemDTO dto = new FeedSchedItemDTO();
-        dto.setFeedSchedId(feedSchedItem.getFeedSched().getFeedSchedid());
-        dto.setItemId(feedSchedItem.getItem().getItemId());
+        dto.setFeedSchedId(feedSchedItem.getFeedSched().getId());
+        dto.setItemId(feedSchedItem.getItem().getId());
         dto.setFeedDescription(feedSchedItem.getFeedSched().getDescription());
         dto.setItemName(feedSchedItem.getItem().getName());
         return dto;

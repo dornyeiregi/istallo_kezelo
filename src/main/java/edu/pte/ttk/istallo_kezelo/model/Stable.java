@@ -13,7 +13,7 @@ public class Stable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stable_id", nullable = false)
-    private Long stableId;
+    private Long id;
 
     @Column(name = "stable_name", nullable = false, unique = true)
     private String stableName;
@@ -35,8 +35,8 @@ public class Stable {
     // Getters and Setters
 
     // Getters
-    public Long getStableId() {
-        return stableId;
+    public Long getId() {
+        return id;
     }
 
     public String getStableName() {

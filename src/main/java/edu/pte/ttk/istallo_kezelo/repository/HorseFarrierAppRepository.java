@@ -17,8 +17,10 @@ public interface HorseFarrierAppRepository extends JpaRepository<HorseFarrierApp
 
     List<HorseFarrierApp> findByFarrierApp_Id(Long farrierAppId);
 
-    List<HorseFarrierApp> findByHorse_Id(Long horseId);
+    List<HorseFarrierApp> findByHorseId(Long horseId);
 
     boolean existsByFarrierAppAndHorse(FarrierApp app, Horse horse);
+
+    int countByFarrierApp_Id(Long farrierAppId);
 
 }

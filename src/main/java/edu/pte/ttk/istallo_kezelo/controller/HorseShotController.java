@@ -73,14 +73,14 @@ public class HorseShotController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeHorseShot(@PathVariable Long id, Authentication auth){
         HorseShot link = horseShotService.getHorseShotById(id, auth);
-        horseShotService.removeShotFromHorse(link.getShot().getShotId(), link.getHorse().getId(), auth);
+        horseShotService.removeShotFromHorse(link.getShot().getId(), link.getHorse().getId(), auth);
         return ResponseEntity.ok("Link sikeresen törölve.");
     }
 
 
     private HorseShotDTO toDtO(HorseShot link){
         HorseShotDTO dto = new HorseShotDTO();
-        dto.setShotId(link.getShot().getShotId());
+        dto.setShotId(link.getShot().getId());
         dto.setHorseId(link.getHorse().getId());
         dto.setHorseName(link.getHorse().getHorseName());
         dto.setShotName(link.getShot().getShotName());

@@ -54,12 +54,12 @@ public class FeedSchedItemService {
 
     // Etetési napló minden tételének lekérdezése
     public List<FeedSchedItem> getItemsForFeedSched(Long feedSchedId){
-        return feedSchedItemRepository.findByFeedSched_FeedSchedid(feedSchedId);
+        return feedSchedItemRepository.findByFeedSched_Id(feedSchedId);
     }
 
     // Egy tételt tartalmazó összes etetési napló lekérdezése
     public List<FeedSchedItem> getFeedSchedsForItem(Long itemId){
-        return feedSchedItemRepository.findByItem_ItemId(itemId);
+        return feedSchedItemRepository.findByItem_Id(itemId);
     }
 
     // Link lekérdezése id alapján
@@ -71,6 +71,6 @@ public class FeedSchedItemService {
     // Tétel eltávolítása etetési naplóból
     @Transactional
     public void removeItemFromFeedSched(Long feedSchedId, Long itemId){
-        feedSchedItemRepository.deleteByFeedSched_FeedSchedidAndItem_ItemId(feedSchedId, itemId);
+        feedSchedItemRepository.deleteByFeedSched_IdAndItem_Id(feedSchedId, itemId);
     }
 }

@@ -17,10 +17,11 @@ public interface HorseShotRepository extends JpaRepository<HorseShot, Long> {
 
     boolean existsByShotAndHorse(Shot shot, Horse horse);
 
-    void deleteByShot_ShotIdAndHorse_Id(Long shotId, Long horseId);
+    void deleteByShot_IdAndHorse_Id(Long shotId, Long horseId);
 
-    List<HorseShot> findByShot_ShotId(Long shotId);
+    List<HorseShot> findByShot_Id(Long shotId);
 
     List<HorseShot> findByHorse_horseName(String horseName);
 
+    int countByShot_Id(Long shotId);
 }

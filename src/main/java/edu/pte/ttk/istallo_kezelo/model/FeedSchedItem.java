@@ -8,7 +8,7 @@ public class FeedSchedItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;        // Created in postgres??
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "feed_sched_id", nullable = false)

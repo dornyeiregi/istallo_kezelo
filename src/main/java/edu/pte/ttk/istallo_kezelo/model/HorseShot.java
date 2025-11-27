@@ -8,7 +8,7 @@ public class HorseShot {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long horseShotId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "horse_id", nullable = false)

@@ -53,7 +53,7 @@ public class StorageService {
     // Tároló lekérdezése tárolt tétel alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage getStorageByItemId(Long itemId){
-        return storageRepository.findByItem_ItemId(itemId);
+        return storageRepository.findByItem_Id(itemId);
     }
 
     // Tároló frissítése

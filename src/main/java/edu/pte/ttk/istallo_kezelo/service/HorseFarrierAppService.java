@@ -83,7 +83,7 @@ public class HorseFarrierAppService {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseFarrierApp> getFarrierAppsForHorse(Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
-        return horseFarrierAppRepository.findByHorse_Id(horseId);
+        return horseFarrierAppRepository.findByHorseId(horseId);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")

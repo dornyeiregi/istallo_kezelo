@@ -11,8 +11,8 @@ public class Item {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id", nullable = false)
-    private Long itemId;
+    @Column(name = "id", nullable = false)
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -34,8 +34,8 @@ public class Item {
     // Constructors, getters, and setters
 
     //Getters
-    public Long getItemId() {
-        return itemId;  
+    public Long getId() {
+        return id;  
     }
 
     public String getName() {
@@ -55,8 +55,8 @@ public class Item {
     }
 
     //Setters
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public void setName(String name) {

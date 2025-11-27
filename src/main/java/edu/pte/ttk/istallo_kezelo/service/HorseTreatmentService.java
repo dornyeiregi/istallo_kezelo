@@ -94,7 +94,7 @@ public class HorseTreatmentService {
     // Kezelt lovak lekérdezése kezelés id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseTreatment> getHorsesByTreatment(Long treatmentId, Authentication auth) {
-        List<HorseTreatment> all =  horseTreatmentRepository.findByTreatment_TreatmentId(treatmentId);
+        List<HorseTreatment> all =  horseTreatmentRepository.findByTreatment_Id(treatmentId);
         return filterHorseTreatmentForOwner(all, auth);
     }
 
@@ -103,7 +103,7 @@ public class HorseTreatmentService {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void removeTreatmentFromHorse(Long treatmentId, Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
-        horseTreatmentRepository.deleteByTreatment_TreatmentIdAndHorse_Id(treatmentId, horseId);
+        horseTreatmentRepository.deleteByTreatment_IdAndHorse_Id(treatmentId, horseId);
     }
 
     // Helper – OWNER csak a saját lovait módosíthatja

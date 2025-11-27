@@ -1,5 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
+import edu.pte.ttk.istallo_kezelo.dto.SignupRequestDTO;
 import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.service.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,15 @@ public class AdminController {
 
     @Autowired
     private AdminService adminService;
+
+    // Új felhasználó létrehozása
+    @PostMapping("/users")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> createUser(@RequestBody SignupRequestDTO dto) {
+        adminService.createUser(dto);
+        return ResponseEntity.ok("Felhasználó sikeresen létrehozva.");
+    }
+
 
     // Összes felhasználó listázása (csak admin láthatja)
     @GetMapping("/users")
@@ -38,4 +48,13 @@ public class AdminController {
         adminService.updateUserRole(id, newRole);
         return ResponseEntity.ok("Felhasználó típusa sikeresen frissítve.");
     }
+
+    // Felhasználó törlése
+    @DeleteMapping("/users/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+        adminService.deleteUser(id);
+        return ResponseEntity.ok("Felhasználó sikeresen törölve.");
+    }
+
 }

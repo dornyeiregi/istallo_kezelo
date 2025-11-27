@@ -39,13 +39,13 @@ public class FeedSchedService {
 
         if (dto.getHorseIds() != null) {
             for (Long horseId : dto.getHorseIds()) {
-                addHorseToFeedSched(feedSched.getFeedSchedid(), horseId);
+                addHorseToFeedSched(feedSched.getId(), horseId);
             }
         }
 
         if (dto.getItemIds() != null) {
             for (Long itemId : dto.getItemIds()) {
-                addItemToFeedSched(feedSched.getFeedSchedid(), itemId);
+                addItemToFeedSched(feedSched.getId(), itemId);
             }
         }
 

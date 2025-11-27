@@ -13,10 +13,14 @@ public interface HorseFeedSchedRepository extends JpaRepository<HorseFeedSched, 
 
     boolean existsByFeedSchedAndHorse(FeedSched feedSched, Horse horse);
 
-    void deleteByHorse_IdAndFeedSched_FeedSchedid(Long horseId, Long feedSchedId);
+    void deleteByHorse_IdAndFeedSched_Id(Long horseId, Long feedSchedId);
 
-    List<HorseFeedSched> findByFeedSched_FeedSchedid(Long feedSchedId);
+    List<HorseFeedSched> findByFeedSched_Id(Long feedSchedId);
 
     List<HorseFeedSched> findByHorse_Id(Long horseId);
+
+    int countByFeedSchedId(Long feedSchedid);
+
+    List<HorseFeedSched> findByHorseId(Long horseId);
 
 }

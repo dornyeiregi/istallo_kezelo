@@ -73,7 +73,7 @@ public class ItemController {
         
     private ItemDTO toDTO(Item item) {
         ItemDTO dto = new ItemDTO();
-        dto.setItemId(item.getItemId());
+        dto.setItemId(item.getId());
         dto.setName(item.getName());
         dto.setItemType(item.getItemType());
         dto.setItemCategory(item.getItemCategory());

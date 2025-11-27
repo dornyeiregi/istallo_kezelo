@@ -59,7 +59,7 @@ public class HorseFeedSchedService {
 
     // Összes ló lekérdezése etetési naplóhoz
     public List<HorseFeedSched> getHorsesForFeedSChed(Long feedSchedId){
-        return horseFeedSchedRepository.findByFeedSched_FeedSchedid(feedSchedId);
+        return horseFeedSchedRepository.findByFeedSched_Id(feedSchedId);
     }
 
     // Lóhoz tartozó összes etetési napló lekérdezése
@@ -70,6 +70,6 @@ public class HorseFeedSchedService {
     // Ló eltávolítása etetési naplóból
     @Transactional
     public void removeHorseFromFeedSched(Long feedSchedId, Long horseId){
-        horseFeedSchedRepository.deleteByHorse_IdAndFeedSched_FeedSchedid(horseId, feedSchedId);
+        horseFeedSchedRepository.deleteByHorse_IdAndFeedSched_Id(horseId, feedSchedId);
     }
 }

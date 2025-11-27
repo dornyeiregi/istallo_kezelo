@@ -87,13 +87,13 @@ public class FeedSchedController {
 
     private FeedSchedDTO toDTO(FeedSched feedSched) {
         FeedSchedDTO dto = new FeedSchedDTO();
-        dto.setFeedSchedId(feedSched.getFeedSchedid());
+        dto.setFeedSchedId(feedSched.getId());
         dto.setFeedTime(feedSched.getFeedTime());
         dto.setDescription(feedSched.getDescription());
         dto.setHorseIds(feedSched.getHorseFeedScheds().stream()
             .map(hfs -> hfs.getHorse().getId()).toList());
         dto.setItemIds(feedSched.getFeedSchedItems().stream()
-            .map(fsi -> fsi.getItem().getItemId()).toList());
+            .map(fsi -> fsi.getItem().getId()).toList());
         return dto;
     }
 }

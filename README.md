@@ -10,7 +10,7 @@ Az alkalmazás célja, hogy egy átlátható, könnyen kezelhető felületen leh
 - Oltási, patkolási és egyéb események nyilvántartása
 - Etetési naplók rögzítése különböző napszakokhoz
 - Felhasználói szerepkörök kezelése (Admin, Tulajdonos, Alkalmazott)
-- REST API alapú backend Spring Boot keretrendszerrel
+- REST API alapú backend Spring Boot keretrendszerrel, PostgreSQL adatbázissal
 
 
 ## Stack
@@ -39,19 +39,29 @@ Szükséges komponensek:
 2. Futtasd az ENUM típusokat létrehozó scriptet az adatbázisban.
     -> SQL fájl: `sql/istallo_kezelo_enum.sql`
 
+3. Indítsd el a backendet (lásd lent), majd futtasd le az admin felhasználót létrehozó scriptet:
+    -> SQL fájl: `sql/istallo_kezelo_admin.sql`
+
 
 ### 3. Backend konfigurálása és futtatása
 
 1. A `src/main/resources/application.properties` fájlban állítsd be a PostgreSQL elérési adatokat:
 
+```
 spring.datasource.url=jdbc:postgresql://localhost:5432/istallo_kezelo
-spring.datasource.username=postgres
-spring.datasource.password=your_password        --------------- saját postgres jelszót kell megadni!
+spring.datasource.username=postgres        # saját Postgres felhasználód
+spring.datasource.password=your_password   # saját Postgres jelszavad
 
-spring.jpa.hibernate.ddl-auto=create            --------------- első futtatáskor 'create', minden további futtatáaskor 'update'!
+spring.jpa.hibernate.ddl-auto=create       # első futtatáskor 'create', utána 'update'
 spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+```
 
-2. A kód futtatása terminálból: 
-        mvn spring-boot:run
+   - Cseréld le a `spring.datasource.username` és `spring.datasource.password` értékeit a saját PostgreSQL felhasználódra és jelszavadra.
+   - Az első indítás előtt a `spring.jpa.hibernate.ddl-auto` legyen `create`, majd a további indításokhoz állítsd `update`-re.
 
-A backend alapértelmezés szerint a 'http://localhost_8080' címen érhető el.
+2. A backend indítása terminálból:
+```
+mvn spring-boot:run
+```
+
+3. Az alkalmazás alapértelmezés szerint a `http://localhost:8080` címen érhető el.

@@ -5,9 +5,25 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
+import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
+import edu.pte.ttk.istallo_kezelo.repository.HorseFarrierAppRepository;
+import edu.pte.ttk.istallo_kezelo.repository.HorseFeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
+import edu.pte.ttk.istallo_kezelo.repository.HorseShotRepository;
+import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
+import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
+import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
+import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
+import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
+import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
+import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
+import edu.pte.ttk.istallo_kezelo.model.HorseShot;
+import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
+import edu.pte.ttk.istallo_kezelo.model.Shot;
+import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
 
 import java.util.List;
@@ -19,11 +35,51 @@ public class HorseService {
     private final HorseRepository horseRepository;
     private final UserRepository userRepository;
 
-    public HorseService(HorseRepository horseRepository,
-                        UserRepository userRepository) {
-        this.horseRepository = horseRepository; 
+    private final HorseShotRepository horseShotRepository;
+    private final ShotRepository shotRepository;
+
+    private final HorseFarrierAppRepository horseFarrierAppRepository;
+    private final FarrierAppRepository farrierAppRepository;
+
+    private final HorseFeedSchedRepository horseFeedSchedRepository;
+    private final FeedSchedRepository feedSchedRepository;
+
+    private final HorseTreatmentRepository horseTreatmentRepository;
+    private final TreatmentRepository treatmentRepository;
+
+    public HorseService(
+            HorseRepository horseRepository,
+            UserRepository userRepository,
+
+            HorseShotRepository horseShotRepository,
+            ShotRepository shotRepository,
+
+            HorseFarrierAppRepository horseFarrierAppRepository,
+            FarrierAppRepository farrierAppRepository,
+
+            HorseFeedSchedRepository horseFeedSchedRepository,
+            FeedSchedRepository feedSchedRepository,
+
+            HorseTreatmentRepository horseTreatmentRepository,
+            TreatmentRepository treatmentRepository
+    ) {
+        this.horseRepository = horseRepository;
         this.userRepository = userRepository;
+
+        this.horseShotRepository = horseShotRepository;
+        this.shotRepository = shotRepository;
+
+        this.horseFarrierAppRepository = horseFarrierAppRepository;
+        this.farrierAppRepository = farrierAppRepository;
+
+        this.horseFeedSchedRepository = horseFeedSchedRepository;
+        this.feedSchedRepository = feedSchedRepository;
+
+        this.horseTreatmentRepository = horseTreatmentRepository;
+        this.treatmentRepository = treatmentRepository;
     }
+
+
 
     // Új ló mentése
     @Transactional
@@ -90,28 +146,66 @@ public class HorseService {
     // Ló törlése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public void deleteHorseById(Long id) {
-        horseRepository.deleteById(id);
+    public void deleteHorseById(Long horseId) {
+
+        Horse horse = horseRepository.findById(horseId)
+                .orElseThrow(() -> new RuntimeException("A ló nem található."));
+
+        // Oltások (HorseShot)
+        List<HorseShot> shotLinks = horseShotRepository.findByHorse_Id(horseId);
+
+        for (HorseShot link : shotLinks) {
+
+            Shot shot = link.getShot();
+            horseShotRepository.delete(link);
+            int remaining = horseShotRepository.countByShot_Id(shot.getId());
+            // ha nincs több ló hozzácsatolva, töröljük a shot-ot is
+            if (remaining == 0) {
+                shotRepository.delete(shot);
+            }
+        }
+
+        // Kezelések (HorseTreatment)
+        List<HorseTreatment> treatmentLinks = horseTreatmentRepository.findByHorse_Id(horseId);
+
+        for (HorseTreatment link : treatmentLinks) {
+
+            Treatment treatment = link.getTreatment();
+            horseTreatmentRepository.delete(link);
+            int remaining = horseTreatmentRepository.countByTreatment_Id(treatment.getId());
+            if (remaining == 0) {
+                treatmentRepository.delete(treatment);
+            }
+        }
+
+        // Patkolások (HorseFarrierApp)
+        List<HorseFarrierApp> farrierLinks = horseFarrierAppRepository.findByHorseId(horseId);
+
+        for (HorseFarrierApp link : farrierLinks) {
+            FarrierApp app = link.getFarrierApp();
+            horseFarrierAppRepository.delete(link);
+            int remaining = horseFarrierAppRepository.countByFarrierApp_Id(app.getId());
+            if (remaining == 0) {
+                farrierAppRepository.delete(app);
+            }
+        }
+
+        // Etetési naplók  (HorseFeedSched)
+        List<HorseFeedSched> feedLinks = horseFeedSchedRepository.findByHorseId(horseId);
+
+        for (HorseFeedSched link : feedLinks) {
+            FeedSched sched = link.getFeedSched();
+            horseFeedSchedRepository.delete(link);
+            int remaining = horseFeedSchedRepository.countByFeedSchedId(sched.getId());
+            if (remaining == 0) {
+                feedSchedRepository.delete(sched);
+            }
+        }
+
+        // Ló törlése
+        // Stable NEM törlődik!
+        horseRepository.delete(horse);
     }
-
-    // Segédmetódus – OWNER csak a saját lovait láthatja
-    // private List<Horse> filterHorsesForOwner(List<Horse> all, Authentication auth) {
-    //     if (auth == null) return all;
-
-    //     boolean isAdmin = auth.getAuthorities().stream()
-    //             .anyMatch(a -> a.getAuthority().equals("ADMIN"));
-    //     boolean isEmployee = auth.getAuthorities().stream()
-    //             .anyMatch(a -> a.getAuthority().equals("EMPLOYEE"));
-
-    //     if (isAdmin || isEmployee) {
-    //         return all;
-    //     }
-
-    //     String username = auth.getName();
-    //     return all.stream()
-    //             .filter(h -> h.getOwner() != null && h.getOwner().getUsername().equals(username))
-    //             .toList();
-    // }
 
     // Egyetlen ló elérhetőségének ellenőrzése
     private boolean canAccessHorse(Horse horse, Authentication auth) {

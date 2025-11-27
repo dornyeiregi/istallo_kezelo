@@ -17,9 +17,11 @@ public interface HorseTreatmentRepository extends JpaRepository<HorseTreatment, 
 
     boolean existsByTreatmentAndHorse(Treatment treatment, Horse horse);
 
-    void deleteByTreatment_TreatmentIdAndHorse_Id(Long treatmentId, Long horseId);
+    void deleteByTreatment_IdAndHorse_Id(Long treatmentId, Long horseId);
 
     List<HorseTreatment> findByHorse_horseName(String horseName);
 
-    List<HorseTreatment> findByTreatment_TreatmentId(Long treatmentId);
+    List<HorseTreatment> findByTreatment_Id(Long treatmentId);
+
+    int countByTreatment_Id(Long treatmentId);
 }

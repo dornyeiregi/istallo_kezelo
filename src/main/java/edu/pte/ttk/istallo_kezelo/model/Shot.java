@@ -14,7 +14,7 @@ public class Shot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "shot_id", nullable = false)
-    private Long shotId;
+    private Long id;
 
     @Column(name = "shot_name", nullable = false)
     private String shotName;
@@ -34,8 +34,8 @@ public class Shot {
 
 
     // Constructors, getters, and setters
-    public Long getShotId() {
-        return shotId;
+    public Long getId() {
+        return id;
     }
 
     public String getShotName() {

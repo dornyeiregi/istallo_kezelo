@@ -68,7 +68,7 @@ public class HorseFeedSchedController {
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeHorseFromFeedSched(@PathVariable Long id){
         HorseFeedSched link = horseFeedSchedService.getHorseFeedSchedById(id);
-        horseFeedSchedService.removeHorseFromFeedSched(link.getFeedSched().getFeedSchedid(), link.getHorse().getId());
+        horseFeedSchedService.removeHorseFromFeedSched(link.getFeedSched().getId(), link.getHorse().getId());
         return ResponseEntity.ok("Link sikeresen törölve.");
     }
     
@@ -76,7 +76,7 @@ public class HorseFeedSchedController {
     private HorseFeedSchedDTO toDTO(HorseFeedSched horseFeedSched){
         HorseFeedSchedDTO dto = new HorseFeedSchedDTO();
         dto.setHorseId(horseFeedSched.getHorse().getId());
-        dto.setFeedSchedId(horseFeedSched.getFeedSched().getFeedSchedid());
+        dto.setFeedSchedId(horseFeedSched.getFeedSched().getId());
         dto.setFeedDescription(horseFeedSched.getFeedSched().getDescription());
         dto.setHorseName(horseFeedSched.getHorse().getHorseName());
         return dto;

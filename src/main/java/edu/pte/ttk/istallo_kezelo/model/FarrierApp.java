@@ -13,7 +13,7 @@ public class FarrierApp {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "farrier_app_id", nullable = false)
-    private Long farrierAppId;
+    private Long id;
 
     @Column(name = "farrier_name", nullable = true)
     private String farrierName;
@@ -36,7 +36,7 @@ public class FarrierApp {
 
     //Getters
     public Long getId() {
-        return farrierAppId;
+        return id;
     }
 
     public String getFarrierName() {

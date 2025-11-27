@@ -104,7 +104,7 @@ public class StableController {
 
     private StableDTO toDTO(Stable stable){
         StableDTO dto = new StableDTO();
-        dto.setStableId(stable.getStableId());
+        dto.setStableId(stable.getId());
         dto.setStableName(stable.getStableName());
         dto.setHorses(stable.getHorsesInStable().stream().map(this::toHorseDTO).toList());
         return dto;
@@ -112,7 +112,7 @@ public class StableController {
 
     private HorseDTO toHorseDTO(Horse horse){
         HorseDTO dto = new HorseDTO();
-        dto.setHorseId(horse.getId());
+        dto.setId(horse.getId());
         dto.setHorseName(horse.getHorseName());
         dto.setDob(horse.getDob());
         dto.setSex(horse.getSex());
@@ -120,7 +120,7 @@ public class StableController {
             + horse.getOwner().getUserFname());
         dto.setOwnerId(horse.getOwner().getId());
         dto.setStableName(horse.getStable().getStableName());
-        dto.setStableId(horse.getStable().getStableId());
+        dto.setStableId(horse.getStable().getId());
         dto.setMicrochipNum(horse.getMicrochipNum());
         dto.setPassportNum(horse.getPassportNum());
         dto.setAdditional(horse.getAdditional());

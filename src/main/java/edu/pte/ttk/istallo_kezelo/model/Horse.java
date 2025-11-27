@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import edu.pte.ttk.istallo_kezelo.config.EmptyStringToNullConverter;
 import jakarta.persistence.*;
-
 @Entity
 @Table(name = "horse")
 public class Horse {
@@ -38,40 +37,29 @@ public class Horse {
     @Column(name = "additional", nullable = true)
     private String additional;
 
-
     // Relationships
-
-    // Many-to-one
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stable_id", nullable = false)
     private Stable stable;
 
-    // Many-to-one relationship with User (owner)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     @JsonBackReference
     private User owner;
 
-    // One-to-many relationship with HorseFarrierApp
-    @OneToMany(mappedBy = "horse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseFarrierApp> farrierApps = new ArrayList<>();
-    
-    // One-to-many relationship with HorseFeedSched
-    @OneToMany(mappedBy = "horse", cascade = CascadeType.ALL, orphanRemoval = true)
+
+    @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseFeedSched> feedScheds = new ArrayList<>();
 
-    // One-to-many relationship with HorseShot
-    @OneToMany(mappedBy = "horse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseShot> shots = new ArrayList<>();
 
-    // One-to-many relationship with HorseTreatment
-    @OneToMany(mappedBy = "horse", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseTreatment> treatments = new ArrayList<>();
 
-
-    // Constructors, getters, and setters
-
-    //Getters
+    // Getters
     public Long getId() {
         return id;
     }
@@ -108,12 +96,6 @@ public class Horse {
         return stable;
     }
 
-    /* 
-    public Long getStableId() {
-    return stable != null ? stable.getStableId() : null;
-    }
-    */
-
     public List<HorseFarrierApp> getFarrierApps() {
         return farrierApps;
     }
@@ -126,12 +108,11 @@ public class Horse {
         return shots;
     }
 
-    public List<HorseTreatment> getTreatments() {
-        return treatments;
+    public List<HorseTreatment> getTreatments() { 
+        return treatments; 
     }
 
-    //Setters
-
+    // Setters
     public void setOwner(User owner) {
         this.owner = owner;
     }
@@ -164,9 +145,7 @@ public class Horse {
         this.stable = stable;
     }
 
-    // Methods to manage bi-directional relationships
-
-    // Farrier Apps
+    // Bi-directional methods
     public void addFarrierApp(HorseFarrierApp app) {
         farrierApps.add(app);
         app.setHorse(this);
@@ -177,7 +156,6 @@ public class Horse {
         app.setHorse(null);
     }
 
-    // Feed Schedules
     public void addFeedSched(HorseFeedSched sched) {
         feedScheds.add(sched);
         sched.setHorse(this);
@@ -188,7 +166,6 @@ public class Horse {
         sched.setHorse(null);
     }
 
-    // Shots
     public void addShot(HorseShot shot) {
         shots.add(shot);
         shot.setHorse(this);
@@ -199,7 +176,6 @@ public class Horse {
         shot.setHorse(null);
     }
 
-    // Treatments
     public void addTreatment(HorseTreatment treatment) {
         treatments.add(treatment);
         treatment.setHorse(this);
@@ -209,6 +185,4 @@ public class Horse {
         treatments.remove(treatment);
         treatment.setHorse(null);
     }
-
-
 }

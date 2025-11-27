@@ -10,7 +10,7 @@ import jakarta.persistence.*;
 public class FeedSched {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long feedSchedid;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "feed_time", nullable = false)
@@ -31,8 +31,8 @@ public class FeedSched {
     // Constructors, getters, and setters
 
     //Getters
-    public Long getFeedSchedid() {
-        return feedSchedid;
+    public Long getId() {
+        return id;
     }
 
     public FeedTime getFeedTime() {

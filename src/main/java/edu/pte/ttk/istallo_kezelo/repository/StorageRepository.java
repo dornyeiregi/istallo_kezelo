@@ -7,6 +7,6 @@ import edu.pte.ttk.istallo_kezelo.model.Storage;
 @Repository
 public interface StorageRepository extends JpaRepository<Storage, Long> {
 
-    Storage findByItem_ItemId(Long itemId);
+    Storage findByItem_Id(Long itemId);
 
 }
