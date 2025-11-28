@@ -48,14 +48,14 @@ public class FeedSchedItemController {
     }
 
     // Etetési napló minden tételének lekérdezése
-    @GetMapping("/byFeedSched/{feedSchedId}")
+    @GetMapping("/feedSchedId/{feedSchedId}")
     public List<FeedSchedItemDTO> getItemsForFeedSched(@PathVariable Long feedSchedId) {
         List<FeedSchedItem> links = feedSchedItemService.getItemsForFeedSched(feedSchedId);
         return links.stream().map(this::toDTO).toList();
     }
 
     // Egy tételt tartalmazó összes etetési napló lekérdezése
-    @GetMapping("/byItem/{itemId}")
+    @GetMapping("/itemId/{itemId}")
     public List<FeedSchedItemDTO> getFeedSchedsForItem(@PathVariable Long itemId) {
         List<FeedSchedItem> links = feedSchedItemService.getFeedSchedsForItem(itemId);
         return links.stream().map(this::toDTO).toList();

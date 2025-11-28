@@ -59,7 +59,7 @@ public class TreatmentController {
     }
 
     // Egy ló minden kezelésének lekérdezése ló ID alapján
-    @GetMapping("/byHorseId/{horseId}")
+    @GetMapping("/horseId/{horseId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId, Authentication auth) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId, auth);
@@ -67,7 +67,7 @@ public class TreatmentController {
     }
 
     // Egy ló minden kezelésének lekérdezése ló név alapján
-    @GetMapping("/byHorseName/{horseName}")
+    @GetMapping("/horseName/{horseName}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName, Authentication auth) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName, auth);

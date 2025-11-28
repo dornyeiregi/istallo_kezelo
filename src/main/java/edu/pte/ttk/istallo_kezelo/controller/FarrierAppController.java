@@ -62,7 +62,7 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése dátum alaján
-    @GetMapping("/byDate/{date}")
+    @GetMapping("/date/{date}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date, auth);
@@ -70,7 +70,7 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése patkolókovács neve alaján
-    @GetMapping("/byFarrierName/{farrierName}")
+    @GetMapping("/farrierName/{farrierName}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName, auth);
@@ -78,7 +78,7 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése ló neve alaján
-    @GetMapping("/byHorseName/{horseName}")
+    @GetMapping("/horseName/{horseName}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName, auth);
@@ -86,7 +86,7 @@ public class FarrierAppController {
     }
 
     // Patkolás lekérdezése ló id alaján
-    @GetMapping("/byHorseId/{horseId}")
+    @GetMapping("/horseId/{horseId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId, auth);

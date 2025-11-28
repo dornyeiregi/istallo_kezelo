@@ -51,14 +51,14 @@ public class HorseFeedSchedController {
     }
 
     // Összes ló lekérdezése etetési naplóhoz
-    @GetMapping("/byFeedSchedId/{feedSchedId}")
+    @GetMapping("/feedSchedId/{feedSchedId}")
     public List<HorseFeedSchedDTO> getHorsesForFeedSched(@PathVariable Long feedSchedId){
         List<HorseFeedSched> links = horseFeedSchedService.getHorsesForFeedSChed(feedSchedId);
         return links.stream().map(this::toDTO).toList();
     }
 
     // Lóhoz tartozó összes etetési napló lekérdezése
-    @GetMapping("/byHorseId/{horseId}")
+    @GetMapping("/horseId/{horseId}")
     public List<HorseFeedSchedDTO> getFeedSchedsForHorse(@PathVariable Long horseId){
         List<HorseFeedSched> links = horseFeedSchedService.getFeedSchedsForHorse(horseId);
         return links.stream().map(this::toDTO).toList();
