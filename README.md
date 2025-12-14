@@ -34,13 +34,8 @@ Szükséges komponensek:
 ### 2. Adatbázis előkészítése
 
 1. Hozz létre egy üres adatbázist `istallo_kezelo` néven a PostgreSQL-ben.
-    -> SQL fájl: `sql/istallo_kezelo_adatbazis.sql`
-
-2. Futtasd az ENUM típusokat létrehozó scriptet az adatbázisban.
-    -> SQL fájl: `sql/istallo_kezelo_enum.sql`
-
-3. Indítsd el a backendet (lásd lent), majd futtasd le az admin felhasználót létrehozó scriptet:
-    -> SQL fájl: `sql/istallo_kezelo_admin.sql`
+2. Indítsd el a backendet: a Flyway automatikusan lefuttatja a `src/main/resources/db/migration` alatt lévő migrációkat (pl. `V1__init.sql`), létrehozza a táblákat és az alapértelmezett admin felhasználót.
+   - Alapértelmezett admin felhasználó: username: `admin`, jelszó: `admin123`.
 
 
 ### 3. Backend konfigurálása és futtatása
@@ -51,13 +46,10 @@ Szükséges komponensek:
 spring.datasource.url=jdbc:postgresql://localhost:5432/istallo_kezelo
 spring.datasource.username=postgres        # saját Postgres felhasználód
 spring.datasource.password=your_password   # saját Postgres jelszavad
-
-spring.jpa.hibernate.ddl-auto=create       # első futtatáskor 'create', utána 'update'
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
 ```
 
    - Cseréld le a `spring.datasource.username` és `spring.datasource.password` értékeit a saját PostgreSQL felhasználódra és jelszavadra.
-   - Az első indítás előtt a `spring.jpa.hibernate.ddl-auto` legyen `create`, majd a további indításokhoz állítsd `update`-re.
+   - A Flyway migrációk kezelik a sémát, ezért a `spring.jpa.hibernate.ddl-auto` alapértelmezett `none` értéke maradhat.
 
 2. A backend indítása terminálból:
 ```

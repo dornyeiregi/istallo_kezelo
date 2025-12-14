@@ -20,7 +20,7 @@ public class WebSecurityConfig {
 
     private final AuthEntryPointJwt unauthorizedHandler;
 
-    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler){
+    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler) {
         this.unauthorizedHandler = unauthorizedHandler;
     }
 
@@ -30,49 +30,38 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable())
+        http.csrf(csrf -> csrf.disable());
 
-            .cors(cors -> cors.configurationSource(request -> {
-                var config = new CorsConfiguration();
-                config.addAllowedOrigin("http://localhost:4200");
-                config.addAllowedMethod("*");
-                config.addAllowedHeader("*");
-                config.setAllowCredentials(true);
-                return config;
-            }))
+        http.cors(cors -> cors.configurationSource(request -> {
+            var config = new CorsConfiguration();
+            config.addAllowedOrigin("http://localhost:4200");
+            config.addAllowedMethod("*");
+            config.addAllowedHeader("*");
+            config.setAllowCredentials(true);
+            return config;
+        }));
 
-            .exceptionHandling(ex -> ex.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        http.exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler));
+        http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-            .authorizeHttpRequests(auth -> auth
-                // minden OPTIONS kérés engedélyezve
+        http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // nyilvános auth endpointok
-                .requestMatchers("/api/auth/**", "/api/test/all").permitAll()
-
-                // admin endpointok
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                // minden más endpoint csak hitelesített usernek
+                .requestMatchers("/api/auth/**", "/api/test/**").permitAll()
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")   // => ROLE_ADMIN
                 .anyRequest().authenticated()
-            )
+        );
 
-            // JWT filter beillesztése
-            .addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

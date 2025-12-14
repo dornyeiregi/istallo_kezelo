@@ -124,7 +124,14 @@ public class FeedSchedService {
     // Etetési napló törlése
     @Transactional
     public void deleteFeedSched(Long id){
-        feedSchedRepository.deleteById(id);
+        FeedSched feedSched = feedSchedRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
+
+        // Explicitly remove child links so FK rows disappear before deleting the parent
+        feedSched.getHorseFeedScheds().clear();
+        feedSched.getFeedSchedItems().clear();
+
+        feedSchedRepository.delete(feedSched);
     }
 
     // Ló hozzáadása etetési naplóhoz

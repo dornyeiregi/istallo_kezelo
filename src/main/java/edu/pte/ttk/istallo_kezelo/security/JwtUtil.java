@@ -6,6 +6,7 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -27,12 +28,16 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // JWT token generálása felhasználóhoz és szerepkörökhöz
+    // JWT token generálása
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        // 🔹 Szerepkörök hozzáadása a tokenhez
+
+        // Szerepkörök ROLE_ előtag nélkül kerülnek a tokenbe
         claims.put("roles", userDetails.getAuthorities().stream()
-                .map(a -> a.getAuthority())
+                .map(a -> {
+                    String r = a.getAuthority();
+                    return r.startsWith("ROLE_") ? r.substring(5) : r;
+                })
                 .collect(Collectors.toList()));
 
         return Jwts.builder()
@@ -44,17 +49,14 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Felhasználónév kinyerése a tokenből
     public String getUsernameFromToken(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+                .getBody().getSubject();
     }
 
-    // Szerepkörök kinyerése a tokenből
     public List<String> getRolesFromToken(String token) {
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -71,22 +73,12 @@ public class JwtUtil {
         return Collections.emptyList();
     }
 
-    
-    // Token érvényesség ellenőrzése
     public boolean validateJwtToken(String token) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (SecurityException e) {
-            System.out.println("Invalid JWT signature: " + e.getMessage());
-        } catch (MalformedJwtException e) {
-            System.out.println("Invalid JWT token: " + e.getMessage());
-        } catch (ExpiredJwtException e) {
-            System.out.println("JWT token is expired: " + e.getMessage());
-        } catch (UnsupportedJwtException e) {
-            System.out.println("JWT token is unsupported: " + e.getMessage());
-        } catch (IllegalArgumentException e) {
-            System.out.println("JWT claims string is empty: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("JWT error: " + e.getMessage());
         }
         return false;
     }

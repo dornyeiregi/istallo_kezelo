@@ -1,3 +1,7 @@
+-----------------------------------------------------------------------
+-- 1. TÁBLÁK LÉTREHOZÁSA
+-----------------------------------------------------------------------
+
 CREATE TABLE app_user (
     user_id BIGSERIAL PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
@@ -6,7 +10,9 @@ CREATE TABLE app_user (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50),
     password_hash VARCHAR(255) NOT NULL,
-    user_type VARCHAR(20) NOT NULL
+
+    -- JPA EnumType.STRING -> VARCHAR kell
+    user_type VARCHAR(10) NOT NULL
 );
 
 CREATE TABLE stable (
@@ -17,13 +23,18 @@ CREATE TABLE stable (
 CREATE TABLE item (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
+
+    -- ENUM helyett VARCHAR
     item_type VARCHAR(50) NOT NULL,
-    item_category VARCHAR(50) NOT NULL
+    item_category VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE feed_sched (
     id BIGSERIAL PRIMARY KEY,
-    feed_time VARCHAR(20) NOT NULL,
+
+    -- ENUM helyett VARCHAR
+    feed_time VARCHAR(50) NOT NULL,
+
     description TEXT
 );
 
@@ -54,10 +65,14 @@ CREATE TABLE horse (
     id BIGSERIAL PRIMARY KEY,
     horse_name VARCHAR(255) NOT NULL,
     dob DATE,
-    sex VARCHAR(10) NOT NULL,
+
+    -- ENUM helyett VARCHAR
+    sex VARCHAR(2) NOT NULL,
+
     passport_num VARCHAR(255) UNIQUE,
     microchip_num VARCHAR(255) UNIQUE,
     additional TEXT,
+
     stable_id BIGINT NOT NULL REFERENCES stable (stable_id),
     user_id BIGINT NOT NULL REFERENCES app_user (user_id)
 );
@@ -115,3 +130,19 @@ CREATE TABLE storage (
 );
 
 CREATE INDEX idx_storage_item_id ON storage (item_id);
+
+-----------------------------------------------------------------------
+-- 3. ALAPÉRTELMEZETT ADMIN FELHASZNÁLÓ LÉTREHOZÁSA
+-----------------------------------------------------------------------
+
+INSERT INTO app_user (username, user_lname, user_fname, email, phone, password_hash, user_type)
+VALUES (
+    'admin',
+    'Admin',
+    'Felhasználó',
+    'admin@example.com',
+    NULL,
+    '$2b$12$6dScWm9USZE7vVcZmfbC5ePGbMdk5G1bp/LiDMmYhCxZdqmvqw3j.', -- admin123
+    'ADMIN'
+)
+ON CONFLICT (username) DO NOTHING;

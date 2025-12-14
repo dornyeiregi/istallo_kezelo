@@ -5,7 +5,7 @@ import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,7 +20,7 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
+    //@Autowired
     public AdminService(UserRepository userRepository,
                         PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;

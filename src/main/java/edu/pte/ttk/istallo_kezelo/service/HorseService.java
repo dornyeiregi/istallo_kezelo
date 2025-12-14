@@ -153,57 +153,61 @@ public class HorseService {
 
         // Oltások (HorseShot)
         List<HorseShot> shotLinks = horseShotRepository.findByHorse_Id(horseId);
+        List<Long> shotIds = shotLinks.stream()
+                .map(link -> link.getShot().getId())
+                .toList();
 
-        for (HorseShot link : shotLinks) {
+        horseShotRepository.deleteAll(shotLinks);
 
-            Shot shot = link.getShot();
-            horseShotRepository.delete(link);
-            int remaining = horseShotRepository.countByShot_Id(shot.getId());
-            // ha nincs több ló hozzácsatolva, töröljük a shot-ot is
-            if (remaining == 0) {
-                shotRepository.delete(shot);
+        shotIds.forEach(shotId -> {
+            if (horseShotRepository.countByShot_Id(shotId) == 0) {
+                shotRepository.deleteById(shotId);
             }
-        }
+        });
 
-        // Kezelések (HorseTreatment)
+        // Kezelések
         List<HorseTreatment> treatmentLinks = horseTreatmentRepository.findByHorse_Id(horseId);
+        List<Long> treatmentIds = treatmentLinks.stream()
+                .map(link -> link.getTreatment().getId())
+                .toList();
 
-        for (HorseTreatment link : treatmentLinks) {
+        horseTreatmentRepository.deleteAll(treatmentLinks);
 
-            Treatment treatment = link.getTreatment();
-            horseTreatmentRepository.delete(link);
-            int remaining = horseTreatmentRepository.countByTreatment_Id(treatment.getId());
-            if (remaining == 0) {
-                treatmentRepository.delete(treatment);
+        treatmentIds.forEach(treatmentId -> {
+            if (horseTreatmentRepository.countByTreatment_Id(treatmentId) == 0) {
+                treatmentRepository.deleteById(treatmentId);
             }
-        }
+        });
 
-        // Patkolások (HorseFarrierApp)
+        // Patkolás
         List<HorseFarrierApp> farrierLinks = horseFarrierAppRepository.findByHorseId(horseId);
+        List<Long> farrierIds = farrierLinks.stream()
+                .map(link -> link.getFarrierApp().getId())
+                .toList();
 
-        for (HorseFarrierApp link : farrierLinks) {
-            FarrierApp app = link.getFarrierApp();
-            horseFarrierAppRepository.delete(link);
-            int remaining = horseFarrierAppRepository.countByFarrierApp_Id(app.getId());
-            if (remaining == 0) {
-                farrierAppRepository.delete(app);
+        horseFarrierAppRepository.deleteAll(farrierLinks);
+
+        farrierIds.forEach(farrierAppId -> {
+            if (horseFarrierAppRepository.countByFarrierApp_Id(farrierAppId) == 0) {
+                farrierAppRepository.deleteById(farrierAppId);
             }
-        }
+        });
 
-        // Etetési naplók  (HorseFeedSched)
+        // Feed sched
         List<HorseFeedSched> feedLinks = horseFeedSchedRepository.findByHorseId(horseId);
+        List<Long> feedIds = feedLinks.stream()
+                .map(link -> link.getFeedSched().getId())
+                .toList();
 
-        for (HorseFeedSched link : feedLinks) {
-            FeedSched sched = link.getFeedSched();
-            horseFeedSchedRepository.delete(link);
-            int remaining = horseFeedSchedRepository.countByFeedSchedId(sched.getId());
-            if (remaining == 0) {
-                feedSchedRepository.delete(sched);
+        horseFeedSchedRepository.deleteAll(feedLinks);
+
+        feedIds.forEach(feedSchedId -> {
+            if (horseFeedSchedRepository.countByFeedSchedId(feedSchedId) == 0) {
+                feedSchedRepository.deleteById(feedSchedId);
             }
-        }
+        });
 
         // Ló törlése
-        // Stable NEM törlődik!
         horseRepository.delete(horse);
     }
 
