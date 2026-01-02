@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.HorseMapper;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.model.User;
@@ -57,14 +58,14 @@ public class HorseController {
         horse.setAdditional(dto.getAdditional());
 
         Horse savedHorse = horseService.saveHorse(horse);
-        return toDTO(savedHorse);
+        return HorseMapper.toDTO(savedHorse);
     }
 
     // Összes ló lekérdezése
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
     public List<HorseDTO> getAllHorses(Authentication auth) {
-        return horseService.getAllHorses(auth).stream().map(this::toDTO).toList();
+        return horseService.getAllHorses(auth).stream().map(HorseMapper::toDTO).toList();
     }
 
     // Ló lekérdezése id alapján
@@ -78,7 +79,7 @@ public class HorseController {
             throw new RuntimeException("Nincs jogosultsága más lovait megtekinteni.");
         }
 
-        return toDTO(horse);
+        return HorseMapper.toDTO(horse);
     }
 
     // Ló lekérdezése név alapján
@@ -89,7 +90,7 @@ public class HorseController {
         if (horse == null) {
             throw new RuntimeException("Ló nem található.");
         }
-        return toDTO(horse);
+        return HorseMapper.toDTO(horse);
     }
 
     // Ló frissítése
@@ -123,7 +124,7 @@ public class HorseController {
 
         Horse savedHorse = horseService.saveHorse(existingHorse);
 
-        return toDTO(savedHorse);
+        return HorseMapper.toDTO(savedHorse);
     }
 
     // Ló törlése
@@ -147,7 +148,7 @@ public class HorseController {
     public List<HorseDTO> getMyHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream()
             .filter(h -> h.getOwner().getUsername().equals(auth.getName()))
-            .map(this::toDTO).toList();
+            .map(HorseMapper::toDTO).toList();
     }
     
 
@@ -160,7 +161,7 @@ public class HorseController {
         } else {
             return horseService.getAllHorses(auth).stream()
                 .filter(horse -> horse.getOwner().getId().equals(ownerId))
-                .map(this::toDTO).toList();
+                .map(HorseMapper::toDTO).toList();
         }
     }
 
@@ -174,7 +175,7 @@ public class HorseController {
         }
         return horseService.getAllHorses(auth).stream()
             .filter(horse -> horse.getOwner().getId().equals(owner.getId()))
-            .map(this::toDTO).toList();
+            .map(HorseMapper::toDTO).toList();
     }
 
     // Felhasználó összes lovának lekérdezése felhasználónév alapján
@@ -187,7 +188,7 @@ public class HorseController {
         }
         return horseService.getAllHorses(auth).stream()
             .filter(horse -> horse.getOwner().getUsername().equals(username))
-            .map(this::toDTO).toList();
+            .map(HorseMapper::toDTO).toList();
     }
     
 
@@ -200,7 +201,7 @@ public class HorseController {
         } else {
             return horseService.getAllHorses(auth).stream()
                 .filter(horse -> horse.getStable().getId().equals(stableId))
-                .map(this::toDTO).toList();
+                .map(HorseMapper::toDTO).toList();
         }
     }
 
@@ -214,26 +215,7 @@ public class HorseController {
         }
         return horseService.getAllHorses(auth).stream()
             .filter(horse -> horse.getStable().getStableName().equals(stable.getStableName()))
-            .map(this::toDTO).toList();
-    }
-
-
-
-    private HorseDTO toDTO(Horse horse){
-        HorseDTO dto = new HorseDTO();
-        dto.setId(horse.getId());
-        dto.setHorseName(horse.getHorseName());
-        dto.setDob(horse.getDob());
-        dto.setSex(horse.getSex());
-        dto.setOwnerName(horse.getOwner().getUserLname() + " "
-            + horse.getOwner().getUserFname());
-        dto.setOwnerId(horse.getOwner().getId());
-        dto.setStableName(horse.getStable().getStableName());
-        dto.setStableId(horse.getStable().getId());
-        dto.setMicrochipNum(horse.getMicrochipNum());
-        dto.setPassportNum(horse.getPassportNum());
-        dto.setAdditional(horse.getAdditional());
-        return dto;
+            .map(HorseMapper::toDTO).toList();
     }
 
     private boolean hasRole(Authentication auth, String role) {

@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import edu.pte.ttk.istallo_kezelo.config.EmptyStringToNullConverter;
+import edu.pte.ttk.istallo_kezelo.model.enums.*;
 import jakarta.persistence.*;
 @Entity
 @Table(name = "horse")

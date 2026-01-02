@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-
+import edu.pte.ttk.istallo_kezelo.model.enums.*;
 import jakarta.persistence.*;
 
 @Entity

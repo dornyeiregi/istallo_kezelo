@@ -15,15 +15,11 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
-import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
-import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
-import edu.pte.ttk.istallo_kezelo.model.Shot;
-import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
-import edu.pte.ttk.istallo_kezelo.model.ItemCategory;
-import edu.pte.ttk.istallo_kezelo.model.ItemType;
+import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;
+import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

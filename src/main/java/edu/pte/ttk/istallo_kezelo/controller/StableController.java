@@ -3,9 +3,8 @@ package edu.pte.ttk.istallo_kezelo.controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
 import edu.pte.ttk.istallo_kezelo.dto.StableDTO;
-import edu.pte.ttk.istallo_kezelo.model.Horse;
+import edu.pte.ttk.istallo_kezelo.mapper.StableMapper;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.service.StableService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,14 +41,14 @@ public class StableController {
         
         Stable savedStable = stableService.saveStable(stable);
 
-        return toDTO(savedStable);
+        return StableMapper.toDTO(savedStable);
     }
     
     // Összes istálló lekérdezése
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<StableDTO> getAllStables(){
-        return stableService.getAllStables().stream().map(this::toDTO).toList();
+        return stableService.getAllStables().stream().map(StableMapper::toDTO).toList();
     }
 
     // Istálló lekérdezése id alapján
@@ -61,7 +60,7 @@ public class StableController {
         if (stable == null) {
             throw new RuntimeException("Istálló nem található.");
         }
-        return toDTO(stable);
+        return StableMapper.toDTO(stable);
     }
 
     // Istálló lekérdezése név alapján
@@ -70,7 +69,7 @@ public class StableController {
     public StableDTO getStableByName(@RequestParam String stableName) {
         Stable stable = stableService.getStableByName(stableName);
 
-        return toDTO(stable);
+        return StableMapper.toDTO(stable);
     }
 
     // Istálló frissítése
@@ -88,7 +87,7 @@ public class StableController {
         }
 
         Stable savedStable = stableService.saveStable(existingStable);
-        return toDTO(savedStable);
+        return StableMapper.toDTO(savedStable);
     }
 
 
@@ -99,32 +98,6 @@ public class StableController {
     public ResponseEntity<String> deleteStable(@PathVariable Long stableId){
         stableService.deleteStableById(stableId);
         return ResponseEntity.ok("Istálló sikeresen törölve.");
-    }
-
-
-    private StableDTO toDTO(Stable stable){
-        StableDTO dto = new StableDTO();
-        dto.setStableId(stable.getId());
-        dto.setStableName(stable.getStableName());
-        dto.setHorses(stable.getHorsesInStable().stream().map(this::toHorseDTO).toList());
-        return dto;
-    }
-
-    private HorseDTO toHorseDTO(Horse horse){
-        HorseDTO dto = new HorseDTO();
-        dto.setId(horse.getId());
-        dto.setHorseName(horse.getHorseName());
-        dto.setDob(horse.getDob());
-        dto.setSex(horse.getSex());
-        dto.setOwnerName(horse.getOwner().getUserLname() + " "
-            + horse.getOwner().getUserFname());
-        dto.setOwnerId(horse.getOwner().getId());
-        dto.setStableName(horse.getStable().getStableName());
-        dto.setStableId(horse.getStable().getId());
-        dto.setMicrochipNum(horse.getMicrochipNum());
-        dto.setPassportNum(horse.getPassportNum());
-        dto.setAdditional(horse.getAdditional());
-        return dto;
     }
 
 }

@@ -2,7 +2,7 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import edu.pte.ttk.istallo_kezelo.model.UserType;
+import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

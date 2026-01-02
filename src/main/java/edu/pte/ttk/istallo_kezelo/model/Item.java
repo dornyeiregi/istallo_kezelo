@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import edu.pte.ttk.istallo_kezelo.model.enums.*;
 
 @Entity
 @Table(name = "item")

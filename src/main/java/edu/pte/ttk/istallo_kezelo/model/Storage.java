@@ -1,5 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.model;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -16,6 +18,9 @@ public class Storage {
 
     @Column(name = "amount_stored", nullable = false)
     private Double amountStored;
+
+    @Column(name = "last_reduced_date")
+    private LocalDate lastReducedDate;
 
     @ManyToOne
     @JoinColumn(name = "item_id", nullable = false)
@@ -36,6 +41,10 @@ public class Storage {
         return amountStored;
     }
 
+    public LocalDate getLastReducedDate() {
+        return lastReducedDate;
+    }
+
     public Item getItem() {
         return item;
     }
@@ -51,6 +60,10 @@ public class Storage {
 
     public void setAmountStored(Double amountStored) {
         this.amountStored = amountStored;
+    }
+
+    public void setLastReducedDate(LocalDate lastReducedDate) {
+        this.lastReducedDate = lastReducedDate;
     }
 
     public void setItem(Item item) {

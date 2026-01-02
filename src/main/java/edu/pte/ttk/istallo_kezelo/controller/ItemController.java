@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.ItemDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.ItemMapper;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.service.ItemService;
 
@@ -37,13 +38,13 @@ public class ItemController {
         item.setItemCategory(dto.getItemCategory());
 
         Item saved = itemService.createItem(item);
-        return toDTO(saved);
+        return ItemMapper.toDTO(saved);
     }
 
     // Összes tétel lekérdezése
     @GetMapping()
     public List<ItemDTO> getAllItems() {
-        return itemService.getAllItems().stream().map(this::toDTO).toList();
+        return itemService.getAllItems().stream().map(ItemMapper::toDTO).toList();
     }
 
     // Tétel lekérdezése id alapján
@@ -53,14 +54,14 @@ public class ItemController {
         if (item == null) {
             throw new RuntimeException("Tétel nem található.");
         }
-        return toDTO(item);
+        return ItemMapper.toDTO(item);
     }
 
     // Tétel frissítése
     @PatchMapping("/{id}")
     public ResponseEntity<ItemDTO> updateItem(@PathVariable Long id, @RequestBody ItemDTO dto) {
         Item updated = itemService.updateItem(id, dto);
-        return ResponseEntity.ok(toDTO(updated));
+        return ResponseEntity.ok(ItemMapper.toDTO(updated));
     }
 
 
@@ -71,12 +72,4 @@ public class ItemController {
         return ResponseEntity.ok("Tétel sikeresen törölve.");
     }
         
-    private ItemDTO toDTO(Item item) {
-        ItemDTO dto = new ItemDTO();
-        dto.setItemId(item.getId());
-        dto.setName(item.getName());
-        dto.setItemType(item.getItemType());
-        dto.setItemCategory(item.getItemCategory());
-        return dto;
-    }
 }

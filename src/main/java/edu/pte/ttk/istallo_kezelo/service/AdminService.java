@@ -2,8 +2,9 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import edu.pte.ttk.istallo_kezelo.dto.SignupRequestDTO;
 import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.UserMapper;
 import edu.pte.ttk.istallo_kezelo.model.User;
-import edu.pte.ttk.istallo_kezelo.model.UserType;
+import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 //import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class AdminService {
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
-            .map(this::toDTO).toList();
+            .map(UserMapper::toDTO).toList();
     }
 
     public User updateUserRole(Long userId, String newRole) {
@@ -57,18 +58,6 @@ public class AdminService {
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Érvénytelen role típus");
         }
-    }
-
-    private UserDTO toDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setUserId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setUserLname(user.getUserLname());
-        dto.setUserFname(user.getUserFname());
-        dto.setEmail(user.getEmail());
-        dto.setPhone(user.getPhone());
-        dto.setUserType(user.getUserType());
-        return dto;
     }
 
     public void deleteUser(Long id) {

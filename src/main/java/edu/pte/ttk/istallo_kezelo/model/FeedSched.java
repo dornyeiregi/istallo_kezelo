@@ -2,6 +2,7 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import edu.pte.ttk.istallo_kezelo.model.enums.*;
 
 import jakarta.persistence.*;
 

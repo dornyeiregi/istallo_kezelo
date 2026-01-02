@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseFeedSchedDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.HorseFeedSchedMapper;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.service.HorseFeedSchedService;
 
@@ -33,35 +34,35 @@ public class HorseFeedSchedController {
     @PostMapping()
     public HorseFeedSchedDTO addHorseToFeedSched(@RequestBody HorseFeedSchedDTO dto){
         HorseFeedSched link = horseFeedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), dto.getHorseId());
-        return toDTO(link);
+        return HorseFeedSchedMapper.toDTO(link);
     }
 
     // Összes link lekérdezése
     @GetMapping()
     public List<HorseFeedSchedDTO> getAllHorseFeedScheds(){
         List<HorseFeedSched> links = horseFeedSchedService.getAllHorseFeedScheds();
-        return links.stream().map(this::toDTO).toList();
+        return links.stream().map(HorseFeedSchedMapper::toDTO).toList();
     }
 
     // Link lekérdezése id alapján
     @GetMapping("/{id}")
     public HorseFeedSchedDTO getHorseFeedSchedById(@PathVariable Long id){
         HorseFeedSched link = horseFeedSchedService.getHorseFeedSchedById(id);
-        return toDTO(link);
+        return HorseFeedSchedMapper.toDTO(link);
     }
 
     // Összes ló lekérdezése etetési naplóhoz
     @GetMapping("/feedSchedId/{feedSchedId}")
     public List<HorseFeedSchedDTO> getHorsesForFeedSched(@PathVariable Long feedSchedId){
         List<HorseFeedSched> links = horseFeedSchedService.getHorsesForFeedSChed(feedSchedId);
-        return links.stream().map(this::toDTO).toList();
+        return links.stream().map(HorseFeedSchedMapper::toDTO).toList();
     }
 
     // Lóhoz tartozó összes etetési napló lekérdezése
     @GetMapping("/horseId/{horseId}")
     public List<HorseFeedSchedDTO> getFeedSchedsForHorse(@PathVariable Long horseId){
         List<HorseFeedSched> links = horseFeedSchedService.getFeedSchedsForHorse(horseId);
-        return links.stream().map(this::toDTO).toList();
+        return links.stream().map(HorseFeedSchedMapper::toDTO).toList();
     }
 
     // Ló eltávolítása etetési naplóból
@@ -70,15 +71,5 @@ public class HorseFeedSchedController {
         HorseFeedSched link = horseFeedSchedService.getHorseFeedSchedById(id);
         horseFeedSchedService.removeHorseFromFeedSched(link.getFeedSched().getId(), link.getHorse().getId());
         return ResponseEntity.ok("Link sikeresen törölve.");
-    }
-    
-
-    private HorseFeedSchedDTO toDTO(HorseFeedSched horseFeedSched){
-        HorseFeedSchedDTO dto = new HorseFeedSchedDTO();
-        dto.setHorseId(horseFeedSched.getHorse().getId());
-        dto.setFeedSchedId(horseFeedSched.getFeedSched().getId());
-        dto.setFeedDescription(horseFeedSched.getFeedSched().getDescription());
-        dto.setHorseName(horseFeedSched.getHorse().getHorseName());
-        return dto;
     }
 }

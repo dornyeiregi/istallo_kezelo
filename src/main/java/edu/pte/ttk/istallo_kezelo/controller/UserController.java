@@ -3,6 +3,7 @@ package edu.pte.ttk.istallo_kezelo.controller;
 import org.springframework.web.bind.annotation.*;
 
 import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.UserMapper;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
 import org.springframework.http.ResponseEntity;
@@ -40,14 +41,14 @@ public class UserController {
 
         User savedUser = userService.saveUser(user);
 
-        return toDTO(savedUser);
+        return UserMapper.toDTO(savedUser);
     }
     
     // Összes felhasználó lekérdezése       
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<UserDTO> getAllUsers() {
-        return userService.getAllUsers().stream().map(this::toDTO).toList();
+        return userService.getAllUsers().stream().map(UserMapper::toDTO).toList();
     }
     
 
@@ -57,7 +58,7 @@ public class UserController {
     public UserDTO getUserById(@PathVariable Long id, Authentication auth){
         User user = userService.getUserById(id, auth)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
-        return toDTO(user);
+        return UserMapper.toDTO(user);
     }
 
     
@@ -69,7 +70,7 @@ public class UserController {
         if (user == null){
             throw new RuntimeException("Felhasználó nem található.");
         }
-        return toDTO(user);
+        return UserMapper.toDTO(user);
     }
 
     // Felhasználó lekérdezése név alapján
@@ -80,7 +81,7 @@ public class UserController {
         if (user == null) {
             throw new RuntimeException("Felhasználó nem található.");
         }
-        return toDTO(user);
+        return UserMapper.toDTO(user);
     }
     
     // Felhasználó lekérdezése ló neve alapján
@@ -91,7 +92,7 @@ public class UserController {
         if (user == null) {
             throw new RuntimeException("Felhasználó nem található.");
         }
-        return toDTO(user);
+        return UserMapper.toDTO(user);
     }
     
     /*
@@ -152,7 +153,7 @@ public class UserController {
         if (dto.getUsername() != null) {existingUser.setUsername(dto.getUsername());};
 
         User savedUser = userService.saveUser(existingUser);
-        return toDTO(savedUser);
+        return UserMapper.toDTO(savedUser);
     }
 
     // Felhasználó törlése
@@ -163,17 +164,5 @@ public class UserController {
         return ResponseEntity.ok("Felhasználó sikeresen törölve.");
     }
 
-
-    private UserDTO toDTO(User user) {
-        UserDTO dto = new UserDTO();
-        dto.setUserId(user.getId());
-        dto.setUsername(user.getUsername());
-        dto.setUserLname(user.getUserLname());
-        dto.setUserFname(user.getUserFname());
-        dto.setEmail(user.getEmail());
-        dto.setPhone(user.getPhone());
-        dto.setUserType(user.getUserType());
-        return dto;
-    }
 
 }

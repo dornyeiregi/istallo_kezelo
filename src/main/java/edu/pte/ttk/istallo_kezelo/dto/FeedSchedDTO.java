@@ -1,6 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
-import edu.pte.ttk.istallo_kezelo.model.FeedTime;
+import edu.pte.ttk.istallo_kezelo.model.enums.FeedTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

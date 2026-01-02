@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.FarrierAppMapper;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.service.FarrierAppService;
 
@@ -38,7 +39,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<FarrierAppDTO> createFarrierApp(@RequestBody FarrierAppDTO dto, Authentication auth) {
         FarrierApp created = farrierAppService.createFarrierApp(dto, auth);
-        return ResponseEntity.ok(toDTO(created));
+        return ResponseEntity.ok(FarrierAppMapper.toDTO(created));
     }
 
 
@@ -47,7 +48,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getAllFarrierApps(Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps(auth);
-        return farrierApps.stream().map(this::toDTO).toList();
+        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     // Patkolás lekérdezése id alaján
@@ -58,7 +59,7 @@ public class FarrierAppController {
         if (farrierApp == null) {
             throw new RuntimeException("Patkolás nem található.");
         }
-        return toDTO(farrierApp);
+        return FarrierAppMapper.toDTO(farrierApp);
     }
 
     // Patkolás lekérdezése dátum alaján
@@ -66,7 +67,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date, auth);
-        return farrierApps.stream().map(this::toDTO).toList();
+        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     // Patkolás lekérdezése patkolókovács neve alaján
@@ -74,7 +75,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName, auth);
-        return farrierApps.stream().map(this::toDTO).toList();
+        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló neve alaján
@@ -82,7 +83,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName, auth);
-        return farrierApps.stream().map(this::toDTO).toList();
+        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     // Patkolás lekérdezése ló id alaján
@@ -90,7 +91,7 @@ public class FarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId, auth);
-        return farrierApps.stream().map(this::toDTO).toList();
+        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     // Patkolás frissítése
@@ -107,18 +108,6 @@ public class FarrierAppController {
     public ResponseEntity<String> deleteFarrierApp(@PathVariable Long id) {
         farrierAppService.deleteFarrierApp(id);
         return ResponseEntity.ok("Patkolás sikeresen törölve.");
-    }
-
-    private FarrierAppDTO toDTO(FarrierApp farrierApp) {
-        FarrierAppDTO dto = new FarrierAppDTO();
-        dto.setFarrierAppId(farrierApp.getId());
-        dto.setAppointmentDate(farrierApp.getAppointmentDate());
-        dto.setFarrierPhone(farrierApp.getFarrierPhone());
-        dto.setFarrierName(farrierApp.getFarrierName());
-        dto.setShoes(farrierApp.getShoes());
-        dto.setHorseIds(farrierApp.getHorses_done().stream()
-                .map(hfa -> hfa.getHorse().getId()).toList());
-        return dto;
     }
 
 }

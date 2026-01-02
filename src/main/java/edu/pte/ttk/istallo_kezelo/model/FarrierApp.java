@@ -59,8 +59,8 @@ public class FarrierApp {
         return horsesDone;
     }
 
-    //Setters
 
+    //Setters
     public void setFarrierName(String farrierName) {
         this.farrierName = farrierName; 
     }

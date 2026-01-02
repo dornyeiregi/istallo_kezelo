@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.TreatmentDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.TreatmentMapper;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.service.TreatmentService;
 
@@ -39,7 +40,7 @@ public class TreatmentController {
         treatment.setDate(dto.getDate());
 
         Treatment saved = treatmentService.saveTreatment(treatment, auth);
-        return toDTO(saved);
+        return TreatmentMapper.toDTO(saved);
     }
 
     // Összes kezelés lekérdezése
@@ -47,7 +48,7 @@ public class TreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<TreatmentDTO> getAllTreatments(Authentication auth) {
         List<Treatment> treatments = treatmentService.getAllTreatments(auth);
-        return treatments.stream().map(this::toDTO).toList();
+        return treatments.stream().map(TreatmentMapper::toDTO).toList();
     }
 
     // Kezelés lekérdezése ID alapján
@@ -55,7 +56,7 @@ public class TreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public TreatmentDTO getTreatmentById(@PathVariable Long id, Authentication auth) {
         Treatment treatment = treatmentService.getTreatmentById(id, auth);
-        return toDTO(treatment);
+        return TreatmentMapper.toDTO(treatment);
     }
 
     // Egy ló minden kezelésének lekérdezése ló ID alapján
@@ -63,7 +64,7 @@ public class TreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId, Authentication auth) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId, auth);
-        return treatments.stream().map(this::toDTO).toList();
+        return treatments.stream().map(TreatmentMapper::toDTO).toList();
     }
 
     // Egy ló minden kezelésének lekérdezése ló név alapján
@@ -71,7 +72,7 @@ public class TreatmentController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName, Authentication auth) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName, auth);
-        return treatments.stream().map(this::toDTO).toList();
+        return treatments.stream().map(TreatmentMapper::toDTO).toList();
     }
 
     // Kezelés frissítése
@@ -88,14 +89,5 @@ public class TreatmentController {
     public ResponseEntity<String> deleteTreatment(@PathVariable Long treatmentId, Authentication auth) {
         treatmentService.deleteTreatmentById(treatmentId, auth);
         return ResponseEntity.ok("Kezelés sikeresen törölve.");
-    }
-
-    private TreatmentDTO toDTO(Treatment treatment) {
-        TreatmentDTO dto = new TreatmentDTO();
-        dto.setTreatmentId(treatment.getId());
-        dto.setTreatmentName(treatment.getTreatmentName());
-        dto.setDescription(treatment.getDescription());
-        dto.setDate(treatment.getDate());
-        return dto;
     }
 }

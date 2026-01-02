@@ -10,8 +10,6 @@ CREATE TABLE app_user (
     email VARCHAR(255) NOT NULL UNIQUE,
     phone VARCHAR(50),
     password_hash VARCHAR(255) NOT NULL,
-
-    -- JPA EnumType.STRING -> VARCHAR kell
     user_type VARCHAR(10) NOT NULL
 );
 
@@ -23,18 +21,13 @@ CREATE TABLE stable (
 CREATE TABLE item (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
-
-    -- ENUM helyett VARCHAR
     item_type VARCHAR(50) NOT NULL,
     item_category VARCHAR(20) NOT NULL
 );
 
 CREATE TABLE feed_sched (
     id BIGSERIAL PRIMARY KEY,
-
-    -- ENUM helyett VARCHAR
     feed_time VARCHAR(50) NOT NULL,
-
     description TEXT
 );
 
@@ -65,17 +58,25 @@ CREATE TABLE horse (
     id BIGSERIAL PRIMARY KEY,
     horse_name VARCHAR(255) NOT NULL,
     dob DATE,
-
-    -- ENUM helyett VARCHAR
     sex VARCHAR(2) NOT NULL,
-
     passport_num VARCHAR(255) UNIQUE,
     microchip_num VARCHAR(255) UNIQUE,
     additional TEXT,
-
     stable_id BIGINT NOT NULL REFERENCES stable (stable_id),
     user_id BIGINT NOT NULL REFERENCES app_user (user_id)
 );
+
+CREATE TABLE calendar_event (
+    event_id BIGSERIAL PRIMARY KEY,
+    horse_id BIGINT NOT NULL REFERENCES horse (id),
+    event_type VARCHAR(30) NOT NULL,
+    event_date DATE NOT NULL,
+    related_entity_id BIGINT
+);
+
+CREATE INDEX idx_calendar_event_horse_id ON calendar_event (horse_id);
+CREATE INDEX idx_calendar_event_event_date ON calendar_event (event_date);
+CREATE INDEX idx_calendar_event_type_related ON calendar_event (event_type, related_entity_id);
 
 CREATE TABLE feed_sched_item (
     id BIGSERIAL PRIMARY KEY,
@@ -126,6 +127,7 @@ CREATE TABLE storage (
     storage_id BIGSERIAL PRIMARY KEY,
     amount_in_use DOUBLE PRECISION NOT NULL,
     amount_stored DOUBLE PRECISION NOT NULL,
+    last_reduced_date DATE,
     item_id BIGINT NOT NULL REFERENCES item (id)
 );
 
@@ -142,7 +144,7 @@ VALUES (
     'Felhasználó',
     'admin@example.com',
     NULL,
-    '$2b$12$6dScWm9USZE7vVcZmfbC5ePGbMdk5G1bp/LiDMmYhCxZdqmvqw3j.', -- admin123
+    '$2b$12$6dScWm9USZE7vVcZmfbC5ePGbMdk5G1bp/LiDMmYhCxZdqmvqw3j.',
     'ADMIN'
 )
 ON CONFLICT (username) DO NOTHING;

@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.ShotDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.ShotMapper;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 import edu.pte.ttk.istallo_kezelo.service.ShotService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,7 @@ public class ShotController {
 
         Shot savedShot = shotService.saveShot(shot, dto.getHorseIds(), auth);
 
-        return toDTO(savedShot);
+        return ShotMapper.toDTO(savedShot);
     }
 
 
@@ -51,14 +52,14 @@ public class ShotController {
     @GetMapping()
     public List<ShotDTO> getAllShots(Authentication auth) {
         List<Shot> shots = shotService.getAllShots(auth);
-        return (shots).stream().map(this::toDTO).toList();
+        return (shots).stream().map(ShotMapper::toDTO).toList();
     }
 
     // Oltás lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/{shotId}")
     public ShotDTO getShotById(@PathVariable Long shotId, Authentication auth) {
-        return toDTO(shotService.getShotById(shotId, auth));
+        return ShotMapper.toDTO(shotService.getShotById(shotId, auth));
     }
 
     // Ló összes oltásának lekérdezése id alapján
@@ -66,7 +67,7 @@ public class ShotController {
     @GetMapping("/horseId/{horseId}")
     public List<ShotDTO> getAllShotsOfHorseById(@PathVariable Long horseId, Authentication auth) {
         List<Shot> shots = shotService.getShotsByHorseId(horseId, auth);
-        return shots.stream().map(this::toDTO).toList(); 
+        return shots.stream().map(ShotMapper::toDTO).toList(); 
     }
     
     // Ló összes oltásának lekérdezése ló neve alapján
@@ -74,7 +75,7 @@ public class ShotController {
     @GetMapping("/horseName/{horseName}")
     public List<ShotDTO> getAllShotsOfHorseByName(@PathVariable String horseName, Authentication auth) {
         List<Shot> shots = shotService.getShotsByHorseName(horseName, auth);
-        return shots.stream().map(this::toDTO).toList();
+        return shots.stream().map(ShotMapper::toDTO).toList();
     }
     
     // Oltás frissítése
@@ -93,19 +94,5 @@ public class ShotController {
         return ResponseEntity.ok("Oltás sikeresen törölve.");
     }
 
-
-    private ShotDTO toDTO(Shot shot){
-        ShotDTO dto = new ShotDTO();
-        dto.setShotId(shot.getId());
-        dto.setShotName(shot.getShotName());
-        dto.setDate(shot.getDate());
-        dto.setFrequencyUnit(shot.getFrequencyUnit());
-        dto.setFrequencyValue(shot.getFrequencyValue());
-        dto.setHorseIds(shot.getHorses_treated().stream()
-            .map(hs -> hs.getHorse().getId()).toList());
-        return dto;
-    }
-    
-    
 
 }

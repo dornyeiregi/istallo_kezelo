@@ -2,7 +2,7 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.time.LocalDate;
 
-import edu.pte.ttk.istallo_kezelo.model.Sex;
+import edu.pte.ttk.istallo_kezelo.model.enums.Sex;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

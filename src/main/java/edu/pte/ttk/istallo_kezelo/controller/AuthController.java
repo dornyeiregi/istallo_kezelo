@@ -2,7 +2,7 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import edu.pte.ttk.istallo_kezelo.dto.SignupRequestDTO;
 import edu.pte.ttk.istallo_kezelo.model.User;
-import edu.pte.ttk.istallo_kezelo.model.UserType;
+import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 import edu.pte.ttk.istallo_kezelo.security.JwtUtil;
 

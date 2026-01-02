@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
+import edu.pte.ttk.istallo_kezelo.mapper.StorageMapper;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.service.StorageService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,28 +36,28 @@ public class StorageController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public StorageDTO addStorage(@RequestBody StorageDTO dto) {
         Storage saved = storageService.createStorage(dto);
-        return toDTO(saved);
+        return StorageMapper.toDTO(saved);
     }
 
     // Összes tároló lekérdezése
     @GetMapping()
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<StorageDTO> getAllStorages() {
-        return storageService.getAllStorages().stream().map(this::toDTO).toList();
+        return storageService.getAllStorages().stream().map(StorageMapper::toDTO).toList();
     }
     
     // Tároló lekérdezése id alapján
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StorageDTO getStorageById(@PathVariable Long id) {
-        return toDTO(storageService.getStorageById(id));
+        return StorageMapper.toDTO(storageService.getStorageById(id));
     }
     
     // Tároló lekérdezése tárolt tétel alapján
     @GetMapping("/byItem/{itemId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public StorageDTO getStorageByItemId(@PathVariable Long itemId) {
-        return toDTO(storageService.getStorageByItemId(itemId));
+        return StorageMapper.toDTO(storageService.getStorageByItemId(itemId));
     }
 
     // Tároló frissítése
@@ -67,7 +68,7 @@ public class StorageController {
             @RequestBody StorageDTO dto) {
 
         Storage updated = storageService.updateStorage(id, dto);
-        return ResponseEntity.ok(toDTO(updated));
+        return ResponseEntity.ok(StorageMapper.toDTO(updated));
     }
     
     // Tároló törlése
@@ -77,14 +78,4 @@ public class StorageController {
         storageService.deleteStorage(id);
         return ResponseEntity.ok("Tároló sikeresen törölve.");
     }
-
-    private StorageDTO toDTO(Storage storage){
-        StorageDTO dto = new StorageDTO();
-        dto.setStorageId(storage.getId());
-        dto.setAmountInUse(storage.getAmountInUse());
-        dto.setAmountStored(storage.getAmountStored());
-        dto.setItemId(storage.getItem().getId());
-        return dto;
-    }
-    
 }
