@@ -17,13 +17,16 @@ public class FeedSchedItemService {
     private final FeedSchedItemRepository feedSchedItemRepository;
     private final FeedSchedRepository feedSchedRepository;
     private final ItemRepository itemRepository;
+    private final StorageService storageService;
 
     public FeedSchedItemService(FeedSchedItemRepository feedSchedItemRepository,
                                 FeedSchedRepository feedSchedRepository,
-                                ItemRepository itemRepository) {
+                                ItemRepository itemRepository,
+                                StorageService storageService) {
         this.feedSchedItemRepository = feedSchedItemRepository;
         this.feedSchedRepository = feedSchedRepository;
         this.itemRepository = itemRepository;
+        this.storageService = storageService;
     }
 
     // Tétel hozzáadása etetési naplóhoz
@@ -44,7 +47,9 @@ public class FeedSchedItemService {
         link.setFeedSched(feedSched);
         link.setItem(item);
 
-        return feedSchedItemRepository.save(link);
+        FeedSchedItem saved = feedSchedItemRepository.save(link);
+        storageService.syncAmountInUseForItem(itemId);
+        return saved;
     }
 
     // Minden link lekérdezése
@@ -72,5 +77,6 @@ public class FeedSchedItemService {
     @Transactional
     public void removeItemFromFeedSched(Long feedSchedId, Long itemId){
         feedSchedItemRepository.deleteByFeedSched_IdAndItem_Id(feedSchedId, itemId);
+        storageService.syncAmountInUseForItem(itemId);
     }
 }

@@ -7,7 +7,6 @@ import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.StorageMapper;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.service.StorageService;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 
 
@@ -77,5 +77,13 @@ public class StorageController {
     public ResponseEntity<String> deleteStorage(@PathVariable Long id){
         storageService.deleteStorage(id);
         return ResponseEntity.ok("Tároló sikeresen törölve.");
+    }
+
+    // Tárolók újraszámolása (amountInUse)
+    @PostMapping("/sync")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<String> syncStorages() {
+        storageService.syncAllAmountsInUse();
+        return ResponseEntity.ok("Tárolók sikeresen szinkronizálva.");
     }
 }

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
+import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
@@ -17,11 +18,16 @@ public class HorseFeedSchedService {
     private final FeedSchedRepository feedSchedRepository;
     private final HorseRepository horseRepository;
     private final HorseFeedSchedRepository horseFeedSchedRepository;
+    private final StorageService storageService;
 
-    public HorseFeedSchedService(FeedSchedRepository feedSchedRepository, HorseRepository horseRepository, HorseFeedSchedRepository horseFeedSchedRepository) {
+    public HorseFeedSchedService(FeedSchedRepository feedSchedRepository,
+                                 HorseRepository horseRepository,
+                                 HorseFeedSchedRepository horseFeedSchedRepository,
+                                 StorageService storageService) {
         this.feedSchedRepository = feedSchedRepository;
         this.horseRepository = horseRepository;
         this.horseFeedSchedRepository = horseFeedSchedRepository;
+        this.storageService = storageService;
     }
 
     // Ló hozzáadása etetési naplóhoz
@@ -42,7 +48,11 @@ public class HorseFeedSchedService {
         link.setFeedSched(feedSched);
         link.setHorse(horse);
 
-        return horseFeedSchedRepository.save(link);
+        HorseFeedSched saved = horseFeedSchedRepository.save(link);
+        for (FeedSchedItem itemLink : feedSched.getFeedSchedItems()) {
+            storageService.syncAmountInUseForItem(itemLink.getItem().getId());
+        }
+        return saved;
     }
 
     // Összes link lekérdezése
@@ -70,6 +80,11 @@ public class HorseFeedSchedService {
     // Ló eltávolítása etetési naplóból
     @Transactional
     public void removeHorseFromFeedSched(Long feedSchedId, Long horseId){
+        FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
+            .orElseThrow(() -> new RuntimeException("Etetési napló nem található"));
         horseFeedSchedRepository.deleteByHorse_IdAndFeedSched_Id(horseId, feedSchedId);
+        for (FeedSchedItem itemLink : feedSched.getFeedSchedItems()) {
+            storageService.syncAmountInUseForItem(itemLink.getItem().getId());
+        }
     }
 }

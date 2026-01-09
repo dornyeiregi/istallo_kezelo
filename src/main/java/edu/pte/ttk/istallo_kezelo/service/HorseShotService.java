@@ -11,6 +11,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
@@ -22,15 +23,18 @@ public class HorseShotService {
     private final ShotRepository shotRepository;
     private final HorseShotRepository horseShotRepository;
     private final UserRepository userRepository;
+    private final CalendarEventService calendarEventService;
 
     public HorseShotService(HorseRepository horseRepository,
                             ShotRepository shotRepository,
                             HorseShotRepository horseShotRepository,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            CalendarEventService calendarEventService) {
         this.horseRepository = horseRepository;
         this.shotRepository = shotRepository;
         this.horseShotRepository = horseShotRepository;
         this.userRepository = userRepository;
+        this.calendarEventService = calendarEventService;
     }
 
     // Oltás hozzáadása lóhoz
@@ -52,7 +56,9 @@ public class HorseShotService {
         HorseShot link = new HorseShot();
         link.setShot(shot);
         link.setHorse(horse);
-        return horseShotRepository.save(link);
+        HorseShot saved = horseShotRepository.save(link);
+        calendarEventService.syncFromDomain(horse, EventType.SHOT, shot.getDate(), shot.getId());
+        return saved;
     }
 
     // Összes link lekérdezése
@@ -103,6 +109,7 @@ public class HorseShotService {
     public void removeShotFromHorse(Long shotId, Long horseId, Authentication auth) {
         checkHorseOwnership(auth, horseId);
         horseShotRepository.deleteByShot_IdAndHorse_Id(shotId, horseId);
+        calendarEventService.deleteFromDomain(EventType.SHOT, shotId, horseId);
     }
 
     // Helper – OWNER csak a saját lovait módosíthatja

@@ -62,7 +62,7 @@ public class CalendarEventService {
         if (relatedEntityId == null) throw new IllegalArgumentException("relatedEntityId null");
 
         CalendarEvent event = calendarEventRepository
-                .findByEventTypeAndRelatedEntityId(eventType, relatedEntityId)
+                .findByEventTypeAndRelatedEntityIdAndHorse_Id(eventType, relatedEntityId, horse.getId())
                 .orElseGet(CalendarEvent::new);
 
         event.setHorse(horse);
@@ -81,6 +81,18 @@ public class CalendarEventService {
         calendarEventRepository.deleteByEventTypeAndRelatedEntityId(eventType, relatedEntityId);
     }
 
+    /**
+     * Domain rekord és ló kapcsolat törlésekor hívjuk meg.
+     */
+    public void deleteFromDomain(EventType eventType, Long relatedEntityId, Long horseId) {
+        if (eventType == null || relatedEntityId == null || horseId == null) return;
+        calendarEventRepository.deleteByEventTypeAndRelatedEntityIdAndHorse_Id(
+                eventType,
+                relatedEntityId,
+                horseId
+        );
+    }
+
     // ================================================================================
 
     // Esemény lekérdezése id alapján
@@ -95,6 +107,21 @@ public class CalendarEventService {
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getHorseEvents(Long horseId) {
         return calendarEventRepository.findByHorse_IdOrderByEventDateAsc(horseId)
+                .stream()
+                .map(CalendarEventMapper::toDTO)
+                .toList();
+    }
+
+    // Események lekérdezése (opcionális dátum intervallummal)
+    @Transactional(readOnly = true)
+    public List<CalendarEventDTO> getAllEvents(LocalDate start, LocalDate end) {
+        if (start != null && end != null) {
+            return calendarEventRepository.findByEventDateBetweenOrderByEventDateAsc(start, end)
+                    .stream()
+                    .map(CalendarEventMapper::toDTO)
+                    .toList();
+        }
+        return calendarEventRepository.findAllByOrderByEventDateAsc()
                 .stream()
                 .map(CalendarEventMapper::toDTO)
                 .toList();

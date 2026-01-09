@@ -22,11 +22,16 @@ public class FeedSchedService {
     private final FeedSchedRepository feedSchedRepository;
     private final HorseRepository horseRepository;
     private final ItemRepository itemRepository;
+    private final StorageService storageService;
 
-    public FeedSchedService(FeedSchedRepository feedSchedRepository, HorseRepository horseRepository, ItemRepository itemRepository) {
+    public FeedSchedService(FeedSchedRepository feedSchedRepository,
+                            HorseRepository horseRepository,
+                            ItemRepository itemRepository,
+                            StorageService storageService) {
         this.feedSchedRepository = feedSchedRepository;
         this.horseRepository = horseRepository;
         this.itemRepository = itemRepository;
+        this.storageService = storageService;
     }
 
     // Új etetési napló hozzáadása
@@ -46,6 +51,12 @@ public class FeedSchedService {
         if (dto.getItemIds() != null) {
             for (Long itemId : dto.getItemIds()) {
                 addItemToFeedSched(feedSched.getId(), itemId);
+            }
+        }
+
+        if (dto.getItemIds() != null) {
+            for (Long itemId : dto.getItemIds()) {
+                storageService.syncAmountInUseForItem(itemId);
             }
         }
 
@@ -79,6 +90,10 @@ public class FeedSchedService {
     public void updateFeedSched(Long id, FeedSchedDTO dto){
         FeedSched existingFeedSched = feedSchedRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
+
+        List<Long> existingItemIds = existingFeedSched.getFeedSchedItems().stream()
+                .map(link -> link.getItem().getId())
+                .toList();
 
         if (dto.getFeedTime() != null) {
             existingFeedSched.setFeedTime(dto.getFeedTime());
@@ -118,6 +133,13 @@ public class FeedSchedService {
             }
         }
         feedSchedRepository.save(existingFeedSched);
+
+        List<Long> newItemIds = dto.getItemIds() != null ? dto.getItemIds() : existingItemIds;
+        java.util.Set<Long> affectedItemIds = new java.util.HashSet<>(existingItemIds);
+        affectedItemIds.addAll(newItemIds);
+        for (Long itemId : affectedItemIds) {
+            storageService.syncAmountInUseForItem(itemId);
+        }
     }
 
 
@@ -127,11 +149,19 @@ public class FeedSchedService {
         FeedSched feedSched = feedSchedRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
 
+        List<Long> itemIds = feedSched.getFeedSchedItems().stream()
+                .map(link -> link.getItem().getId())
+                .toList();
+
         // Explicitly remove child links so FK rows disappear before deleting the parent
         feedSched.getHorseFeedScheds().clear();
         feedSched.getFeedSchedItems().clear();
 
         feedSchedRepository.delete(feedSched);
+
+        for (Long itemId : itemIds) {
+            storageService.syncAmountInUseForItem(itemId);
+        }
     }
 
     // Ló hozzáadása etetési naplóhoz
@@ -148,6 +178,10 @@ public class FeedSchedService {
 
         feedSched.getHorseFeedScheds().add(link);
         feedSchedRepository.save(feedSched);
+
+        for (FeedSchedItem itemLink : feedSched.getFeedSchedItems()) {
+            storageService.syncAmountInUseForItem(itemLink.getItem().getId());
+        }
     }
 
     // Tétel hozzáadása etetési naplóhoz
@@ -164,6 +198,7 @@ public class FeedSchedService {
 
         feedSched.getFeedSchedItems().add(link);
         feedSchedRepository.save(feedSched);
+        storageService.syncAmountInUseForItem(itemId);
     }
 
     

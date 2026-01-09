@@ -15,9 +15,11 @@ import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 public class StorageConsumptionService {
 
     private final StorageRepository storageRepository;
+    private final StorageService storageService;
 
-    public StorageConsumptionService(StorageRepository storageRepository) {
+    public StorageConsumptionService(StorageRepository storageRepository, StorageService storageService) {
         this.storageRepository = storageRepository;
+        this.storageService = storageService;
     }
 
     /**
@@ -28,6 +30,8 @@ public class StorageConsumptionService {
     @Transactional
     public void reduceConsumablesDaily() {
         LocalDate today = LocalDate.now();
+
+        storageService.syncAllAmountsInUse();
 
         List<Storage> storages = storageRepository.findByItem_ItemCategory(ItemCategory.CONSUMABLE);
 

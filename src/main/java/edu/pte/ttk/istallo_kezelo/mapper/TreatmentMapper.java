@@ -12,6 +12,9 @@ public final class TreatmentMapper {
         dto.setTreatmentName(treatment.getTreatmentName());
         dto.setDescription(treatment.getDescription());
         dto.setDate(treatment.getDate());
+        dto.setHorseIds(treatment.getHorses_treated().stream()
+                .map(link -> link.getHorse().getId())
+                .toList());
         return dto;
     }
 }

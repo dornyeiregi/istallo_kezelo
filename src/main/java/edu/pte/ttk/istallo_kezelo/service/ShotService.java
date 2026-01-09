@@ -1,6 +1,8 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -12,6 +14,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
@@ -24,15 +27,18 @@ public class ShotService {
     private final HorseShotRepository horseShotRepository;
     private final HorseRepository horseRepository;
     private final UserRepository userRepository;
+    private final CalendarEventService calendarEventService;
 
     public ShotService(ShotRepository shotRepository,
                        HorseShotRepository horseShotRepository,
                        HorseRepository horseRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       CalendarEventService calendarEventService) {
         this.shotRepository = shotRepository;
         this.horseShotRepository = horseShotRepository;
         this.horseRepository = horseRepository;
         this.userRepository = userRepository;
+        this.calendarEventService = calendarEventService;
     }
 
     // Új oltás létrehozása
@@ -58,6 +64,13 @@ public class ShotService {
                 horseShotRepository.save(link);
 
                 saved.getHorses_treated().add(link);
+
+                calendarEventService.createEvent(
+                        horse.getId(),
+                        EventType.SHOT,
+                        saved.getDate(),
+                        saved.getId()
+                );
             }
         }
         return saved;
@@ -124,7 +137,50 @@ public class ShotService {
         if (updatedShot.getFrequencyUnit() != null) shot.setFrequencyUnit(updatedShot.getFrequencyUnit());
         if (updatedShot.getFrequencyValue() != null) shot.setFrequencyValue(updatedShot.getFrequencyValue());
 
-        return shotRepository.save(shot);
+        if (updatedShot.getHorseIds() != null) {
+            Set<Long> desiredHorseIds = new HashSet<>(updatedShot.getHorseIds());
+            Set<Long> existingHorseIds = shot.getHorses_treated().stream()
+                    .map(link -> link.getHorse().getId())
+                    .collect(java.util.stream.Collectors.toSet());
+
+            java.util.Iterator<HorseShot> iterator = shot.getHorses_treated().iterator();
+            while (iterator.hasNext()) {
+                HorseShot link = iterator.next();
+                Long horseId = link.getHorse().getId();
+                if (!desiredHorseIds.contains(horseId)) {
+                    iterator.remove();
+                    calendarEventService.deleteFromDomain(EventType.SHOT, shotId, horseId);
+                    horseShotRepository.delete(link);
+                }
+            }
+
+            for (Long horseId : desiredHorseIds) {
+                if (!existingHorseIds.contains(horseId)) {
+                    if (auth != null && !isAdmin(auth)) {
+                        checkHorseOwnership(auth, horseId);
+                    }
+                    Horse horse = horseRepository.findById(horseId)
+                            .orElseThrow(() -> new RuntimeException("Ló nem található: " + horseId));
+                    HorseShot link = new HorseShot();
+                    link.setHorse(horse);
+                    link.setShot(shot);
+                    shot.getHorses_treated().add(link);
+                }
+            }
+        }
+
+        Shot saved = shotRepository.save(shot);
+        for (HorseShot link : saved.getHorses_treated()) {
+            Horse horse = link.getHorse();
+            calendarEventService.syncFromDomain(
+                    horse,
+                    EventType.SHOT,
+                    saved.getDate(),
+                    saved.getId()
+            );
+        }
+
+        return saved;
     }
 
     // Oltás törlése
@@ -143,6 +199,7 @@ public class ShotService {
         }   
 
         shotRepository.deleteById(shotId);
+        calendarEventService.deleteFromDomain(EventType.SHOT, shotId);
     }
 
     // Helper – OWNER csak a saját lovait módosíthatja

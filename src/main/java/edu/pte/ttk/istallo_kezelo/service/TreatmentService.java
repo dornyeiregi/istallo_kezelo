@@ -1,6 +1,8 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
@@ -22,27 +25,50 @@ public class TreatmentService {
     private final HorseTreatmentRepository horseTreatmentRepository;
     private final UserRepository userRepository;
     private final HorseRepository horseRepository;
+    private final CalendarEventService calendarEventService;
 
     public TreatmentService(TreatmentRepository treatmentRepository,
                             HorseTreatmentRepository horseTreatmentRepository,
                             UserRepository userRepository,
-                            HorseRepository horseRepository) {
+                            HorseRepository horseRepository,
+                            CalendarEventService calendarEventService) {
         this.treatmentRepository = treatmentRepository;
         this.horseTreatmentRepository = horseTreatmentRepository;
         this.userRepository = userRepository;
         this.horseRepository = horseRepository;
+        this.calendarEventService = calendarEventService;
     }
 
     // Új kezelés létrehozása
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public Treatment saveTreatment(Treatment treatment, Authentication auth) {
-        if (auth != null && !isAdmin(auth)) {
-            for (HorseTreatment ht : treatment.getHorses_treated()) {
-                checkHorseOwnership(auth, ht.getHorse().getId());
+    public Treatment saveTreatment(Treatment treatment, List<Long> horseIds, Authentication auth) {
+        Treatment saved = treatmentRepository.save(treatment);
+
+        if (horseIds != null) {
+            for (Long horseId : horseIds) {
+                if (auth != null && !isAdmin(auth)) {
+                    checkHorseOwnership(auth, horseId);
+                }
+                Horse horse = horseRepository.findById(horseId)
+                        .orElseThrow(() -> new RuntimeException("Ló nem található: " + horseId));
+
+                HorseTreatment link = new HorseTreatment();
+                link.setHorse(horse);
+                link.setTreatment(saved);
+                horseTreatmentRepository.save(link);
+                saved.getHorses_treated().add(link);
+
+                calendarEventService.syncFromDomain(
+                        horse,
+                        EventType.TREATMENT,
+                        saved.getDate(),
+                        saved.getId()
+                );
             }
         }
-        return treatmentRepository.save(treatment);
+
+        return saved;
     }
 
     // Összes kezelés lekérdezése
@@ -105,7 +131,49 @@ public class TreatmentService {
         if (updatedTreatment.getDescription() != null) treatment.setDescription(updatedTreatment.getDescription());
         if (updatedTreatment.getDate() != null) treatment.setDate(updatedTreatment.getDate());
 
-        return treatmentRepository.save(treatment);
+        if (updatedTreatment.getHorseIds() != null) {
+            Set<Long> desiredHorseIds = new HashSet<>(updatedTreatment.getHorseIds());
+            Set<Long> existingHorseIds = treatment.getHorses_treated().stream()
+                    .map(link -> link.getHorse().getId())
+                    .collect(java.util.stream.Collectors.toSet());
+
+            java.util.Iterator<HorseTreatment> iterator = treatment.getHorses_treated().iterator();
+            while (iterator.hasNext()) {
+                HorseTreatment link = iterator.next();
+                Long horseId = link.getHorse().getId();
+                if (!desiredHorseIds.contains(horseId)) {
+                    iterator.remove();
+                    calendarEventService.deleteFromDomain(EventType.TREATMENT, treatmentId, horseId);
+                    horseTreatmentRepository.delete(link);
+                }
+            }
+
+            for (Long horseId : desiredHorseIds) {
+                if (!existingHorseIds.contains(horseId)) {
+                    if (auth != null && !isAdmin(auth)) {
+                        checkHorseOwnership(auth, horseId);
+                    }
+                    Horse horse = horseRepository.findById(horseId)
+                            .orElseThrow(() -> new RuntimeException("Ló nem található: " + horseId));
+                    HorseTreatment link = new HorseTreatment();
+                    link.setHorse(horse);
+                    link.setTreatment(treatment);
+                    treatment.getHorses_treated().add(link);
+                }
+            }
+        }
+
+        Treatment saved = treatmentRepository.save(treatment);
+        for (HorseTreatment link : saved.getHorses_treated()) {
+            Horse horse = link.getHorse();
+            calendarEventService.syncFromDomain(
+                    horse,
+                    EventType.TREATMENT,
+                    saved.getDate(),
+                    saved.getId()
+            );
+        }
+        return saved;
     }
 
     // Kezelés törlése
@@ -124,6 +192,7 @@ public class TreatmentService {
         }
 
         treatmentRepository.deleteById(id);
+        calendarEventService.deleteFromDomain(EventType.TREATMENT, id);
     }
 
     // Helper – OWNER csak a saját lovaihoz férhet hozzá

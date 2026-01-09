@@ -7,8 +7,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
+import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
+import edu.pte.ttk.istallo_kezelo.repository.FeedSchedItemRepository;
+import edu.pte.ttk.istallo_kezelo.repository.HorseFeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 
@@ -16,10 +19,17 @@ import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 public class StorageService {
     private final StorageRepository storageRepository;
     private final ItemRepository itemRepository;
+    private final FeedSchedItemRepository feedSchedItemRepository;
+    private final HorseFeedSchedRepository horseFeedSchedRepository;
 
-    public StorageService(StorageRepository storageRepository, ItemRepository itemRepository){
+    public StorageService(StorageRepository storageRepository,
+                          ItemRepository itemRepository,
+                          FeedSchedItemRepository feedSchedItemRepository,
+                          HorseFeedSchedRepository horseFeedSchedRepository) {
         this.storageRepository = storageRepository;
         this.itemRepository = itemRepository;
+        this.feedSchedItemRepository = feedSchedItemRepository;
+        this.horseFeedSchedRepository = horseFeedSchedRepository;
     }
 
     // Új tároló hozzáadása
@@ -80,6 +90,38 @@ public class StorageService {
         storageRepository.deleteById(id);
     }
 
-    
+    @Transactional
+    public void syncAmountInUseForItem(Long itemId) {
+        Storage storage = storageRepository.findByItem_Id(itemId);
+        if (storage == null) {
+            return;
+        }
+
+        List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
+        double totalInUse = 0;
+        for (FeedSchedItem link : links) {
+            Long feedSchedId = link.getFeedSched().getId();
+            totalInUse += horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+        }
+
+        storage.setAmountInUse(totalInUse);
+        storageRepository.save(storage);
+    }
+
+    @Transactional
+    public void syncAllAmountsInUse() {
+        List<Storage> storages = storageRepository.findAll();
+        for (Storage storage : storages) {
+            Long itemId = storage.getItem().getId();
+            List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
+            double totalInUse = 0;
+            for (FeedSchedItem link : links) {
+                Long feedSchedId = link.getFeedSched().getId();
+                totalInUse += horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+            }
+            storage.setAmountInUse(totalInUse);
+        }
+        storageRepository.saveAll(storages);
+    }
 
 }

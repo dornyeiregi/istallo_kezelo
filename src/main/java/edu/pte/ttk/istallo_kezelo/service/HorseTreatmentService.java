@@ -11,6 +11,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
@@ -22,15 +23,18 @@ public class HorseTreatmentService {
     private final HorseRepository horseRepository;
     private final TreatmentRepository treatmentRepository;
     private final UserRepository userRepository;
+    private final CalendarEventService calendarEventService;
 
     public HorseTreatmentService(HorseTreatmentRepository horseTreatmentRepository,
                                 HorseRepository horseRepository,
                                 TreatmentRepository treatmentRepository,
-                                UserRepository userRepository){
+                                UserRepository userRepository,
+                                CalendarEventService calendarEventService){
         this.horseTreatmentRepository = horseTreatmentRepository;
         this.horseRepository = horseRepository;
         this.treatmentRepository = treatmentRepository;
         this.userRepository = userRepository;
+        this.calendarEventService = calendarEventService;
     }
 
     // Kezelés hozzáadása lóhoz
@@ -53,7 +57,14 @@ public class HorseTreatmentService {
         link.setHorse(horse);
         link.setTreatment(treatment);
 
-        return horseTreatmentRepository.save(link);
+        HorseTreatment saved = horseTreatmentRepository.save(link);
+        calendarEventService.syncFromDomain(
+                horse,
+                EventType.TREATMENT,
+                treatment.getDate(),
+                treatment.getId()
+        );
+        return saved;
     }
 
     // Összes link lekérdezése
@@ -104,6 +115,7 @@ public class HorseTreatmentService {
     public void removeTreatmentFromHorse(Long treatmentId, Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
         horseTreatmentRepository.deleteByTreatment_IdAndHorse_Id(treatmentId, horseId);
+        calendarEventService.deleteFromDomain(EventType.TREATMENT, treatmentId, horseId);
     }
 
     // Helper – OWNER csak a saját lovait módosíthatja

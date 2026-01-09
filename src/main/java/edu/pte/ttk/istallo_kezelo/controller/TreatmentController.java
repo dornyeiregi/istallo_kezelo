@@ -39,7 +39,7 @@ public class TreatmentController {
         treatment.setDescription(dto.getDescription());
         treatment.setDate(dto.getDate());
 
-        Treatment saved = treatmentService.saveTreatment(treatment, auth);
+        Treatment saved = treatmentService.saveTreatment(treatment, dto.getHorseIds(), auth);
         return TreatmentMapper.toDTO(saved);
     }
 

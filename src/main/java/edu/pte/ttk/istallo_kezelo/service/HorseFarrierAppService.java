@@ -11,6 +11,7 @@ import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
@@ -22,15 +23,18 @@ public class HorseFarrierAppService {
     private final HorseRepository horseRepository;
     private final HorseFarrierAppRepository horseFarrierAppRepository;
     private final UserRepository userRepository;
+    private final CalendarEventService calendarEventService;
 
     public HorseFarrierAppService(FarrierAppRepository farrierAppRepository, 
                                   HorseRepository horseRepository, 
                                   HorseFarrierAppRepository horseFarrierAppRepository,
-                                  UserRepository userRepository) {
+                                  UserRepository userRepository,
+                                  CalendarEventService calendarEventService) {
         this.farrierAppRepository = farrierAppRepository;
         this.horseRepository = horseRepository;
         this.horseFarrierAppRepository = horseFarrierAppRepository;
         this.userRepository = userRepository;
+        this.calendarEventService = calendarEventService;
     }
 
     // Ló hozzáadása patkoláshoz
@@ -53,7 +57,14 @@ public class HorseFarrierAppService {
         link.setFarrierApp(app);
         link.setHorse(horse);
 
-        return horseFarrierAppRepository.save(link);
+        HorseFarrierApp saved = horseFarrierAppRepository.save(link);
+        calendarEventService.syncFromDomain(
+                horse,
+                EventType.FARRIERAPP,
+                app.getAppointmentDate(),
+                app.getId()
+        );
+        return saved;
     }
 
     // Összes link lekérdezése
@@ -70,6 +81,7 @@ public class HorseFarrierAppService {
     public void removeHorseFromFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
         horseFarrierAppRepository.deleteByFarrierApp_IdAndHorse_Id(farrierAppId, horseId);
+        calendarEventService.deleteFromDomain(EventType.FARRIERAPP, farrierAppId, horseId);
     }
 
     // Összes ló lekérdezése patkolás id alapján

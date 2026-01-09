@@ -52,6 +52,19 @@ public class CalendarEventController {
         return calendarEventService.getById(eventId);
     }
 
+    // Összes esemény lekérdezése (opcionális dátum intervallummal)
+    @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    public List<CalendarEventDTO> getAllEvents(
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false)
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+            Authentication auth
+    ) {
+        return calendarEventService.getAllEvents(start, end);
+    }
+
     // Ló eseményeinek lekérdezése (opcionális dátum intervallummal)
     @GetMapping("/horse/{horseId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")

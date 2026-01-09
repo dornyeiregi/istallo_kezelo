@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,4 +15,5 @@ public class TreatmentDTO {
     private String treatmentName;
     private String description;
     private LocalDate date;
+    private List<Long> horseIds;
 }

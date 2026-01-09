@@ -27,7 +27,19 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
             LocalDate end
     );
 
+    List<CalendarEvent> findAllByOrderByEventDateAsc();
+
+    List<CalendarEvent> findByEventDateBetweenOrderByEventDateAsc(LocalDate start, LocalDate end);
+
     Optional<CalendarEvent> findByEventTypeAndRelatedEntityId(EventType eventType, Long relatedEntityId);
 
+    Optional<CalendarEvent> findByEventTypeAndRelatedEntityIdAndHorse_Id(
+            EventType eventType,
+            Long relatedEntityId,
+            Long horseId
+    );
+
     void deleteByEventTypeAndRelatedEntityId(EventType eventType, Long relatedEntityId);
+
+    void deleteByEventTypeAndRelatedEntityIdAndHorse_Id(EventType eventType, Long relatedEntityId, Long horseId);
 }

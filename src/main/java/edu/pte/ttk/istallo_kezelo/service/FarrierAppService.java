@@ -13,6 +13,7 @@ import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
@@ -24,11 +25,17 @@ public class FarrierAppService {
     private final FarrierAppRepository farrierAppRepository;
     private final HorseRepository horseRepository;
     private final UserRepository userRepository;
+    private final CalendarEventService calendarEventService;
 
-    public FarrierAppService(FarrierAppRepository farrierAppRepository, HorseRepository horseRepository, UserRepository userRepository, AuthController authController) {
+    public FarrierAppService(FarrierAppRepository farrierAppRepository,
+                             HorseRepository horseRepository,
+                             UserRepository userRepository,
+                             AuthController authController,
+                             CalendarEventService calendarEventService) {
         this.farrierAppRepository = farrierAppRepository; 
         this.horseRepository = horseRepository;
         this.userRepository = userRepository;
+        this.calendarEventService = calendarEventService;
     }
     
     // Új patkolás hozzáadása
@@ -152,6 +159,17 @@ public class FarrierAppService {
         }
         farrierAppRepository.save(existingFarrierApp);
 
+        calendarEventService.deleteFromDomain(EventType.FARRIERAPP, existingFarrierApp.getId());
+        for (HorseFarrierApp link : existingFarrierApp.getHorses_done()) {
+            Horse horse = link.getHorse();
+            calendarEventService.createEvent(
+                    horse.getId(),
+                    EventType.FARRIERAPP,
+                    existingFarrierApp.getAppointmentDate(),
+                    existingFarrierApp.getId()
+            );
+        }
+
     }
 
     // Patkolás törlése
@@ -159,6 +177,7 @@ public class FarrierAppService {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteFarrierApp(Long id) {
         farrierAppRepository.deleteById(id);
+        calendarEventService.deleteFromDomain(EventType.FARRIERAPP, id);
     }
 
     // Ló csatolása patkoláshoz
@@ -174,6 +193,12 @@ public class FarrierAppService {
         link.setFarrierApp(farrierApp);
         farrierApp.getHorses_done().add(link);
         farrierAppRepository.save(farrierApp);
+        calendarEventService.createEvent(
+                horse.getId(),
+                EventType.FARRIERAPP,
+                farrierApp.getAppointmentDate(),
+                farrierApp.getId()
+        );
     }
 
     // Owner csak saját lovához férhessen hozzá
