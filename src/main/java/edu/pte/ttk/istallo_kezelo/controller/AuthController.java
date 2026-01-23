@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import edu.pte.ttk.istallo_kezelo.dto.SignupRequestDTO;
+import edu.pte.ttk.istallo_kezelo.dto.ChangePasswordRequest;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
@@ -100,5 +101,38 @@ public class AuthController {
         response.put("user", userPayload);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<Map<String, Object>> changePassword(
+        @RequestBody ChangePasswordRequest request,
+        Authentication authentication
+    ) {
+        if (authentication == null || authentication.getName() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("message", "Nincs hitelesítve."));
+        }
+
+        if (request.getCurrentPassword() == null || request.getCurrentPassword().isBlank()
+            || request.getNewPassword() == null || request.getNewPassword().isBlank()) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Hiányzó jelszó mezők."));
+        }
+
+        User user = userRepository.findByUsername(authentication.getName());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("message", "Felhasználó nem található."));
+        }
+
+        if (!encoder.matches(request.getCurrentPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("message", "Hibás jelenlegi jelszó."));
+        }
+
+        user.setPassword(encoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+
+        return ResponseEntity.ok(Map.of("message", "Jelszó sikeresen frissítve."));
     }
 }

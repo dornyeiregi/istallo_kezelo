@@ -37,8 +37,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         String path = request.getServletPath();
 
-        // Auth endpointok kihagyása
-        if (path.startsWith("/api/auth/") || path.startsWith("/api/test/")) {
+        // Csak a bejelentkezés/regisztráció kihagyása
+        if (path.equals("/api/auth/signin")
+            || path.equals("/api/auth/signup")
+            || path.startsWith("/api/test/")) {
             filterChain.doFilter(request, response);
             return;
         }
