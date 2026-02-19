@@ -4,8 +4,12 @@ import java.time.LocalDate;
 
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "calendar_event")
 public class CalendarEvent {
 
@@ -27,10 +31,6 @@ public class CalendarEvent {
 
     @Column(name = "related_entity_id")
     private Long relatedEntityId;
-
-    // Constructors
-    // No args for JPA
-    public CalendarEvent() {}
 
     public CalendarEvent(Horse horse, EventType eventType, LocalDate eventDate) {
         this.horse = horse;

@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import edu.pte.ttk.istallo_kezelo.model.enums.*;
+import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "app_user")
 public class User {
 
@@ -104,9 +108,7 @@ public class User {
         this.email = email;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
+    public void setPhone(String phone) { this.phone = phone; }
 
     public void setPassword(String password) {
         this.password = password;

@@ -40,7 +40,7 @@ public class StorageService {
             .orElseThrow(() -> new RuntimeException("Tétel nem található."));
 
         Storage storage = new Storage();
-        storage.setAmountInUse(dto.getAmountInUse());
+        storage.setAmountInUse(0.0);
         storage.setAmountStored(dto.getAmountStored());
         storage.setItem(item);
 
@@ -73,14 +73,9 @@ public class StorageService {
         Storage existingStorage = storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
         
-        if (dto.getAmountInUse() != null) {
-            existingStorage.setAmountInUse(dto.getAmountInUse());
-        }
         if (dto.getAmountStored() != null) {
             existingStorage.setAmountStored(dto.getAmountStored());
-        }
-        // nem lehet a tételt frissíteni
-        
+        }        
         return storageRepository.save(existingStorage);
     }
 
@@ -101,7 +96,7 @@ public class StorageService {
         double totalInUse = 0;
         for (FeedSchedItem link : links) {
             Long feedSchedId = link.getFeedSched().getId();
-            totalInUse += horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+            totalInUse += link.getAmount() * horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
         }
 
         storage.setAmountInUse(totalInUse);
@@ -117,7 +112,7 @@ public class StorageService {
             double totalInUse = 0;
             for (FeedSchedItem link : links) {
                 Long feedSchedId = link.getFeedSched().getId();
-                totalInUse += horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+                totalInUse += link.getAmount() * horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
             }
             storage.setAmountInUse(totalInUse);
         }

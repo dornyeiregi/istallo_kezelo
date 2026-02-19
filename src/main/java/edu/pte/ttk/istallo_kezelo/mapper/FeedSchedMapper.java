@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.mapper;
 
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
+import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemAmountDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 
 public final class FeedSchedMapper {
@@ -15,6 +16,9 @@ public final class FeedSchedMapper {
             .map(hfs -> hfs.getHorse().getId()).toList());
         dto.setItemIds(feedSched.getFeedSchedItems().stream()
             .map(fsi -> fsi.getItem().getId()).toList());
+        dto.setItems(feedSched.getFeedSchedItems().stream()
+            .map(fsi -> new FeedSchedItemAmountDTO(fsi.getItem().getId(), fsi.getAmount()))
+            .toList());
         return dto;
     }
 }

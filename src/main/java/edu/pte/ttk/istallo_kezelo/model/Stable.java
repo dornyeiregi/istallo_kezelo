@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "stable")
 public class Stable {
 
@@ -21,18 +25,9 @@ public class Stable {
     @OneToMany(mappedBy = "stable", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Horse> horses = new ArrayList<>();
 
-
-    // Constructors
-    public Stable(){
-
-    }
-
     public Stable(String stableName){
         this.stableName = stableName;
     }
-
-
-    // Getters and Setters
 
     // Getters
     public Long getId() {

@@ -12,6 +12,7 @@ public final class FeedSchedItemMapper {
         dto.setItemId(feedSchedItem.getItem().getId());
         dto.setFeedDescription(feedSchedItem.getFeedSched().getDescription());
         dto.setItemName(feedSchedItem.getItem().getName());
+        dto.setAmount(feedSchedItem.getAmount());
         return dto;
     }
 }

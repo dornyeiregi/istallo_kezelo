@@ -1,8 +1,12 @@
 package edu.pte.ttk.istallo_kezelo.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "feed_sched_item")
 public class FeedSchedItem {
 
@@ -18,6 +22,9 @@ public class FeedSchedItem {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
+    @Column(name = "amount", nullable = false)
+    private Double amount;
+
     // Constructors, getters, and setters
 
     // Getters
@@ -29,6 +36,10 @@ public class FeedSchedItem {
         return item;
     }
 
+    public Double getAmount() {
+        return amount;
+    }
+
     // Setters
     public void setFeedSched(FeedSched feedSched) {
         this.feedSched = feedSched;
@@ -36,6 +47,10 @@ public class FeedSchedItem {
 
     public void setItem(Item item) {
         this.item = item;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
     }
     
 }

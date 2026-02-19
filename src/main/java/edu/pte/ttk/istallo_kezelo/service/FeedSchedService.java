@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
+import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemAmountDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
@@ -48,15 +49,13 @@ public class FeedSchedService {
             }
         }
 
-        if (dto.getItemIds() != null) {
-            for (Long itemId : dto.getItemIds()) {
-                addItemToFeedSched(feedSched.getId(), itemId);
+        if (dto.getItems() != null) {
+            for (FeedSchedItemAmountDTO item : dto.getItems()) {
+                addItemToFeedSched(feedSched.getId(), item.getItemId(), item.getAmount());
             }
-        }
-
-        if (dto.getItemIds() != null) {
+        } else if (dto.getItemIds() != null) {
             for (Long itemId : dto.getItemIds()) {
-                storageService.syncAmountInUseForItem(itemId);
+                addItemToFeedSched(feedSched.getId(), itemId, 0.0);
             }
         }
 
@@ -118,23 +117,46 @@ public class FeedSchedService {
             }
         }
 
-        if (dto.getItemIds() != null) {
+        if (dto.getItems() != null || dto.getItemIds() != null) {
             existingFeedSched.getFeedSchedItems().clear();
 
-            for (Long itemId : dto.getItemIds()) {
-                Item item = itemRepository.findById(itemId)
-                    .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+            if (dto.getItems() != null) {
+                for (FeedSchedItemAmountDTO itemDto : dto.getItems()) {
+                    if (itemDto.getAmount() == null) {
+                        throw new RuntimeException("Mennyiség kötelező.");
+                    }
+                    Item item = itemRepository.findById(itemDto.getItemId())
+                        .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
 
-                FeedSchedItem link = new FeedSchedItem();
-                link.setItem(item);
-                link.setFeedSched(existingFeedSched);
+                    FeedSchedItem link = new FeedSchedItem();
+                    link.setItem(item);
+                    link.setFeedSched(existingFeedSched);
+                    link.setAmount(itemDto.getAmount());
 
-                existingFeedSched.getFeedSchedItems().add(link);
+                    existingFeedSched.getFeedSchedItems().add(link);
+                }
+            } else if (dto.getItemIds() != null) {
+                for (Long itemId : dto.getItemIds()) {
+                    Item item = itemRepository.findById(itemId)
+                        .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+
+                    FeedSchedItem link = new FeedSchedItem();
+                    link.setItem(item);
+                    link.setFeedSched(existingFeedSched);
+                    link.setAmount(0.0);
+
+                    existingFeedSched.getFeedSchedItems().add(link);
+                }
             }
         }
         feedSchedRepository.save(existingFeedSched);
 
-        List<Long> newItemIds = dto.getItemIds() != null ? dto.getItemIds() : existingItemIds;
+        List<Long> newItemIds;
+        if (dto.getItems() != null) {
+            newItemIds = dto.getItems().stream().map(FeedSchedItemAmountDTO::getItemId).toList();
+        } else {
+            newItemIds = dto.getItemIds() != null ? dto.getItemIds() : existingItemIds;
+        }
         java.util.Set<Long> affectedItemIds = new java.util.HashSet<>(existingItemIds);
         affectedItemIds.addAll(newItemIds);
         for (Long itemId : affectedItemIds) {
@@ -153,7 +175,6 @@ public class FeedSchedService {
                 .map(link -> link.getItem().getId())
                 .toList();
 
-        // Explicitly remove child links so FK rows disappear before deleting the parent
         feedSched.getHorseFeedScheds().clear();
         feedSched.getFeedSchedItems().clear();
 
@@ -186,7 +207,10 @@ public class FeedSchedService {
 
     // Tétel hozzáadása etetési naplóhoz
     @Transactional
-    public void addItemToFeedSched(Long feedSchedId, Long itemId) {
+    public void addItemToFeedSched(Long feedSchedId, Long itemId, Double amount) {
+        if (amount == null) {
+            throw new RuntimeException("Mennyiség kötelező.");
+        }
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
             .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
         Item item = itemRepository.findById(itemId)
@@ -195,6 +219,7 @@ public class FeedSchedService {
         FeedSchedItem link = new FeedSchedItem();
         link.setItem(item);
         link.setFeedSched(feedSched);
+        link.setAmount(amount);
 
         feedSched.getFeedSchedItems().add(link);
         feedSchedRepository.save(feedSched);

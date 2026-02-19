@@ -4,9 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import edu.pte.ttk.istallo_kezelo.model.enums.*;
+import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "item")
 public class Item {
 

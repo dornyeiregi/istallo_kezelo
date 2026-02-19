@@ -5,8 +5,12 @@ import java.util.List;
 import edu.pte.ttk.istallo_kezelo.model.enums.*;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "feed_sched")
 public class FeedSched {
     @Id

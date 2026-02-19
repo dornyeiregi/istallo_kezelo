@@ -8,8 +8,14 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import edu.pte.ttk.istallo_kezelo.config.EmptyStringToNullConverter;
 import edu.pte.ttk.istallo_kezelo.model.enums.*;
+import edu.pte.ttk.istallo_kezelo.model.enums.Sex;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "horse")
 public class Horse {
 

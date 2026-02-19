@@ -81,7 +81,8 @@ CREATE INDEX idx_calendar_event_type_related ON calendar_event (event_type, rela
 CREATE TABLE feed_sched_item (
     id BIGSERIAL PRIMARY KEY,
     feed_sched_id BIGINT NOT NULL REFERENCES feed_sched (id),
-    item_id BIGINT NOT NULL REFERENCES item (id)
+    item_id BIGINT NOT NULL REFERENCES item (id),
+    amount DOUBLE PRECISION NOT NULL
 );
 
 CREATE INDEX idx_feed_sched_item_feed_sched_id ON feed_sched_item (feed_sched_id);

@@ -30,7 +30,11 @@ public class FeedSchedItemController {
     // Tétel hozzáadása etetési naplóhoz
     @PostMapping()
     public FeedSchedItemDTO addItemToFeedSched(@RequestBody FeedSchedItemDTO dto) {
-        FeedSchedItem link = feedSchedItemService.addItemToFeedSched(dto.getFeedSchedId(), dto.getItemId());
+        FeedSchedItem link = feedSchedItemService.addItemToFeedSched(
+            dto.getFeedSchedId(),
+            dto.getItemId(),
+            dto.getAmount()
+        );
         return FeedSchedItemMapper.toDTO(link);
     }
 

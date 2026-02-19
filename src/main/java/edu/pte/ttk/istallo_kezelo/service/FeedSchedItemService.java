@@ -31,7 +31,7 @@ public class FeedSchedItemService {
 
     // Tétel hozzáadása etetési naplóhoz
     @Transactional
-    public FeedSchedItem addItemToFeedSched(Long feedSchedId, Long itemId){
+    public FeedSchedItem addItemToFeedSched(Long feedSchedId, Long itemId, Double amount){
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
             .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
 
@@ -42,10 +42,14 @@ public class FeedSchedItemService {
         if (exists) {
             throw new RuntimeException("Tétel már hozzá van rendelve az etetési naplóhoz.");
         }
+        if (amount == null) {
+            throw new RuntimeException("Mennyiség kötelező.");
+        }
 
         FeedSchedItem link = new FeedSchedItem();
         link.setFeedSched(feedSched);
         link.setItem(item);
+        link.setAmount(amount);
 
         FeedSchedItem saved = feedSchedItemRepository.save(link);
         storageService.syncAmountInUseForItem(itemId);
@@ -70,7 +74,7 @@ public class FeedSchedItemService {
     // Link lekérdezése id alapján
     public FeedSchedItem getFeedSchedItemById(Long id){
         return feedSchedItemRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Link nem tallható."));
+            .orElseThrow(() -> new RuntimeException("Link nem található."));
     }
 
     // Tétel eltávolítása etetési naplóból

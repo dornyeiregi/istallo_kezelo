@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FeedSchedItemDTO {
-    private Long feedSchedId;
+public class FeedSchedItemAmountDTO {
     private Long itemId;
-    private String itemName;
-    private String feedDescription;
     private Double amount;
 }

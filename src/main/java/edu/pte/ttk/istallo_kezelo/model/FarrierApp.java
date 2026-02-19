@@ -5,8 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "farrier_app")
 public class FarrierApp {
 
@@ -30,9 +34,6 @@ public class FarrierApp {
     @OneToMany(mappedBy = "farrierApp", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorseFarrierApp> horsesDone = new ArrayList<>();
 
-
-
-    // Constructors, getters, and setters
 
     //Getters
     public Long getId() {

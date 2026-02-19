@@ -16,4 +16,5 @@ public class FeedSchedDTO {
     private String description;
     private List<Long> horseIds;
     private List<Long> itemIds;
+    private List<FeedSchedItemAmountDTO> items;
 }

@@ -3,8 +3,12 @@ package edu.pte.ttk.istallo_kezelo.model;
 import java.time.LocalDate;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "storage")
 public class Storage {
 
@@ -26,7 +30,6 @@ public class Storage {
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
-    // Constructors, getters, and setters
 
     //Getters
     public Long getId() {
