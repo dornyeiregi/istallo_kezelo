@@ -9,7 +9,6 @@ public final class CalendarEventMapper {
 
     public static CalendarEventDTO toDTO(CalendarEvent event) {
         CalendarEventDTO dto = new CalendarEventDTO();
-
         dto.setId(event.getId());
         dto.setHorseId(event.getHorse().getId());
         dto.setHorseName(event.getHorse().getHorseName());
@@ -17,7 +16,6 @@ public final class CalendarEventMapper {
         dto.setEventType(event.getEventType());
         dto.setEventDate(event.getEventDate());
         dto.setRelatedEntityId(event.getRelatedEntityId());
-
         return dto;
     }
 }

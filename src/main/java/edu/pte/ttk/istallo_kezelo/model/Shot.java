@@ -4,11 +4,14 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,58 +35,11 @@ public class Shot {
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
-    // Bi-directional relationship with HorseShot
     @OneToMany(mappedBy = "shot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorseShot> horses_treated = new ArrayList<>();
-
-
-    // Constructors, getters, and setters
-    public Long getId() {
-        return id;
-    }
-
-    public String getShotName() {
-        return shotName;
-    }
-
-    public LocalDate getDate(){
-        return date;
-    }
-
-    public Integer getFrequencyValue(){
-        return frequencyValue;
-    }
-
-    public String getFrequencyUnit(){
-        return frequencyUnit;
-    }
 
     public LocalDate getNextShotDate(){
         ChronoUnit unit = ChronoUnit.valueOf(frequencyUnit.toUpperCase());
         return date.plus(frequencyValue, unit);
     }
-
-    public List<HorseShot> getHorses_treated() {
-        return horses_treated;
-    }
-
-    // Setters
-
-    public void setShotName(String shotName) {
-        this.shotName = shotName;
-    }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public void setFrequencyValue(Integer value){
-        this.frequencyValue = value;
-    }
-
-    public void setFrequencyUnit(String unit){
-        this.frequencyUnit = unit;
-    }
-
-
 }

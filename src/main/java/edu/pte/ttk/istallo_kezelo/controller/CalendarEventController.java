@@ -2,13 +2,11 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import edu.pte.ttk.istallo_kezelo.dto.CalendarEventDTO;
 import edu.pte.ttk.istallo_kezelo.service.CalendarEventService;
 
@@ -22,11 +20,9 @@ public class CalendarEventController {
         this.calendarEventService = calendarEventService;
     }
 
-    // Új esemény létrehozása
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public CalendarEventDTO createEvent(@RequestBody CalendarEventDTO dto, Authentication auth) {
-
         if (dto.getHorseId() == null) {
             throw new RuntimeException("A horseId megadása kötelező.");
         }
@@ -36,7 +32,6 @@ public class CalendarEventController {
         if (dto.getEventType() == null) {
             throw new RuntimeException("Az eventType megadása kötelező.");
         }
-
         return calendarEventService.createEvent(
                 dto.getHorseId(),
                 dto.getEventType(),
@@ -45,14 +40,12 @@ public class CalendarEventController {
         );
     }
 
-    // Esemény lekérdezése id alapján
     @GetMapping("/{eventId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public CalendarEventDTO getEventById(@PathVariable Long eventId, Authentication auth) {
         return calendarEventService.getById(eventId);
     }
 
-    // Összes esemény lekérdezése (opcionális dátum intervallummal)
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public List<CalendarEventDTO> getAllEvents(
@@ -65,7 +58,6 @@ public class CalendarEventController {
         return calendarEventService.getAllEvents(start, end);
     }
 
-    // Ló eseményeinek lekérdezése (opcionális dátum intervallummal)
     @GetMapping("/horse/{horseId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public List<CalendarEventDTO> getHorseEvents(
@@ -82,7 +74,6 @@ public class CalendarEventController {
         return calendarEventService.getHorseEvents(horseId);
     }
 
-    // Istálló eseményeinek lekérdezése dátum intervallumban
     @GetMapping("/stable/{stableId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
     public List<CalendarEventDTO> getStableEventsInRange(
@@ -99,7 +90,6 @@ public class CalendarEventController {
         return calendarEventService.getStableEventsInRange(stableId, start, end);
     }
 
-    // Esemény frissítése
     @PatchMapping("/{eventId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public CalendarEventDTO updateEventPartially(
@@ -115,7 +105,6 @@ public class CalendarEventController {
         );
     }
 
-    // Esemény törlése
     @DeleteMapping("/{eventId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<?> deleteEvent(@PathVariable Long eventId) {

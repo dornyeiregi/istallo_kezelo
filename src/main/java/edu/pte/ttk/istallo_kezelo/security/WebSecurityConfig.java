@@ -39,9 +39,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
         http.csrf(csrf -> csrf.disable());
-
         http.cors(cors -> cors.configurationSource(request -> {
             var config = new CorsConfiguration();
             config.addAllowedOrigin("http://localhost:4200");
@@ -50,19 +48,15 @@ public class WebSecurityConfig {
             config.setAllowCredentials(true);
             return config;
         }));
-
         http.exceptionHandling(e -> e.authenticationEntryPoint(unauthorizedHandler));
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/signin", "/api/auth/signup", "/api/test/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")   // => ROLE_ADMIN
                 .anyRequest().authenticated()
         );
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 }

@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 
 public final class FeedSchedItemMapper {
+
     private FeedSchedItemMapper() {}
 
     public static FeedSchedItemDTO toDTO(FeedSchedItem feedSchedItem) {

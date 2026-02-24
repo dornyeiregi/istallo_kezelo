@@ -2,8 +2,12 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -21,27 +25,4 @@ public class HorseShot {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "shot_id", nullable = false)
     private Shot shot;
-    
-    // Constructors, getters, and setters
-
-    // Getters
-
-    public Horse getHorse() {
-        return horse;
-    }
-
-    public Shot getShot() {
-        return shot;
-    }
-
-    // Setters
-
-    public void setHorse(Horse horse) {
-        this.horse = horse;
-    }
-
-    public void setShot(Shot shot) {
-        this.shot = shot;
-    }
-
 }

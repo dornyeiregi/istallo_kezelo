@@ -3,7 +3,6 @@ package edu.pte.ttk.istallo_kezelo.config;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
-
 @Converter(autoApply = true)
 public class EmptyStringToNullConverter implements AttributeConverter<String, String> {
 

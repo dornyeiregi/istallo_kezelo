@@ -1,12 +1,15 @@
 package edu.pte.ttk.istallo_kezelo.model;
 
 import java.time.LocalDate;
-
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,16 +41,4 @@ public class CalendarEvent {
         this.eventDate = eventDate;
     }
 
-    // Getters
-    public Long getId() { return id; }
-    public Horse getHorse() { return horse; }
-    public EventType getEventType() { return eventType; }
-    public LocalDate getEventDate() { return eventDate; }
-    public Long getRelatedEntityId() { return relatedEntityId; }
-
-    // Setters
-    public void setHorse(Horse horse) { this.horse = horse; }
-    public void setEventType(EventType eventType) { this.eventType = eventType; }
-    public void setEventDate(LocalDate eventDate) { this.eventDate = eventDate; }
-    public void setRelatedEntityId(Long relatedEntityId) { this.relatedEntityId = relatedEntityId; }
 }

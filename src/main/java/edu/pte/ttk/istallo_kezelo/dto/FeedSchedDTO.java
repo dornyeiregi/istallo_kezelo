@@ -4,7 +4,6 @@ import edu.pte.ttk.istallo_kezelo.model.enums.FeedTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.util.List;
 
 @Data

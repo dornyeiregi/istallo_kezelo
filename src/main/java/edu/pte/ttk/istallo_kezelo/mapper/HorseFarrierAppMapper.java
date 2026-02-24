@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.HorseFarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 
 public final class HorseFarrierAppMapper {
+
     private HorseFarrierAppMapper() {}
 
     public static HorseFarrierAppDTO toDTO(HorseFarrierApp link) {

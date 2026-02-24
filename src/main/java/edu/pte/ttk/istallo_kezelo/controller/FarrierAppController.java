@@ -2,15 +2,12 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.FarrierAppMapper;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.service.FarrierAppService;
-
 import java.time.LocalDate;
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,8 +17,6 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-
 
 @RestController
 @RequestMapping("/api/farrierApps")
@@ -33,8 +28,6 @@ public class FarrierAppController {
         this.farrierAppService = farrierAppService;
     }
 
-
-    // Új patkolás hozzáadása
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<FarrierAppDTO> createFarrierApp(@RequestBody FarrierAppDTO dto, Authentication auth) {
@@ -42,8 +35,6 @@ public class FarrierAppController {
         return ResponseEntity.ok(FarrierAppMapper.toDTO(created));
     }
 
-
-    // Összes patkolás lekérdezése
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getAllFarrierApps(Authentication auth) {
@@ -51,7 +42,6 @@ public class FarrierAppController {
         return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
-    // Patkolás lekérdezése id alaján
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public FarrierAppDTO getFarrierAppById(@PathVariable Long id, Authentication auth) {
@@ -62,7 +52,6 @@ public class FarrierAppController {
         return FarrierAppMapper.toDTO(farrierApp);
     }
 
-    // Patkolás lekérdezése dátum alaján
     @GetMapping("/date/{date}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date, Authentication auth) {
@@ -70,7 +59,6 @@ public class FarrierAppController {
         return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
-    // Patkolás lekérdezése patkolókovács neve alaján
     @GetMapping("/farrierName/{farrierName}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName, Authentication auth) {
@@ -78,7 +66,6 @@ public class FarrierAppController {
         return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
-    // Patkolás lekérdezése ló neve alaján
     @GetMapping("/horseName/{horseName}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName, Authentication auth) {
@@ -86,7 +73,6 @@ public class FarrierAppController {
         return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
-    // Patkolás lekérdezése ló id alaján
     @GetMapping("/horseId/{horseId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
@@ -94,7 +80,6 @@ public class FarrierAppController {
         return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
-    // Patkolás frissítése
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<String> updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto, Authentication auth) {
@@ -102,12 +87,10 @@ public class FarrierAppController {
         return ResponseEntity.ok("Patkolás sikeresen frissítve.");
     }
     
-    // Patkolás törlése
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteFarrierApp(@PathVariable Long id) {
         farrierAppService.deleteFarrierApp(id);
         return ResponseEntity.ok("Patkolás sikeresen törölve.");
     }
-
 }

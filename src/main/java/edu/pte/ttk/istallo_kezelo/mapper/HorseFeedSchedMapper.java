@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.HorseFeedSchedDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 
 public final class HorseFeedSchedMapper {
+
     private HorseFeedSchedMapper() {}
 
     public static HorseFeedSchedDTO toDTO(HorseFeedSched horseFeedSched) {

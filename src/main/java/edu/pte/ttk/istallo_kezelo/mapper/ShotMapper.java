@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.ShotDTO;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 
 public final class ShotMapper {
+
     private ShotMapper() {}
 
     public static ShotDTO toDTO(Shot shot) {

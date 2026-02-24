@@ -6,7 +6,6 @@ import edu.pte.ttk.istallo_kezelo.mapper.UserMapper;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,7 +20,6 @@ public class AdminService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    //@Autowired
     public AdminService(UserRepository userRepository,
                         PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -36,25 +34,19 @@ public class AdminService {
     public User updateUserRole(Long userId, String newRole) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Felhasználó nem található"));
-
         try {
             UserType newType = UserType.valueOf(newRole.trim().toUpperCase());
-
             String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
             if (user.getUsername().equals(currentUsername)
                     && user.getUserType() == UserType.ADMIN
                     && newType != UserType.ADMIN) {
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Saját magadat nem fokozhatod le.");
             }
-
             if (user.getUserType() != newType) {
                 user.setUserType(newType);
                 userRepository.save(user);
             }
-
             return user;
-
         } catch (IllegalArgumentException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Érvénytelen role típus");
         }
@@ -63,11 +55,9 @@ public class AdminService {
     public void deleteUser(Long id) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByUsername(currentUsername);
-
         if (currentUser != null && currentUser.getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Saját magadat nem törölheted.");
         }
-
         userRepository.deleteById(id);
     }
 
@@ -86,7 +76,6 @@ public class AdminService {
         user.setPhone(dto.getPhone());
         user.setUserType(dto.getUserType());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
-
         return userRepository.save(user);
     }
 

@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.StableDTO;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 
 public final class StableMapper {
+
     private StableMapper() {}
 
     public static StableDTO toDTO(Stable stable) {

@@ -15,7 +15,6 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 import java.util.Map;
 
-
 @RestController
 @RequestMapping("/api/horses")
 public class HorseController {
@@ -30,13 +29,11 @@ public class HorseController {
         this.stableService = stableService;
     }
 
-    // Új ló létrehozása
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public HorseDTO createHorse(@RequestBody HorseDTO dto, Authentication auth) {
         User owner = userService.getUserById(dto.getOwnerId(), auth)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
-
         Stable stable = null;
         if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
             stable = stableService.getStableByName(dto.getStableName());
@@ -46,7 +43,6 @@ public class HorseController {
         } else {
             throw new RuntimeException("Az istálló mező kitöltése kötelező.");
         }
-
         Horse horse = new Horse();
         horse.setHorseName(dto.getHorseName());
         horse.setDob(dto.getDob());
@@ -56,19 +52,16 @@ public class HorseController {
         horse.setMicrochipNum(dto.getMicrochipNum());
         horse.setPassportNum(dto.getPassportNum());
         horse.setAdditional(dto.getAdditional());
-
         Horse savedHorse = horseService.saveHorse(horse);
         return HorseMapper.toDTO(savedHorse);
     }
 
-    // Összes ló lekérdezése
     @GetMapping("/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
     public List<HorseDTO> getAllHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream().map(HorseMapper::toDTO).toList();
     }
 
-    // Ló lekérdezése id alapján
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public HorseDTO getHorseById(@PathVariable Long id, Authentication auth) {
@@ -78,11 +71,9 @@ public class HorseController {
         if (hasRole(auth, "OWNER") && !horse.getOwner().getUsername().equals(auth.getName())) {
             throw new RuntimeException("Nincs jogosultsága más lovait megtekinteni.");
         }
-
         return HorseMapper.toDTO(horse);
     }
 
-    // Ló lekérdezése név alapján
     @GetMapping("/byName/{horseName}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
     public HorseDTO getHorseByName (@PathVariable String horseName, Authentication auth) {
@@ -93,13 +84,11 @@ public class HorseController {
         return HorseMapper.toDTO(horse);
     }
 
-    // Ló frissítése
     @PatchMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER')")
     public HorseDTO updateHorsePartially(@PathVariable Long id, @RequestBody HorseDTO dto, Authentication auth){
         Horse existingHorse = horseService.getHorseById(id, auth)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
-
         if (hasRole(auth, "OWNER") && !existingHorse.getOwner().getUsername().equals(auth.getName())) {
             throw new RuntimeException("Csak a saját lovakat lehet szerkeszteni.");
         }
@@ -109,25 +98,20 @@ public class HorseController {
         if(dto.getMicrochipNum() != null) {existingHorse.setMicrochipNum(dto.getMicrochipNum());}
         if(dto.getPassportNum() != null) {existingHorse.setPassportNum(dto.getPassportNum());}
         if(dto.getAdditional() != null) {existingHorse.setAdditional(dto.getAdditional());}
-
         if (dto.getOwnerId() != null) {
             User newOwner = userService.getUserById(dto.getOwnerId(), auth)
                 .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
             existingHorse.setOwner(newOwner);
         }
-
         if (dto.getStableId() != null) {
             Stable newStable = stableService.getStableById(dto.getStableId())
                 .orElseThrow(() -> new RuntimeException("Istálló nem található."));
             existingHorse.setStable(newStable);
         }
-
         Horse savedHorse = horseService.saveHorse(existingHorse);
-
         return HorseMapper.toDTO(savedHorse);
     }
 
-    // Ló törlése
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<Map<String, String>> deleteHorse(@PathVariable Long id) {
@@ -135,14 +119,6 @@ public class HorseController {
         return ResponseEntity.ok(Map.of("message", "Ló sikeresen törölve."));
     }
 
-
-
-    /**
-     * Más service-ekhez tartozó lekérdezések
-     */
-
-
-    // Felhasználó saját lovainak lekérése
     @GetMapping("/mine")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER')")
     public List<HorseDTO> getMyHorses(Authentication auth) {
@@ -150,9 +126,7 @@ public class HorseController {
             .filter(h -> h.getOwner().getUsername().equals(auth.getName()))
             .map(HorseMapper::toDTO).toList();
     }
-    
 
-    // Felhasználó összes lovának lekérdezése felhasználó id alapján
     @GetMapping("/byOwnerId/{ownerId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByOwner(@PathVariable Long ownerId, Authentication auth) {
@@ -165,7 +139,6 @@ public class HorseController {
         }
     }
 
-    // Felhasználó összes lovának lekérdezése felhasználó neve alapján
     @GetMapping("/byOwnerName/{lName}/{fName}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByOwnerName(@PathVariable String lName, @PathVariable String fName, Authentication auth) {
@@ -178,7 +151,6 @@ public class HorseController {
             .map(HorseMapper::toDTO).toList();
     }
 
-    // Felhasználó összes lovának lekérdezése felhasználónév alapján
     @GetMapping("/byUsername/{username}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByUsername(@PathVariable String username, Authentication auth) {
@@ -190,9 +162,7 @@ public class HorseController {
             .filter(horse -> horse.getOwner().getUsername().equals(username))
             .map(HorseMapper::toDTO).toList();
     }
-    
 
-    // Istállóban lévő összes ló lekérdezése istálló id alapján
     @GetMapping("/byStableId/{stableId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByStableId(@PathVariable Long stableId, Authentication auth){
@@ -205,7 +175,6 @@ public class HorseController {
         }
     }
 
-    // Istállóban lévő összes ló lekérdezése istálló név alapján
     @GetMapping("/byStableName/{stableName}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public List<HorseDTO> getHorsesByStableName(@PathVariable String stableName, Authentication auth) {
@@ -222,5 +191,4 @@ public class HorseController {
         return auth.getAuthorities().stream()
             .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
-
 }

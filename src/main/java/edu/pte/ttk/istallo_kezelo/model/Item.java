@@ -2,13 +2,16 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import edu.pte.ttk.istallo_kezelo.model.enums.*;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,50 +35,8 @@ public class Item {
     private ItemCategory itemCategory;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<FeedSchedItem> feedSchedItems = new ArrayList<>(); 
+    private List<FeedSchedItem> feedSchedItems = new ArrayList<>();
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Storage> storages = new ArrayList<>();
-    
-    // Constructors, getters, and setters
-
-    //Getters
-    public Long getId() {
-        return id;  
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public ItemType getItemType() {
-        return itemType;
-    }
-
-    public ItemCategory getItemCategory() {
-        return itemCategory;
-    }
-
-    public List<FeedSchedItem> getFeedSchedItems() {
-        return feedSchedItems;
-    }
-
-    //Setters
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setItemType(ItemType itemType) {
-        this.itemType = itemType;
-    }
-
-    public void setItemCategory(ItemCategory itemCategory) {
-        this.itemCategory = itemCategory;
-    }
-
-
 }

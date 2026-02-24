@@ -39,12 +39,10 @@ public class TreatmentService {
         this.calendarEventService = calendarEventService;
     }
 
-    // Új kezelés létrehozása
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public Treatment saveTreatment(Treatment treatment, List<Long> horseIds, Authentication auth) {
         Treatment saved = treatmentRepository.save(treatment);
-
         if (horseIds != null) {
             for (Long horseId : horseIds) {
                 if (auth != null && !isAdmin(auth)) {
@@ -57,8 +55,7 @@ public class TreatmentService {
                 link.setHorse(horse);
                 link.setTreatment(saved);
                 horseTreatmentRepository.save(link);
-                saved.getHorses_treated().add(link);
-
+                saved.getHorsesTreated().add(link);
                 calendarEventService.syncFromDomain(
                         horse,
                         EventType.TREATMENT,
@@ -67,31 +64,26 @@ public class TreatmentService {
                 );
             }
         }
-
         return saved;
     }
 
-    // Összes kezelés lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<Treatment> getAllTreatments(Authentication auth) {
         List<Treatment> all = treatmentRepository.findAll();
         return filterTreatmentsForOwner(all, auth);
     }
 
-    // Kezelés lekérdezése ID alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public Treatment getTreatmentById(Long id, Authentication auth) {
         Treatment treatment = treatmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kezelés nem található."));
-
-        if (!isAdmin(auth) && treatment.getHorses_treated().stream()
+        if (!isAdmin(auth) && treatment.getHorsesTreated().stream()
                 .noneMatch(link -> link.getHorse().getOwner().getUsername().equals(auth.getName()))) {
             throw new RuntimeException("Nincs jogosultságod ehhez a kezeléshez.");
         }
         return treatment;
     }
 
-    // Egy ló összes kezelése ID alapján
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<Treatment> getTreatmentsByHorseId(Long horseId, Authentication auth) {
@@ -100,7 +92,6 @@ public class TreatmentService {
         return treatments.stream().map(HorseTreatment::getTreatment).toList();
     }
 
-    // Egy ló összes kezelése név alapján
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<Treatment> getTreatmentsByHorseName(String horseName, Authentication auth) {
@@ -108,36 +99,29 @@ public class TreatmentService {
         if (horse == null) {
             throw new RuntimeException("Ló nem található.");
         }
-
         checkHorseOwnership(auth, horse.getId());
-
         List<HorseTreatment> treatments = horseTreatmentRepository.findByHorse_horseName(horseName);
         return treatments.stream().map(HorseTreatment::getTreatment).toList();
     }
 
-    // Kezelés frissítése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public Treatment updateTreatment(Long treatmentId, TreatmentDTO updatedTreatment, Authentication auth) {
         Treatment treatment = treatmentRepository.findById(treatmentId)
                 .orElseThrow(() -> new RuntimeException("Kezelés nem található."));
-
-        if (!isAdmin(auth) && treatment.getHorses_treated().stream()
+        if (!isAdmin(auth) && treatment.getHorsesTreated().stream()
                 .noneMatch(link -> link.getHorse().getOwner().getUsername().equals(auth.getName()))) {
             throw new RuntimeException("Csak a saját lovakhoz tartozó kezeléseket módosíthatod.");
         }
-
         if (updatedTreatment.getTreatmentName() != null) treatment.setTreatmentName(updatedTreatment.getTreatmentName());
         if (updatedTreatment.getDescription() != null) treatment.setDescription(updatedTreatment.getDescription());
         if (updatedTreatment.getDate() != null) treatment.setDate(updatedTreatment.getDate());
-
         if (updatedTreatment.getHorseIds() != null) {
             Set<Long> desiredHorseIds = new HashSet<>(updatedTreatment.getHorseIds());
-            Set<Long> existingHorseIds = treatment.getHorses_treated().stream()
+            Set<Long> existingHorseIds = treatment.getHorsesTreated().stream()
                     .map(link -> link.getHorse().getId())
                     .collect(java.util.stream.Collectors.toSet());
-
-            java.util.Iterator<HorseTreatment> iterator = treatment.getHorses_treated().iterator();
+            java.util.Iterator<HorseTreatment> iterator = treatment.getHorsesTreated().iterator();
             while (iterator.hasNext()) {
                 HorseTreatment link = iterator.next();
                 Long horseId = link.getHorse().getId();
@@ -147,7 +131,6 @@ public class TreatmentService {
                     horseTreatmentRepository.delete(link);
                 }
             }
-
             for (Long horseId : desiredHorseIds) {
                 if (!existingHorseIds.contains(horseId)) {
                     if (auth != null && !isAdmin(auth)) {
@@ -158,13 +141,12 @@ public class TreatmentService {
                     HorseTreatment link = new HorseTreatment();
                     link.setHorse(horse);
                     link.setTreatment(treatment);
-                    treatment.getHorses_treated().add(link);
+                    treatment.getHorsesTreated().add(link);
                 }
             }
         }
-
         Treatment saved = treatmentRepository.save(treatment);
-        for (HorseTreatment link : saved.getHorses_treated()) {
+        for (HorseTreatment link : saved.getHorsesTreated()) {
             Horse horse = link.getHorse();
             calendarEventService.syncFromDomain(
                     horse,
@@ -176,52 +158,42 @@ public class TreatmentService {
         return saved;
     }
 
-    // Kezelés törlése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void deleteTreatmentById(Long id, Authentication auth) {
         Treatment treatment = treatmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kezelés nem található."));
-
         if (!isAdmin(auth)) {
-            boolean ownsTreatment = treatment.getHorses_treated().stream()
+            boolean ownsTreatment = treatment.getHorsesTreated().stream()
                     .anyMatch(link -> link.getHorse().getOwner().getUsername().equals(auth.getName()));
             if (!ownsTreatment) {
                 throw new RuntimeException("Csak a saját lovakhoz tartozó kezeléseket törölheted.");
             }
         }
-
         treatmentRepository.deleteById(id);
         calendarEventService.deleteFromDomain(EventType.TREATMENT, id);
     }
 
-    // Helper – OWNER csak a saját lovaihoz férhet hozzá
     private void checkHorseOwnership(Authentication auth, Long horseId) {
         if (auth == null || isAdmin(auth)) return;
-
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username);
         Horse horse = horseRepository.findById(horseId)
                 .orElseThrow(() -> new RuntimeException("Ló nem található."));
-
         if (!horse.getOwner().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Csak a saját lovaidhoz adhatsz hozzá kezelést.");
         }
     }
 
-    // Helper – OWNER-szűrés minden GET metódushoz
     private List<Treatment> filterTreatmentsForOwner(List<Treatment> all, Authentication auth) {
         if (auth == null || isAdmin(auth)) return all;
-
         String username = auth.getName();
-
         return all.stream()
-                .filter(treatment -> treatment.getHorses_treated().stream()
+                .filter(treatment -> treatment.getHorsesTreated().stream()
                         .anyMatch(link -> link.getHorse().getOwner().getUsername().equals(username)))
                 .toList();
     }
 
-    // Helper – ADMIN-e az adott felhasználó
     private boolean isAdmin(Authentication auth) {
         return auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));

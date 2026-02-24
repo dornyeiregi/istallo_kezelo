@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 
 public final class FarrierAppMapper {
+
     private FarrierAppMapper() {}
 
     public static FarrierAppDTO toDTO(FarrierApp farrierApp) {
@@ -17,5 +18,4 @@ public final class FarrierAppMapper {
                 .map(hfa -> hfa.getHorse().getId()).toList());
         return dto;
     }
-
 }

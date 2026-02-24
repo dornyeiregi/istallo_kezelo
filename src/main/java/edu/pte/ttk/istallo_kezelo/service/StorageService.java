@@ -1,11 +1,9 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Item;
@@ -32,54 +30,45 @@ public class StorageService {
         this.horseFeedSchedRepository = horseFeedSchedRepository;
     }
 
-    // Új tároló hozzáadása
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
     public Storage createStorage(StorageDTO dto){
         Item item = itemRepository.findById(dto.getItemId())
             .orElseThrow(() -> new RuntimeException("Tétel nem található."));
-
         Storage storage = new Storage();
         storage.setAmountInUse(0.0);
         storage.setAmountStored(dto.getAmountStored());
         storage.setItem(item);
-
         return storageRepository.save(storage);
     }
 
-    // Összes tároló lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<Storage> getAllStorages(){
         return storageRepository.findAll();
     }
 
-    // Tároló lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage getStorageById(Long id){
         return storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
     }
 
-    // Tároló lekérdezése tárolt tétel alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage getStorageByItemId(Long itemId){
         return storageRepository.findByItem_Id(itemId);
     }
 
-    // Tároló frissítése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public Storage updateStorage(Long id, StorageDTO dto){
         Storage existingStorage = storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
-        
         if (dto.getAmountStored() != null) {
             existingStorage.setAmountStored(dto.getAmountStored());
         }        
         return storageRepository.save(existingStorage);
     }
 
-    // Tároló törlése
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteStorage(Long id){
         storageRepository.deleteById(id);
@@ -91,14 +80,12 @@ public class StorageService {
         if (storage == null) {
             return;
         }
-
         List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
         double totalInUse = 0;
         for (FeedSchedItem link : links) {
             Long feedSchedId = link.getFeedSched().getId();
             totalInUse += link.getAmount() * horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
         }
-
         storage.setAmountInUse(totalInUse);
         storageRepository.save(storage);
     }
@@ -118,5 +105,4 @@ public class StorageService {
         }
         storageRepository.saveAll(storages);
     }
-
 }

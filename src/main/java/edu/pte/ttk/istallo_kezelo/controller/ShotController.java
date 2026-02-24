@@ -2,16 +2,13 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import edu.pte.ttk.istallo_kezelo.dto.ShotDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.ShotMapper;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 import edu.pte.ttk.istallo_kezelo.service.ShotService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -19,8 +16,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
-
 
 @RestController
 @RequestMapping("/api/shots")

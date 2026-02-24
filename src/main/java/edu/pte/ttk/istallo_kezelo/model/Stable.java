@@ -2,12 +2,14 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -29,23 +31,7 @@ public class Stable {
         this.stableName = stableName;
     }
 
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public String getStableName() {
-        return stableName;
-    }
-
     public List<Horse> getHorsesInStable() {
         return horses;
     }
-    
-
-    // Setters
-    public void setStableName(String stableName) {
-        this.stableName = stableName;
-    }
-
 }

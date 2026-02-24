@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
 
 public final class StorageMapper {
+
     private StorageMapper() {}
 
     public static StorageDTO toDTO(Storage storage) {

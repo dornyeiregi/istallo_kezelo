@@ -2,8 +2,12 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,33 +28,4 @@ public class FeedSchedItem {
 
     @Column(name = "amount", nullable = false)
     private Double amount;
-
-    // Constructors, getters, and setters
-
-    // Getters
-    public FeedSched getFeedSched() {
-        return feedSched;
-    }
-
-    public Item getItem() {
-        return item;
-    }
-
-    public Double getAmount() {
-        return amount;
-    }
-
-    // Setters
-    public void setFeedSched(FeedSched feedSched) {
-        this.feedSched = feedSched;
-    }
-
-    public void setItem(Item item) {
-        this.item = item;
-    }
-
-    public void setAmount(Double amount) {
-        this.amount = amount;
-    }
-    
 }

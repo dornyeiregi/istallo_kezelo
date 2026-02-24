@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.model.User;
 
 public final class UserMapper {
+
     private UserMapper() {}
 
     public static UserDTO toDTO(User user) {

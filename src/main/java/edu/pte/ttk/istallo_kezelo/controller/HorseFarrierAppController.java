@@ -1,12 +1,10 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
 import edu.pte.ttk.istallo_kezelo.dto.HorseFarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.HorseFarrierAppMapper;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
@@ -22,7 +20,6 @@ public class HorseFarrierAppController {
         this.horseFarrierAppService = horseFarrierAppService;
     }
 
-    // Link létrehozása ló és patkolás között
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PostMapping
     public HorseFarrierAppDTO addHorseToFarrierApp(@RequestBody HorseFarrierAppDTO dto, Authentication auth) {
@@ -30,7 +27,6 @@ public class HorseFarrierAppController {
         return HorseFarrierAppMapper.toDTO(link);
     }
 
-    // Összes link lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping
     public List<HorseFarrierAppDTO> getAllHorseFarrierApps(Authentication auth) {
@@ -38,14 +34,12 @@ public class HorseFarrierAppController {
         return links.stream().map(HorseFarrierAppMapper::toDTO).toList();
     }
 
-    // Link lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/{id}")
     public HorseFarrierAppDTO getHorseFarrierAppById(@PathVariable Long id, Authentication auth) {
         return HorseFarrierAppMapper.toDTO(horseFarrierAppService.getHorseFarrierAppById(id, auth));
     }
 
-    // Összes ló lekérdezése patkolás id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/byFarrierAppId/{farrierAppId}")
     public List<HorseFarrierAppDTO> getHorsesForFarrierApp(@PathVariable Long farrierAppId, Authentication auth) {
@@ -53,7 +47,6 @@ public class HorseFarrierAppController {
         return links.stream().map(HorseFarrierAppMapper::toDTO).toList();
     }
 
-    // Összes patkolás lekérdezése ló id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @GetMapping("/byHorseId/{horseId}")
     public List<HorseFarrierAppDTO> getFarrierAppsForHorse(@PathVariable Long horseId, Authentication auth) {
@@ -61,7 +54,6 @@ public class HorseFarrierAppController {
         return links.stream().map(HorseFarrierAppMapper::toDTO).toList();
     }
 
-    // Link törlése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeHorseFromFarrierApp(@PathVariable Long id, Authentication auth) {

@@ -3,15 +3,17 @@ package edu.pte.ttk.istallo_kezelo.model;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
-
 import edu.pte.ttk.istallo_kezelo.config.EmptyStringToNullConverter;
 import edu.pte.ttk.istallo_kezelo.model.enums.Sex;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -43,7 +45,6 @@ public class Horse {
     @Column(name = "additional", nullable = true)
     private String additional;
 
-    // Relationships
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stable_id", nullable = false)
     private Stable stable;
@@ -65,93 +66,6 @@ public class Horse {
     @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseTreatment> treatments = new ArrayList<>();
 
-    // Getters
-    public Long getId() {
-        return id;
-    }
-
-    public User getOwner() {
-        return owner;
-    }
-
-    public String getHorseName() {
-        return horseName;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public Sex getSex() {
-        return sex;
-    }
-
-    public String getPassportNum() {
-        return passportNum;
-    }
-
-    public String getMicrochipNum() {
-        return microchipNum;
-    }
-
-    public String getAdditional() {
-        return additional;
-    }
-
-    public Stable getStable(){
-        return stable;
-    }
-
-    public List<HorseFarrierApp> getFarrierApps() {
-        return farrierApps;
-    }
-
-    public List<HorseFeedSched> getFeedScheds() {
-        return feedScheds;
-    }
-
-    public List<HorseShot> getShots() {
-        return shots;
-    }
-
-    public List<HorseTreatment> getTreatments() { 
-        return treatments; 
-    }
-
-    // Setters
-    public void setOwner(User owner) {
-        this.owner = owner;
-    }
-
-    public void setHorseName(String horseName) {
-        this.horseName = horseName;
-    }
-
-    public void setDob(LocalDate dob) {
-        this.dob = dob;
-    }
-
-    public void setSex(Sex sex) {
-        this.sex = sex;
-    }
-
-    public void setPassportNum(String passportNum) {
-        this.passportNum = passportNum;
-    }
-
-    public void setMicrochipNum(String microchipNum) {
-        this.microchipNum = microchipNum;
-    }
-
-    public void setAdditional(String additional) {
-        this.additional = additional;
-    }
-
-    public void setStable(Stable stable) {
-        this.stable = stable;
-    }
-
-    // Bi-directional methods
     public void addFarrierApp(HorseFarrierApp app) {
         farrierApps.add(app);
         app.setHorse(this);

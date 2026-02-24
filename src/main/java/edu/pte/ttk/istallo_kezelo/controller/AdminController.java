@@ -3,11 +3,9 @@ package edu.pte.ttk.istallo_kezelo.controller;
 import edu.pte.ttk.istallo_kezelo.dto.SignupRequestDTO;
 import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.service.AdminService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +13,10 @@ import java.util.Map;
 @RequestMapping("/api/admin")
 public class AdminController {
 
-    @Autowired
-    private AdminService adminService;
+    private final AdminService adminService;
 
-    // Új felhasználó létrehozása
+    public AdminController(AdminService adminService) { this.adminService = adminService; }
+
     @PostMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> createUser(@RequestBody SignupRequestDTO dto) {
@@ -26,16 +24,12 @@ public class AdminController {
         return ResponseEntity.ok("Felhasználó sikeresen létrehozva.");
     }
 
-
-    // Összes felhasználó listázása (csak admin láthatja)
     @GetMapping("/users")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
     }
 
-
-    // Meglévő user szerepének módosítása
     @PatchMapping("/update-role/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -44,17 +38,14 @@ public class AdminController {
         if (newRole == null || newRole.isBlank()) {
             return ResponseEntity.badRequest().body("Hiányzó role érték");
         }
-
         adminService.updateUserRole(id, newRole);
         return ResponseEntity.ok("Felhasználó típusa sikeresen frissítve.");
     }
 
-    // Felhasználó törlése
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
         return ResponseEntity.ok("Felhasználó sikeresen törölve.");
     }
-
 }

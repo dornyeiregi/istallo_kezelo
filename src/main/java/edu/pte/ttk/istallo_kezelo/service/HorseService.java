@@ -4,7 +4,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFarrierAppRepository;
@@ -21,7 +20,6 @@ import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -75,16 +73,12 @@ public class HorseService {
         this.treatmentRepository = treatmentRepository;
     }
 
-
-
-    // Új ló mentése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
     public Horse saveHorse(Horse horse) {
         return horseRepository.save(horse);
     }
 
-    // Összes ló lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public List<Horse> getAllHorses(Authentication auth) {
     User user = userRepository.findByUsername(auth.getName());
@@ -95,35 +89,28 @@ public class HorseService {
     }
 }
 
-
-    // Ló lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public Optional<Horse> getHorseById(Long id, Authentication auth) {
         Optional<Horse> horse = horseRepository.findById(id);
         return horse.filter(h -> canAccessHorse(h, auth));
     }
 
-    // Ló lekérdezése név alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public Horse getHorseByName(String horseName, Authentication auth) {
         Horse horse = horseRepository.findByHorseName(horseName);
         if (horse == null) {
             throw new RuntimeException("Ló nem található.");
         }
-
         if (!canAccessHorse(horse, auth)) {
             throw new RuntimeException("Nincs jogosultságod megtekinteni ezt a lovat.");
         }
         return horse;
     }
 
-
-    // Ló frissítése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public Horse updateHorse(String horseName, Horse updatedHorse, Authentication auth) {
         Horse horse = horseRepository.findByHorseName(horseName);
-
         if (!canAccessHorse(horse, auth)) {
             throw new RuntimeException("Nincs jogosultságod ennek a lónak a szerkesztéséhez.");
         }
@@ -138,88 +125,63 @@ public class HorseService {
         return horseRepository.save(horse);
     }
 
-
-    // Ló törlése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteHorseById(Long horseId) {
-
         Horse horse = horseRepository.findById(horseId)
                 .orElseThrow(() -> new RuntimeException("A ló nem található."));
-
-        // Oltások (HorseShot)
         List<HorseShot> shotLinks = horseShotRepository.findByHorse_Id(horseId);
         List<Long> shotIds = shotLinks.stream()
                 .map(link -> link.getShot().getId())
                 .toList();
-
         horseShotRepository.deleteAll(shotLinks);
-
         shotIds.forEach(shotId -> {
             if (horseShotRepository.countByShot_Id(shotId) == 0) {
                 shotRepository.deleteById(shotId);
             }
         });
-
-        // Kezelések
         List<HorseTreatment> treatmentLinks = horseTreatmentRepository.findByHorse_Id(horseId);
         List<Long> treatmentIds = treatmentLinks.stream()
                 .map(link -> link.getTreatment().getId())
                 .toList();
-
         horseTreatmentRepository.deleteAll(treatmentLinks);
-
         treatmentIds.forEach(treatmentId -> {
             if (horseTreatmentRepository.countByTreatment_Id(treatmentId) == 0) {
                 treatmentRepository.deleteById(treatmentId);
             }
         });
-
-        // Patkolás
         List<HorseFarrierApp> farrierLinks = horseFarrierAppRepository.findByHorseId(horseId);
         List<Long> farrierIds = farrierLinks.stream()
                 .map(link -> link.getFarrierApp().getId())
                 .toList();
-
         horseFarrierAppRepository.deleteAll(farrierLinks);
-
         farrierIds.forEach(farrierAppId -> {
             if (horseFarrierAppRepository.countByFarrierApp_Id(farrierAppId) == 0) {
                 farrierAppRepository.deleteById(farrierAppId);
             }
         });
-
-        // Feed sched
         List<HorseFeedSched> feedLinks = horseFeedSchedRepository.findByHorseId(horseId);
         List<Long> feedIds = feedLinks.stream()
                 .map(link -> link.getFeedSched().getId())
                 .toList();
-
         horseFeedSchedRepository.deleteAll(feedLinks);
-
         feedIds.forEach(feedSchedId -> {
             if (horseFeedSchedRepository.countByFeedSchedId(feedSchedId) == 0) {
                 feedSchedRepository.deleteById(feedSchedId);
             }
         });
-
-        // Ló törlése
         horseRepository.delete(horse);
     }
 
-    // Egyetlen ló elérhetőségének ellenőrzése
     private boolean canAccessHorse(Horse horse, Authentication auth) {
         if (auth == null) return false;
-
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isEmployee = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
         if (isAdmin || isEmployee) return true;
-
         String username = auth.getName();
         return horse.getOwner() != null && horse.getOwner().getUsername().equals(username);
     }
-    
 }
 

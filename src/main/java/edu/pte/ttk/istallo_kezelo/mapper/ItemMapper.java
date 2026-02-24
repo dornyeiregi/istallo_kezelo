@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.ItemDTO;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 
 public final class ItemMapper {
+
     private ItemMapper() {}
 
     public static ItemDTO toDTO(Item item) {

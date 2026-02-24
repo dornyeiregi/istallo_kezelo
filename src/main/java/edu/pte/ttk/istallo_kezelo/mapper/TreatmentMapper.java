@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.TreatmentDTO;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 
 public final class TreatmentMapper {
+
     private TreatmentMapper() {}
 
     public static TreatmentDTO toDTO(Treatment treatment) {
@@ -12,7 +13,7 @@ public final class TreatmentMapper {
         dto.setTreatmentName(treatment.getTreatmentName());
         dto.setDescription(treatment.getDescription());
         dto.setDate(treatment.getDate());
-        dto.setHorseIds(treatment.getHorses_treated().stream()
+        dto.setHorseIds(treatment.getHorsesTreated().stream()
                 .map(link -> link.getHorse().getId())
                 .toList());
         return dto;

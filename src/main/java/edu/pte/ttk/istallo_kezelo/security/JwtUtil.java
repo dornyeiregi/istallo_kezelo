@@ -6,7 +6,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -28,18 +27,14 @@ public class JwtUtil {
         this.key = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
     }
 
-    // JWT token generálása
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-
-        // Szerepkörök ROLE_ előtag nélkül kerülnek a tokenbe
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(a -> {
                     String r = a.getAuthority();
                     return r.startsWith("ROLE_") ? r.substring(5) : r;
                 })
                 .collect(Collectors.toList()));
-
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .addClaims(claims)

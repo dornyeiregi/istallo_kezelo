@@ -1,7 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.util.List;
-
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,14 +2,11 @@ package edu.pte.ttk.istallo_kezelo.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.FeedSchedItemMapper;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.service.FeedSchedItemService;
-
 import java.util.List;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +24,6 @@ public class FeedSchedItemController {
         this.feedSchedItemService = feedSchedItemService;
     }
 
-    // Tétel hozzáadása etetési naplóhoz
     @PostMapping()
     public FeedSchedItemDTO addItemToFeedSched(@RequestBody FeedSchedItemDTO dto) {
         FeedSchedItem link = feedSchedItemService.addItemToFeedSched(
@@ -38,35 +34,30 @@ public class FeedSchedItemController {
         return FeedSchedItemMapper.toDTO(link);
     }
 
-    // Minden link lekérdezése
     @GetMapping()
     public List<FeedSchedItemDTO> getAllFeedSchedItems() {
         List<FeedSchedItem> links = feedSchedItemService.getAllFeedSchedItems();
         return links.stream().map(FeedSchedItemMapper::toDTO).toList();
     }
 
-    // Link lekérdezése id alapján
     @GetMapping("/{id}")
     public FeedSchedItemDTO getFeedSchedItemById(@PathVariable Long id) {
         FeedSchedItem link = feedSchedItemService.getFeedSchedItemById(id);
         return FeedSchedItemMapper.toDTO(link);
     }
 
-    // Etetési napló minden tételének lekérdezése
     @GetMapping("/feedSchedId/{feedSchedId}")
     public List<FeedSchedItemDTO> getItemsForFeedSched(@PathVariable Long feedSchedId) {
         List<FeedSchedItem> links = feedSchedItemService.getItemsForFeedSched(feedSchedId);
         return links.stream().map(FeedSchedItemMapper::toDTO).toList();
     }
 
-    // Egy tételt tartalmazó összes etetési napló lekérdezése
     @GetMapping("/itemId/{itemId}")
     public List<FeedSchedItemDTO> getFeedSchedsForItem(@PathVariable Long itemId) {
         List<FeedSchedItem> links = feedSchedItemService.getFeedSchedsForItem(itemId);
         return links.stream().map(FeedSchedItemMapper::toDTO).toList();
     }
 
-    // Link törlése
     @DeleteMapping("/{id}")
     public ResponseEntity<String> removeItemFromFeedSched(@PathVariable Long id) {
         FeedSchedItem link = feedSchedItemService.getFeedSchedItemById(id);

@@ -4,6 +4,7 @@ import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 
 public final class HorseMapper {
+
     private HorseMapper() {}
 
     public static HorseDTO toDTO(Horse horse){

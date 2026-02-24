@@ -1,7 +1,6 @@
 package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.time.LocalDate;
-
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;

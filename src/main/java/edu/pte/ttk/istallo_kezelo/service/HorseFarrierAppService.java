@@ -1,12 +1,10 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
-
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
@@ -37,26 +35,21 @@ public class HorseFarrierAppService {
         this.calendarEventService = calendarEventService;
     }
 
-    // Ló hozzáadása patkoláshoz
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseFarrierApp addHorseToFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
         FarrierApp app = farrierAppRepository.findById(farrierAppId)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található."));
-
         Horse horse = horseRepository.findById(horseId)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
-
         boolean exists = horseFarrierAppRepository.existsByFarrierAppAndHorse(app, horse);
         if (exists) {
             throw new RuntimeException("A ló már hozzá van csatolva a patkoláshoz.");
         }
-
         HorseFarrierApp link = new HorseFarrierApp();
         link.setFarrierApp(app);
         link.setHorse(horse);
-
         HorseFarrierApp saved = horseFarrierAppRepository.save(link);
         calendarEventService.syncFromDomain(
                 horse,
@@ -67,7 +60,6 @@ public class HorseFarrierAppService {
         return saved;
     }
 
-    // Összes link lekérdezése
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseFarrierApp> getAllHorseFarrierApps(Authentication auth){
@@ -75,7 +67,6 @@ public class HorseFarrierAppService {
         return filterHorseFarrierAppsForOwner(all, auth);
     }
 
-    // Ló törlése patkolásból
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void removeHorseFromFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
@@ -84,14 +75,12 @@ public class HorseFarrierAppService {
         calendarEventService.deleteFromDomain(EventType.FARRIERAPP, farrierAppId, horseId);
     }
 
-    // Összes ló lekérdezése patkolás id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseFarrierApp> getHorsesForFarrierApp(Long farrierAppId, Authentication auth){
         List<HorseFarrierApp> all = horseFarrierAppRepository.findByFarrierApp_Id(farrierAppId);
         return filterHorseFarrierAppsForOwner(all, auth);
     }
 
-    // Összes patkolás lekérdezése ló id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseFarrierApp> getFarrierAppsForHorse(Long horseId, Authentication auth){
         checkHorseOwnership(auth, horseId);
@@ -102,51 +91,39 @@ public class HorseFarrierAppService {
     public HorseFarrierApp getHorseFarrierAppById(Long id, Authentication auth){
         HorseFarrierApp link = horseFarrierAppRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Link nem található."));
-
         if (auth == null) {
             return link;
         }
-
         boolean isAdmin = auth.getAuthorities().stream()
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) {
             return link;
         }
-
         String username = auth.getName();
         if (!link.getHorse().getOwner().getUsername().equals(username)) {
             throw new RuntimeException("Csak a saját lovadhoz tartozó patkolást érheted el.");
         }
-
         return link;
     }
 
-    // Helper - OWNER csak a saját lovait módosíthatja
     private void checkHorseOwnership(Authentication auth, Long horseId) {
         if (auth == null) { return; }
-
         String username = auth.getName();
         User currentuser = userRepository.findByUsername(username);
         Horse horse = horseRepository.findById(horseId)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
-
         boolean isAdmin = auth.getAuthorities().stream()
             .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        
         if (!isAdmin && !horse.getOwner().getId().equals(currentuser.getId())) {
             throw new RuntimeException("Csak saját lovaidhoz adhatsz vagy törölhetsz patkolást.");
         }
     }
 
-
-    // Helper – OWNER csak saját lovaihoz tartozó linket lásson
     private List<HorseFarrierApp> filterHorseFarrierAppsForOwner(List<HorseFarrierApp> all, Authentication auth) {
         if (auth == null) return all;
-
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         if (isAdmin) return all;
-
         String username = auth.getName();
         return all.stream()
                 .filter(link -> link.getHorse().getOwner().getUsername().equals(username))
