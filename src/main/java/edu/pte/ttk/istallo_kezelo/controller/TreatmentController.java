@@ -59,13 +59,6 @@ public class TreatmentController {
         return treatments.stream().map(TreatmentMapper::toDTO).toList();
     }
 
-    @GetMapping("/horseName/{horseName}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public List<TreatmentDTO> getAllTreatmentsOfHorseByName(@PathVariable String horseName, Authentication auth) {
-        List<Treatment> treatments = treatmentService.getTreatmentsByHorseName(horseName, auth);
-        return treatments.stream().map(TreatmentMapper::toDTO).toList();
-    }
-
     @PatchMapping("/{treatmentId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<String> updateTreatment(@PathVariable Long treatmentId, @RequestBody TreatmentDTO dto, Authentication auth) {

@@ -19,14 +19,11 @@ import org.springframework.http.HttpMethod;
 public class WebSecurityConfig {
 
     private final AuthEntryPointJwt unauthorizedHandler;
+    private final AuthTokenFilter authTokenFilter;
 
-    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler) {
+    public WebSecurityConfig(AuthEntryPointJwt unauthorizedHandler, AuthTokenFilter authTokenFilter) {
         this.unauthorizedHandler = unauthorizedHandler;
-    }
-
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
+        this.authTokenFilter = authTokenFilter;
     }
 
     @Bean
@@ -56,7 +53,7 @@ public class WebSecurityConfig {
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")   // => ROLE_ADMIN
                 .anyRequest().authenticated()
         );
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

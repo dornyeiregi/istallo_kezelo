@@ -6,7 +6,6 @@ import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.FarrierAppMapper;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.service.FarrierAppService;
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -50,27 +49,6 @@ public class FarrierAppController {
             throw new RuntimeException("Patkolás nem található.");
         }
         return FarrierAppMapper.toDTO(farrierApp);
-    }
-
-    @GetMapping("/date/{date}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public List<FarrierAppDTO> getFarrierAppsByDate(@PathVariable LocalDate date, Authentication auth) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByDate(date, auth);
-        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
-    }
-
-    @GetMapping("/farrierName/{farrierName}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public List<FarrierAppDTO> getFarrierAppsByFarrierName(@PathVariable String farrierName, Authentication auth) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByFarrierName(farrierName, auth);
-        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
-    }
-
-    @GetMapping("/horseName/{horseName}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    public List<FarrierAppDTO> getFarrierAppsByHorseName(@PathVariable String horseName, Authentication auth) {
-        List<FarrierApp> farrierApps = farrierAppService.getFarrierAppsByHorseName(horseName, auth);
-        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
     }
 
     @GetMapping("/horseId/{horseId}")

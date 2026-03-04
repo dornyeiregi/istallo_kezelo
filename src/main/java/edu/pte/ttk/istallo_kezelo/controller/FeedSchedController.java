@@ -53,12 +53,6 @@ public class FeedSchedController {
         return feedScheds.stream().map(FeedSchedMapper::toDTO).toList();
     }
 
-    @GetMapping("/horseName/{horseName}")
-    public List<FeedSchedDTO> getFeedSchedsByHorseName(@PathVariable String horseName) {
-        List<FeedSched> feedScheds = feedSchedService.getFeedSchedByHorseName(horseName);
-        return feedScheds.stream().map(FeedSchedMapper::toDTO).toList();
-    }
-    
     @PatchMapping("/{id}")
     public ResponseEntity<String> updateFeedSched(@PathVariable Long id, @RequestBody FeedSchedDTO dto) {
         feedSchedService.updateFeedSched(id, dto);

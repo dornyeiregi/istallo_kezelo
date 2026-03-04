@@ -65,14 +65,6 @@ public class ShotController {
         return shots.stream().map(ShotMapper::toDTO).toList(); 
     }
     
-    // Ló összes oltásának lekérdezése ló neve alapján
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
-    @GetMapping("/horseName/{horseName}")
-    public List<ShotDTO> getAllShotsOfHorseByName(@PathVariable String horseName, Authentication auth) {
-        List<Shot> shots = shotService.getShotsByHorseName(horseName, auth);
-        return shots.stream().map(ShotMapper::toDTO).toList();
-    }
-    
     // Oltás frissítése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PatchMapping("/{shotId}")

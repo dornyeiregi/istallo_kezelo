@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/api/stables")
@@ -40,24 +39,6 @@ public class StableController {
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<StableDTO> getAllStables(){
         return stableService.getAllStables().stream().map(StableMapper::toDTO).toList();
-    }
-
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public StableDTO getStableByID(@PathVariable Long id) {
-        Stable stable = stableService.getStableById(id)
-            .orElseThrow(() -> new RuntimeException("Istálló nem található."));
-        if (stable == null) {
-            throw new RuntimeException("Istálló nem található.");
-        }
-        return StableMapper.toDTO(stable);
-    }
-
-    @GetMapping("/stableName")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public StableDTO getStableByName(@RequestParam String stableName) {
-        Stable stable = stableService.getStableByName(stableName);
-        return StableMapper.toDTO(stable);
     }
 
     @PatchMapping("/{stableId}")

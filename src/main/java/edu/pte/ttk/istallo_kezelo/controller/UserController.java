@@ -5,7 +5,6 @@ import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.UserMapper;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import java.util.List;
@@ -58,26 +57,6 @@ public class UserController {
         return UserMapper.toDTO(user);
     }
 
-    @GetMapping("/byFullName/{lName}/{fName}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public UserDTO getUserByFullName(@PathVariable String lName, @PathVariable String fName) {
-        User user = userService.getUserByFullName(lName, fName);
-        if (user == null) {
-            throw new RuntimeException("Felhasználó nem található.");
-        }
-        return UserMapper.toDTO(user);
-    }
-    
-    @GetMapping("/byHorseName/{horseName}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public UserDTO getUserbyHorseName(@PathVariable String horseName){
-        User user = userService.getUserByHorseName(horseName);
-        if (user == null) {
-            throw new RuntimeException("Felhasználó nem található.");
-        }
-        return UserMapper.toDTO(user);
-    }
-
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public UserDTO updateUserPartially(@PathVariable Long id, @RequestBody UserDTO dto, Authentication auth){
@@ -93,10 +72,4 @@ public class UserController {
         return UserMapper.toDTO(savedUser);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN')")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.ok("Felhasználó sikeresen törölve.");
-    }
 }

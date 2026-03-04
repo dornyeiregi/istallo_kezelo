@@ -39,18 +39,6 @@ public class StorageController {
         return storageService.getAllStorages().stream().map(StorageMapper::toDTO).toList();
     }
     
-    @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public StorageDTO getStorageById(@PathVariable Long id) {
-        return StorageMapper.toDTO(storageService.getStorageById(id));
-    }
-    
-    @GetMapping("/byItem/{itemId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
-    public StorageDTO getStorageByItemId(@PathVariable Long itemId) {
-        return StorageMapper.toDTO(storageService.getStorageByItemId(itemId));
-    }
-
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     @PatchMapping("/{id}")
     public ResponseEntity<StorageDTO> updateStorage(

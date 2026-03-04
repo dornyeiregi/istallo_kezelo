@@ -7,8 +7,6 @@ import edu.pte.ttk.istallo_kezelo.mapper.HorseFeedSchedMapper;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.service.HorseFeedSchedService;
 import java.util.List;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,22 +40,10 @@ public class HorseFeedSchedController {
         return HorseFeedSchedMapper.toDTO(link);
     }
 
-    @GetMapping("/feedSchedId/{feedSchedId}")
-    public List<HorseFeedSchedDTO> getHorsesForFeedSched(@PathVariable Long feedSchedId){
-        List<HorseFeedSched> links = horseFeedSchedService.getHorsesForFeedSChed(feedSchedId);
-        return links.stream().map(HorseFeedSchedMapper::toDTO).toList();
-    }
-
     @GetMapping("/horseId/{horseId}")
     public List<HorseFeedSchedDTO> getFeedSchedsForHorse(@PathVariable Long horseId){
         List<HorseFeedSched> links = horseFeedSchedService.getFeedSchedsForHorse(horseId);
         return links.stream().map(HorseFeedSchedMapper::toDTO).toList();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> removeHorseFromFeedSched(@PathVariable Long id){
-        HorseFeedSched link = horseFeedSchedService.getHorseFeedSchedById(id);
-        horseFeedSchedService.removeHorseFromFeedSched(link.getFeedSched().getId(), link.getHorse().getId());
-        return ResponseEntity.ok("Link sikeresen törölve.");
-    }
 }
