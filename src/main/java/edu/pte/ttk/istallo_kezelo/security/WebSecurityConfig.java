@@ -49,7 +49,7 @@ public class WebSecurityConfig {
         http.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .requestMatchers("/api/auth/signin", "/api/auth/signup", "/api/test/**").permitAll()
+                .requestMatchers("/api/auth/signin", "/api/auth/signup").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")   // => ROLE_ADMIN
                 .anyRequest().authenticated()
         );

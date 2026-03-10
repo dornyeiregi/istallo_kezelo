@@ -35,8 +35,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
 
         if (path.equals("/api/auth/signin")
-            || path.equals("/api/auth/signup")
-            || path.startsWith("/api/test/")) {
+            || path.equals("/api/auth/signup")) {
             filterChain.doFilter(request, response);
             return;
         }
