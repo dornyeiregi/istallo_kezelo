@@ -62,6 +62,7 @@ CREATE TABLE horse (
     passport_num VARCHAR(255) UNIQUE,
     microchip_num VARCHAR(255) UNIQUE,
     additional TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     stable_id BIGINT NOT NULL REFERENCES stable (stable_id),
     user_id BIGINT NOT NULL REFERENCES app_user (user_id)
 );
@@ -133,6 +134,18 @@ CREATE TABLE storage (
 );
 
 CREATE INDEX idx_storage_item_id ON storage (item_id);
+
+CREATE TABLE feed_sched_change_request (
+    id BIGSERIAL PRIMARY KEY,
+    feed_sched_id BIGINT NOT NULL REFERENCES feed_sched (id),
+    requested_by_user_id BIGINT NOT NULL REFERENCES app_user (user_id),
+    requested_at TIMESTAMP NOT NULL,
+    requested_horse_ids TEXT,
+    requested_item_ids TEXT
+);
+
+CREATE INDEX idx_feed_sched_change_request_feed_sched ON feed_sched_change_request (feed_sched_id);
+CREATE INDEX idx_feed_sched_change_request_requested_at ON feed_sched_change_request (requested_at);
 
 -----------------------------------------------------------------------
 -- 3. ALAPÉRTELMEZETT ADMIN FELHASZNÁLÓ LÉTREHOZÁSA

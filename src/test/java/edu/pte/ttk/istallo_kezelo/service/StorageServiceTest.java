@@ -47,8 +47,8 @@ class StorageServiceTest {
 
         when(storageRepository.findByItem_Id(1L)).thenReturn(storage);
         when(feedSchedItemRepository.findByItem_Id(1L)).thenReturn(List.of(firstLink, secondLink));
-        when(horseFeedSchedRepository.countByFeedSchedId(3L)).thenReturn(2);
-        when(horseFeedSchedRepository.countByFeedSchedId(4L)).thenReturn(3);
+        when(horseFeedSchedRepository.countActiveByFeedSchedId(3L)).thenReturn(2);
+        when(horseFeedSchedRepository.countActiveByFeedSchedId(4L)).thenReturn(3);
         when(storageRepository.save(storage)).thenReturn(storage);
 
         storageService.syncAmountInUseForItem(1L);

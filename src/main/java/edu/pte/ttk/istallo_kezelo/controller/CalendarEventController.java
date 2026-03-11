@@ -21,7 +21,7 @@ public class CalendarEventController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO createEvent(@RequestBody CalendarEventDTO dto, Authentication auth) {
         if (dto.getHorseId() == null) {
             throw new RuntimeException("A horseId megadása kötelező.");
@@ -41,13 +41,13 @@ public class CalendarEventController {
     }
 
     @GetMapping("/{eventId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO getEventById(@PathVariable Long eventId, Authentication auth) {
         return calendarEventService.getById(eventId);
     }
 
     @GetMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<CalendarEventDTO> getAllEvents(
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
@@ -59,7 +59,7 @@ public class CalendarEventController {
     }
 
     @GetMapping("/horse/{horseId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<CalendarEventDTO> getHorseEvents(
             @PathVariable Long horseId,
             @RequestParam(required = false)
@@ -75,7 +75,7 @@ public class CalendarEventController {
     }
 
     @GetMapping("/stable/{stableId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<CalendarEventDTO> getStableEventsInRange(
             @PathVariable Long stableId,
             @RequestParam
@@ -91,7 +91,7 @@ public class CalendarEventController {
     }
 
     @PatchMapping("/{eventId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO updateEventPartially(
             @PathVariable Long eventId,
             @RequestBody CalendarEventDTO dto,
@@ -106,7 +106,7 @@ public class CalendarEventController {
     }
 
     @DeleteMapping("/{eventId}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public ResponseEntity<?> deleteEvent(@PathVariable Long eventId) {
         calendarEventService.deleteEvent(eventId);
         return ResponseEntity.ok().build();

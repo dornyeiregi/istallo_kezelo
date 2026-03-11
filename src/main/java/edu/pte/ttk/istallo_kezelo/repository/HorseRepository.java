@@ -13,4 +13,8 @@ public interface HorseRepository extends JpaRepository<Horse, Long> {
     void deleteByHorseName(String horseName);
     boolean existsByHorseName(String horseName);
     List<Horse> findByOwner(User user);
+    List<Horse> findByIsActiveTrueOrIsActiveIsNull();
+    List<Horse> findByIsActiveFalse();
+    List<Horse> findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(User owner, User ownerForNull);
+    List<Horse> findByOwnerAndIsActiveFalse(User owner);
 }

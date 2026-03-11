@@ -6,31 +6,42 @@ import java.util.List;
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemAmountDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
+import edu.pte.ttk.istallo_kezelo.model.FeedSchedChangeRequest;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Item;
+import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
+import edu.pte.ttk.istallo_kezelo.repository.FeedSchedChangeRequestRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
+import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 
 
 @Service
 public class FeedSchedService {
 
     private final FeedSchedRepository feedSchedRepository;
+    private final FeedSchedChangeRequestRepository feedSchedChangeRequestRepository;
     private final HorseRepository horseRepository;
     private final ItemRepository itemRepository;
     private final StorageService storageService;
+    private final UserRepository userRepository;
 
     public FeedSchedService(FeedSchedRepository feedSchedRepository,
+                            FeedSchedChangeRequestRepository feedSchedChangeRequestRepository,
                             HorseRepository horseRepository,
                             ItemRepository itemRepository,
-                            StorageService storageService) {
+                            StorageService storageService,
+                            UserRepository userRepository) {
         this.feedSchedRepository = feedSchedRepository;
+        this.feedSchedChangeRequestRepository = feedSchedChangeRequestRepository;
         this.horseRepository = horseRepository;
         this.itemRepository = itemRepository;
         this.storageService = storageService;
+        this.userRepository = userRepository;
     }
 
     @Transactional
@@ -74,7 +85,31 @@ public class FeedSchedService {
     }
 
     @Transactional
-    public void updateFeedSched(Long id, FeedSchedDTO dto){
+    public boolean updateFeedSched(Long id, FeedSchedDTO dto, Authentication auth){
+        if (auth != null && hasRole(auth, "OWNER")) {
+            createChangeRequest(id, dto, auth);
+            return false;
+        }
+        applyFeedSchedUpdate(id, dto);
+        return true;
+    }
+
+    @Transactional
+    public FeedSchedChangeRequest createChangeRequest(Long feedSchedId, FeedSchedDTO dto, Authentication auth) {
+        FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
+            .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
+        User requester = userRepository.findByUsername(auth.getName());
+        FeedSchedChangeRequest request = new FeedSchedChangeRequest();
+        request.setFeedSched(feedSched);
+        request.setRequestedBy(requester);
+        request.setRequestedAt(java.time.LocalDateTime.now());
+        request.setRequestedHorseIds(joinIds(dto.getHorseIds()));
+        request.setRequestedItemIds(joinIds(dto.getItemIds()));
+        return feedSchedChangeRequestRepository.save(request);
+    }
+
+    @Transactional
+    public FeedSched applyFeedSchedUpdate(Long id, FeedSchedDTO dto){
         FeedSched existingFeedSched = feedSchedRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
         List<Long> existingItemIds = existingFeedSched.getFeedSchedItems().stream()
@@ -125,7 +160,7 @@ public class FeedSchedService {
                 }
             }
         }
-        feedSchedRepository.save(existingFeedSched);
+        FeedSched saved = feedSchedRepository.save(existingFeedSched);
         List<Long> newItemIds;
         if (dto.getItems() != null) {
             newItemIds = dto.getItems().stream().map(FeedSchedItemAmountDTO::getItemId).toList();
@@ -137,6 +172,7 @@ public class FeedSchedService {
         for (Long itemId : affectedItemIds) {
             storageService.syncAmountInUseForItem(itemId);
         }
+        return saved;
     }
 
     @Transactional
@@ -186,5 +222,47 @@ public class FeedSchedService {
         feedSched.getFeedSchedItems().add(link);
         feedSchedRepository.save(feedSched);
         storageService.syncAmountInUseForItem(itemId);
+    }
+
+    public List<FeedSchedChangeRequest> getAllChangeRequests() {
+        return feedSchedChangeRequestRepository.findAllByOrderByRequestedAtDesc();
+    }
+
+    @Transactional
+    public FeedSched approveChangeRequest(Long requestId) {
+        FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Kérés nem található."));
+        FeedSchedDTO dto = new FeedSchedDTO();
+        dto.setHorseIds(parseIds(request.getRequestedHorseIds()));
+        dto.setItemIds(parseIds(request.getRequestedItemIds()));
+        FeedSched updated = applyFeedSchedUpdate(request.getFeedSched().getId(), dto);
+        feedSchedChangeRequestRepository.delete(request);
+        return updated;
+    }
+
+    @Transactional
+    public void rejectChangeRequest(Long requestId) {
+        FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
+            .orElseThrow(() -> new RuntimeException("Kérés nem található."));
+        feedSchedChangeRequestRepository.delete(request);
+    }
+
+    private boolean hasRole(Authentication auth, String role) {
+        return auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
+    }
+
+    private String joinIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) return null;
+        return ids.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+    }
+
+    public List<Long> parseIds(String csv) {
+        if (csv == null || csv.isBlank()) return java.util.List.of();
+        return java.util.Arrays.stream(csv.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isBlank())
+            .map(Long::valueOf)
+            .toList();
     }
 }

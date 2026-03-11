@@ -6,6 +6,8 @@ import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import java.util.List;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface HorseFeedSchedRepository extends JpaRepository<HorseFeedSched, Long> {
@@ -14,5 +16,12 @@ public interface HorseFeedSchedRepository extends JpaRepository<HorseFeedSched, 
     List<HorseFeedSched> findByFeedSched_Id(Long feedSchedId);
     List<HorseFeedSched> findByHorse_Id(Long horseId);
     int countByFeedSchedId(Long feedSchedid);
+    @Query(
+        "select count(hfs) " +
+        "from HorseFeedSched hfs " +
+        "where hfs.feedSched.id = :feedSchedId " +
+        "and (hfs.horse.isActive = true or hfs.horse.isActive is null)"
+    )
+    int countActiveByFeedSchedId(@Param("feedSchedId") Long feedSchedId);
     List<HorseFeedSched> findByHorseId(Long horseId);
 }

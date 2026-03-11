@@ -22,4 +22,5 @@ public class HorseDTO {
     private String microchipNum;
     private String passportNum;
     private String additional;
+    private Boolean isActive;
 }

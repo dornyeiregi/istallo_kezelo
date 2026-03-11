@@ -18,20 +18,20 @@ public class AdminController {
     public AdminController(AdminService adminService) { this.adminService = adminService; }
 
     @PostMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> createUser(@RequestBody SignupRequestDTO dto) {
         adminService.createUser(dto);
         return ResponseEntity.ok("Felhasználó sikeresen létrehozva.");
     }
 
     @GetMapping("/users")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
     }
 
     @PatchMapping("/update-role/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
         System.out.println("FRONTEND BODY: " + body);
         String newRole = body.get("userType");
@@ -43,7 +43,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {
         adminService.deleteUser(id);
         return ResponseEntity.ok("Felhasználó sikeresen törölve.");

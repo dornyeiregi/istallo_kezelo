@@ -21,6 +21,7 @@ public final class HorseMapper {
         dto.setMicrochipNum(horse.getMicrochipNum());
         dto.setPassportNum(horse.getPassportNum());
         dto.setAdditional(horse.getAdditional());
+        dto.setIsActive(horse.getIsActive());
         return dto;
     }
 }

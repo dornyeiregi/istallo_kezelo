@@ -30,12 +30,21 @@ public class HorseController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseDTO createHorse(@RequestBody HorseDTO dto, Authentication auth) {
-        User owner = userService.getUserById(dto.getOwnerId(), auth)
-            .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
+        boolean isOwner = hasRole(auth, "OWNER");
+        User owner;
+        if (isOwner) {
+            owner = userService.getUserByUsername(auth.getName(), auth);
+        } else {
+            owner = userService.getUserById(dto.getOwnerId(), auth)
+                .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
+        }
         Stable stable = null;
-        if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
+        if (dto.getStableId() != null) {
+            stable = stableService.getStableById(dto.getStableId())
+                .orElseThrow(() -> new RuntimeException("Istálló nem található."));
+        } else if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
             stable = stableService.getStableByName(dto.getStableName());
             if (stable == null) {
                 throw new RuntimeException("Istálló nem található név alapján: " + dto.getStableName());
@@ -52,18 +61,25 @@ public class HorseController {
         horse.setMicrochipNum(dto.getMicrochipNum());
         horse.setPassportNum(dto.getPassportNum());
         horse.setAdditional(dto.getAdditional());
+        horse.setIsActive(!isOwner);
         Horse savedHorse = horseService.saveHorse(horse);
         return HorseMapper.toDTO(savedHorse);
     }
 
     @GetMapping("/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<HorseDTO> getAllHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream().map(HorseMapper::toDTO).toList();
     }
 
+    @GetMapping("/inactive")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public List<HorseDTO> getInactiveHorses() {
+        return horseService.getInactiveHorses().stream().map(HorseMapper::toDTO).toList();
+    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER') or hasAuthority('ROLE_EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public HorseDTO getHorseById(@PathVariable Long id, Authentication auth) {
         Horse horse = horseService.getHorseById(id, auth)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
@@ -75,7 +91,7 @@ public class HorseController {
     }
 
     @PatchMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseDTO updateHorsePartially(@PathVariable Long id, @RequestBody HorseDTO dto, Authentication auth){
         Horse existingHorse = horseService.getHorseById(id, auth)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
@@ -103,18 +119,53 @@ public class HorseController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<Map<String, String>> deleteHorse(@PathVariable Long id) {
         horseService.deleteHorseById(id);
         return ResponseEntity.ok(Map.of("message", "Ló sikeresen törölve."));
     }
 
+    @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public HorseDTO deactivateHorse(@PathVariable Long id) {
+        Horse horse = horseService.deactivateHorseById(id);
+        return HorseMapper.toDTO(horse);
+    }
+
     @GetMapping("/mine")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public List<HorseDTO> getMyHorses(Authentication auth) {
         return horseService.getAllHorses(auth).stream()
             .filter(h -> h.getOwner().getUsername().equals(auth.getName()))
             .map(HorseMapper::toDTO).toList();
+    }
+
+    @GetMapping("/requests")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public List<HorseDTO> getHorseRequests() {
+        return horseService.getPendingHorses().stream()
+            .map(HorseMapper::toDTO).toList();
+    }
+
+    @GetMapping("/requests/mine")
+    @PreAuthorize("hasAnyRole('OWNER')")
+    public List<HorseDTO> getMyHorseRequests(Authentication auth) {
+        return horseService.getPendingHorsesForOwner(auth).stream()
+            .map(HorseMapper::toDTO).toList();
+    }
+
+    @PatchMapping("/requests/{id}/approve")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public HorseDTO approveHorseRequest(@PathVariable Long id) {
+        Horse horse = horseService.approveHorseRequest(id);
+        return HorseMapper.toDTO(horse);
+    }
+
+    @DeleteMapping("/requests/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public ResponseEntity<Map<String, String>> rejectHorseRequest(@PathVariable Long id) {
+        horseService.deleteHorseById(id);
+        return ResponseEntity.ok(Map.of("message", "Ló kérés elutasítva és törölve."));
     }
 
     private boolean hasRole(Authentication auth, String role) {

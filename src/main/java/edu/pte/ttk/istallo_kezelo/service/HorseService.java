@@ -74,20 +74,20 @@ public class HorseService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public Horse saveHorse(Horse horse) {
         return horseRepository.save(horse);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public List<Horse> getAllHorses(Authentication auth) {
-    User user = userRepository.findByUsername(auth.getName());
-    if (user.getUserType().name().equals("ADMIN") || user.getUserType().name().equals("EMPLOYEE")) {
-        return horseRepository.findAll();
-    } else {
-        return horseRepository.findByOwner(user);
+        User user = userRepository.findByUsername(auth.getName());
+        if (user.getUserType().name().equals("ADMIN")
+                || user.getUserType().name().equals("EMPLOYEE")) {
+            return horseRepository.findByIsActiveTrueOrIsActiveIsNull();
+        }
+        return horseRepository.findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(user, user);
     }
-}
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public Optional<Horse> getHorseById(Long id, Authentication auth) {
@@ -173,15 +173,51 @@ public class HorseService {
         horseRepository.delete(horse);
     }
 
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public Horse deactivateHorseById(Long horseId) {
+        Horse horse = horseRepository.findById(horseId)
+            .orElseThrow(() -> new RuntimeException("A ló nem található."));
+        horse.setIsActive(Boolean.FALSE);
+        return horseRepository.save(horse);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public List<Horse> getInactiveHorses() {
+        return horseRepository.findByIsActiveFalse();
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public List<Horse> getPendingHorses() {
+        return horseRepository.findByIsActiveFalse();
+    }
+
+    @PreAuthorize("hasAnyRole('OWNER')")
+    public List<Horse> getPendingHorsesForOwner(Authentication auth) {
+        User user = userRepository.findByUsername(auth.getName());
+        return horseRepository.findByOwnerAndIsActiveFalse(user);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public Horse approveHorseRequest(Long horseId) {
+        Horse horse = horseRepository.findById(horseId)
+            .orElseThrow(() -> new RuntimeException("A ló nem található."));
+        horse.setIsActive(Boolean.TRUE);
+        return horseRepository.save(horse);
+    }
+
     private boolean canAccessHorse(Horse horse, Authentication auth) {
         if (auth == null) return false;
         boolean isAdmin = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
         boolean isEmployee = auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
-        if (isAdmin || isEmployee) return true;
+        if (isAdmin) return true;
+        if (isEmployee) {
+            return horse.getIsActive() == null || Boolean.TRUE.equals(horse.getIsActive());
+        }
         String username = auth.getName();
         return horse.getOwner() != null && horse.getOwner().getUsername().equals(username);
     }
 }
-

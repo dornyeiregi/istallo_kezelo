@@ -36,7 +36,7 @@ public class StableController {
     }
     
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public List<StableDTO> getAllStables(){
         return stableService.getAllStables().stream().map(StableMapper::toDTO).toList();
     }

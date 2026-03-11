@@ -67,7 +67,7 @@ class HorseServiceTest {
         Horse horse = ServiceTestSupport.horse(2L, "Csillag", owner, ServiceTestSupport.stable(3L, "Main"));
 
         when(userRepository.findByUsername("anna")).thenReturn(owner);
-        when(horseRepository.findByOwner(owner)).thenReturn(List.of(horse));
+        when(horseRepository.findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(owner, owner)).thenReturn(List.of(horse));
 
         List<Horse> result = horseService.getAllHorses(auth);
 

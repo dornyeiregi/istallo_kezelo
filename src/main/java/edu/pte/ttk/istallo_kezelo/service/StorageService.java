@@ -84,7 +84,7 @@ public class StorageService {
         double totalInUse = 0;
         for (FeedSchedItem link : links) {
             Long feedSchedId = link.getFeedSched().getId();
-            totalInUse += link.getAmount() * horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+            totalInUse += link.getAmount() * horseFeedSchedRepository.countActiveByFeedSchedId(feedSchedId);
         }
         storage.setAmountInUse(totalInUse);
         storageRepository.save(storage);
@@ -99,7 +99,7 @@ public class StorageService {
             double totalInUse = 0;
             for (FeedSchedItem link : links) {
                 Long feedSchedId = link.getFeedSched().getId();
-                totalInUse += link.getAmount() * horseFeedSchedRepository.countByFeedSchedId(feedSchedId);
+                totalInUse += link.getAmount() * horseFeedSchedRepository.countActiveByFeedSchedId(feedSchedId);
             }
             storage.setAmountInUse(totalInUse);
         }

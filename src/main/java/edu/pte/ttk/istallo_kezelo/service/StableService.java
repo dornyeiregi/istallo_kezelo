@@ -23,17 +23,17 @@ public class StableService {
         return stableRepository.save(stable);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public List<Stable> getAllStables() {
         return stableRepository.findAll();
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public Optional<Stable> getStableById(Long id) {
         return stableRepository.findById(id);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
     public Stable getStableByName(String stableName) {
         return stableRepository.findByStableName(stableName);
     }

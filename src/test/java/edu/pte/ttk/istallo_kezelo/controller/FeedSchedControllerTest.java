@@ -17,12 +17,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 
 @ExtendWith(MockitoExtension.class)
 class FeedSchedControllerTest {
 
     @Mock
     private FeedSchedService feedSchedService;
+
+    @Mock
+    private Authentication authentication;
 
     @InjectMocks
     private FeedSchedController feedSchedController;
@@ -77,12 +81,13 @@ class FeedSchedControllerTest {
     @Test
     void updateFeedSched_returnsOk() {
         FeedSchedDTO dto = new FeedSchedDTO();
+        when(feedSchedService.updateFeedSched(1L, dto, authentication)).thenReturn(true);
 
-        var response = feedSchedController.updateFeedSched(1L, dto);
+        var response = feedSchedController.updateFeedSched(1L, dto, authentication);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("Etetési napló sikeresen frissítve.", response.getBody());
-        verify(feedSchedService).updateFeedSched(1L, dto);
+        verify(feedSchedService).updateFeedSched(1L, dto, authentication);
     }
 
     @Test
