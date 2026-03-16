@@ -2,7 +2,6 @@ package edu.pte.ttk.istallo_kezelo.model;
 
 import java.util.ArrayList;
 import java.util.List;
-import edu.pte.ttk.istallo_kezelo.model.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,9 +19,14 @@ public class FeedSched {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "feed_time", nullable = false)
-    private FeedTime feedTime;
+    @Column(name = "feed_morning", nullable = false)
+    private boolean feedMorning;
+
+    @Column(name = "feed_noon", nullable = false)
+    private boolean feedNoon;
+
+    @Column(name = "feed_evening", nullable = false)
+    private boolean feedEvening;
 
     @Column(name = "description", nullable = true)
     private String description;

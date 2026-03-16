@@ -27,7 +27,9 @@ CREATE TABLE item (
 
 CREATE TABLE feed_sched (
     id BIGSERIAL PRIMARY KEY,
-    feed_time VARCHAR(50) NOT NULL,
+    feed_morning BOOLEAN NOT NULL DEFAULT FALSE,
+    feed_noon BOOLEAN NOT NULL DEFAULT FALSE,
+    feed_evening BOOLEAN NOT NULL DEFAULT FALSE,
     description TEXT
 );
 
@@ -63,7 +65,7 @@ CREATE TABLE horse (
     microchip_num VARCHAR(255) UNIQUE,
     additional TEXT,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    stable_id BIGINT NOT NULL REFERENCES stable (stable_id),
+    stable_id BIGINT REFERENCES stable (stable_id),
     user_id BIGINT NOT NULL REFERENCES app_user (user_id)
 );
 
@@ -140,6 +142,9 @@ CREATE TABLE feed_sched_change_request (
     feed_sched_id BIGINT NOT NULL REFERENCES feed_sched (id),
     requested_by_user_id BIGINT NOT NULL REFERENCES app_user (user_id),
     requested_at TIMESTAMP NOT NULL,
+    requested_morning BOOLEAN,
+    requested_noon BOOLEAN,
+    requested_evening BOOLEAN,
     requested_horse_ids TEXT,
     requested_item_ids TEXT
 );

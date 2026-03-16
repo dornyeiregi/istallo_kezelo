@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
-import edu.pte.ttk.istallo_kezelo.model.enums.FeedTime;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
@@ -37,7 +36,7 @@ class FeedSchedServiceTest {
     @Test
     void createFeedSched_withoutLinks_savesFeedSched() {
         FeedSchedDTO dto = new FeedSchedDTO();
-        dto.setFeedTime(FeedTime.EVENING);
+        dto.setFeedEvening(true);
         dto.setDescription("Evening ration");
         when(feedSchedRepository.save(any(FeedSched.class))).thenAnswer(invocation -> {
             FeedSched feedSched = invocation.getArgument(0);
@@ -48,7 +47,7 @@ class FeedSchedServiceTest {
         FeedSched result = feedSchedService.createFeedSched(dto);
 
         assertEquals(7L, result.getId());
-        assertEquals(FeedTime.EVENING, result.getFeedTime());
+        assertEquals(true, result.isFeedEvening());
         assertEquals("Evening ration", result.getDescription());
     }
 }

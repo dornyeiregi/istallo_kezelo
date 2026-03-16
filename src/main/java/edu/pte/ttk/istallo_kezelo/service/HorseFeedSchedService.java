@@ -75,4 +75,23 @@ public class HorseFeedSchedService {
             storageService.syncAmountInUseForItem(itemLink.getItem().getId());
         }
     }
+
+    @Transactional
+    public void removeAllFeedSchedsForHorse(Long horseId) {
+        List<HorseFeedSched> links = horseFeedSchedRepository.findByHorse_Id(horseId);
+        if (links.isEmpty()) {
+            return;
+        }
+        java.util.Set<Long> affectedItemIds = new java.util.HashSet<>();
+        for (HorseFeedSched link : links) {
+            FeedSched feedSched = link.getFeedSched();
+            for (FeedSchedItem itemLink : feedSched.getFeedSchedItems()) {
+                affectedItemIds.add(itemLink.getItem().getId());
+            }
+        }
+        horseFeedSchedRepository.deleteByHorse_Id(horseId);
+        for (Long itemId : affectedItemIds) {
+            storageService.syncAmountInUseForItem(itemId);
+        }
+    }
 }

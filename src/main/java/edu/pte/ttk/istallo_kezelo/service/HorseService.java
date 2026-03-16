@@ -19,6 +19,7 @@ import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
+import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import java.util.List;
 import java.util.Optional;
@@ -200,9 +201,13 @@ public class HorseService {
 
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public Horse approveHorseRequest(Long horseId) {
+    public Horse approveHorseRequest(Long horseId, Stable stable) {
         Horse horse = horseRepository.findById(horseId)
             .orElseThrow(() -> new RuntimeException("A ló nem található."));
+        if (stable == null) {
+            throw new RuntimeException("Istálló megadása kötelező.");
+        }
+        horse.setStable(stable);
         horse.setIsActive(Boolean.TRUE);
         return horseRepository.save(horse);
     }

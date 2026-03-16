@@ -49,7 +49,7 @@ public class Horse {
     private Boolean isActive = Boolean.TRUE;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "stable_id", nullable = false)
+    @JoinColumn(name = "stable_id", nullable = true)
     private Stable stable;
 
     @ManyToOne(fetch = FetchType.LAZY)

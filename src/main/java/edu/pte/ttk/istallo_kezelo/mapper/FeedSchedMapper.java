@@ -11,7 +11,9 @@ public final class FeedSchedMapper {
     public static FeedSchedDTO toDTO(FeedSched feedSched) {
         FeedSchedDTO dto = new FeedSchedDTO();
         dto.setFeedSchedId(feedSched.getId());
-        dto.setFeedTime(feedSched.getFeedTime());
+        dto.setFeedMorning(feedSched.isFeedMorning());
+        dto.setFeedNoon(feedSched.isFeedNoon());
+        dto.setFeedEvening(feedSched.isFeedEvening());
         dto.setDescription(feedSched.getDescription());
         dto.setHorseIds(feedSched.getHorseFeedScheds().stream()
             .map(hfs -> hfs.getHorse().getId()).toList());

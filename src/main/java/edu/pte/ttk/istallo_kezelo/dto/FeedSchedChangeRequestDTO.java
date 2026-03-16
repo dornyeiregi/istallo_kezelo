@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class FeedSchedChangeRequestDTO {
     private Long id;
     private Long feedSchedId;
-    private String feedTime;
+    private Boolean requestedMorning;
+    private Boolean requestedNoon;
+    private Boolean requestedEvening;
     private String description;
     private String requestedByName;
     private LocalDateTime requestedAt;

@@ -46,8 +46,13 @@ public class FeedSchedService {
 
     @Transactional
     public FeedSched createFeedSched(FeedSchedDTO dto) {
+        if (!isAnyTimeSelected(dto)) {
+            throw new RuntimeException("Etetési időpont megadása kötelező.");
+        }
         FeedSched feedSched = new FeedSched();
-        feedSched.setFeedTime(dto.getFeedTime());
+        feedSched.setFeedMorning(Boolean.TRUE.equals(dto.getFeedMorning()));
+        feedSched.setFeedNoon(Boolean.TRUE.equals(dto.getFeedNoon()));
+        feedSched.setFeedEvening(Boolean.TRUE.equals(dto.getFeedEvening()));
         feedSched.setDescription(dto.getDescription());
         feedSched = feedSchedRepository.save(feedSched);
         if (dto.getHorseIds() != null) {
@@ -57,12 +62,13 @@ public class FeedSchedService {
         }
         if (dto.getItems() != null) {
             for (FeedSchedItemAmountDTO item : dto.getItems()) {
+                if (item.getAmount() == null) {
+                    throw new RuntimeException("Mennyiség kötelező.");
+                }
                 addItemToFeedSched(feedSched.getId(), item.getItemId(), item.getAmount());
             }
         } else if (dto.getItemIds() != null) {
-            for (Long itemId : dto.getItemIds()) {
-                addItemToFeedSched(feedSched.getId(), itemId, 0.0);
-            }
+            throw new RuntimeException("Mennyiség kötelező.");
         }
         return feedSched;
     }
@@ -103,6 +109,9 @@ public class FeedSchedService {
         request.setFeedSched(feedSched);
         request.setRequestedBy(requester);
         request.setRequestedAt(java.time.LocalDateTime.now());
+        request.setRequestedMorning(dto.getFeedMorning());
+        request.setRequestedNoon(dto.getFeedNoon());
+        request.setRequestedEvening(dto.getFeedEvening());
         request.setRequestedHorseIds(joinIds(dto.getHorseIds()));
         request.setRequestedItemIds(joinIds(dto.getItemIds()));
         return feedSchedChangeRequestRepository.save(request);
@@ -115,8 +124,14 @@ public class FeedSchedService {
         List<Long> existingItemIds = existingFeedSched.getFeedSchedItems().stream()
                 .map(link -> link.getItem().getId())
                 .toList();
-        if (dto.getFeedTime() != null) {
-            existingFeedSched.setFeedTime(dto.getFeedTime());
+        if (dto.getFeedMorning() != null) {
+            existingFeedSched.setFeedMorning(dto.getFeedMorning());
+        }
+        if (dto.getFeedNoon() != null) {
+            existingFeedSched.setFeedNoon(dto.getFeedNoon());
+        }
+        if (dto.getFeedEvening() != null) {
+            existingFeedSched.setFeedEvening(dto.getFeedEvening());
         }
         if (dto.getDescription() != null) {
             existingFeedSched.setDescription(dto.getDescription());
@@ -233,6 +248,9 @@ public class FeedSchedService {
         FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
             .orElseThrow(() -> new RuntimeException("Kérés nem található."));
         FeedSchedDTO dto = new FeedSchedDTO();
+        dto.setFeedMorning(request.getRequestedMorning());
+        dto.setFeedNoon(request.getRequestedNoon());
+        dto.setFeedEvening(request.getRequestedEvening());
         dto.setHorseIds(parseIds(request.getRequestedHorseIds()));
         dto.setItemIds(parseIds(request.getRequestedItemIds()));
         FeedSched updated = applyFeedSchedUpdate(request.getFeedSched().getId(), dto);
@@ -255,6 +273,12 @@ public class FeedSchedService {
     private String joinIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) return null;
         return ids.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+    }
+
+    private boolean isAnyTimeSelected(FeedSchedDTO dto) {
+        return Boolean.TRUE.equals(dto.getFeedMorning())
+            || Boolean.TRUE.equals(dto.getFeedNoon())
+            || Boolean.TRUE.equals(dto.getFeedEvening());
     }
 
     public List<Long> parseIds(String csv) {

@@ -16,7 +16,9 @@ public final class FeedSchedChangeRequestMapper {
         FeedSchedChangeRequestDTO dto = new FeedSchedChangeRequestDTO();
         dto.setId(request.getId());
         dto.setFeedSchedId(request.getFeedSched().getId());
-        dto.setFeedTime(request.getFeedSched().getFeedTime().name());
+        dto.setRequestedMorning(request.getRequestedMorning());
+        dto.setRequestedNoon(request.getRequestedNoon());
+        dto.setRequestedEvening(request.getRequestedEvening());
         dto.setDescription(request.getFeedSched().getDescription());
         dto.setRequestedAt(request.getRequestedAt());
         dto.setRequestedByName(

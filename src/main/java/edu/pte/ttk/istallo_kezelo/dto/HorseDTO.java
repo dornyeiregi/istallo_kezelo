@@ -23,4 +23,5 @@ public class HorseDTO {
     private String passportNum;
     private String additional;
     private Boolean isActive;
+    private Long feedSchedId;
 }

@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
+import edu.pte.ttk.istallo_kezelo.dto.HorseApprovalDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.HorseMapper;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
@@ -8,6 +9,7 @@ import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.service.HorseService;
 import edu.pte.ttk.istallo_kezelo.service.StableService;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
+import edu.pte.ttk.istallo_kezelo.service.FeedSchedService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,35 +24,40 @@ public class HorseController {
     private final HorseService horseService;
     private final UserService userService;
     private final StableService stableService;
+    private final FeedSchedService feedSchedService;
 
-    public HorseController(HorseService horseService, UserService userService, StableService stableService) {
+    public HorseController(HorseService horseService, UserService userService, StableService stableService, FeedSchedService feedSchedService) {
         this.horseService = horseService;
         this.userService = userService;
         this.stableService = stableService;
+        this.feedSchedService = feedSchedService;
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseDTO createHorse(@RequestBody HorseDTO dto, Authentication auth) {
+        boolean isAdmin = hasRole(auth, "ADMIN");
         boolean isOwner = hasRole(auth, "OWNER");
         User owner;
-        if (isOwner) {
+        if (!isAdmin) {
             owner = userService.getUserByUsername(auth.getName(), auth);
         } else {
             owner = userService.getUserById(dto.getOwnerId(), auth)
                 .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
         }
         Stable stable = null;
-        if (dto.getStableId() != null) {
-            stable = stableService.getStableById(dto.getStableId())
-                .orElseThrow(() -> new RuntimeException("Istálló nem található."));
-        } else if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
-            stable = stableService.getStableByName(dto.getStableName());
-            if (stable == null) {
-                throw new RuntimeException("Istálló nem található név alapján: " + dto.getStableName());
+        if (isAdmin) {
+            if (dto.getStableId() != null) {
+                stable = stableService.getStableById(dto.getStableId())
+                    .orElseThrow(() -> new RuntimeException("Istálló nem található."));
+            } else if (dto.getStableName() != null && !dto.getStableName().isBlank()) {
+                stable = stableService.getStableByName(dto.getStableName());
+                if (stable == null) {
+                    throw new RuntimeException("Istálló nem található név alapján: " + dto.getStableName());
+                }
+            } else {
+                throw new RuntimeException("Az istálló mező kitöltése kötelező.");
             }
-        } else {
-            throw new RuntimeException("Az istálló mező kitöltése kötelező.");
         }
         Horse horse = new Horse();
         horse.setHorseName(dto.getHorseName());
@@ -61,8 +68,11 @@ public class HorseController {
         horse.setMicrochipNum(dto.getMicrochipNum());
         horse.setPassportNum(dto.getPassportNum());
         horse.setAdditional(dto.getAdditional());
-        horse.setIsActive(!isOwner);
+        horse.setIsActive(isAdmin);
         Horse savedHorse = horseService.saveHorse(horse);
+        if (isAdmin && dto.getFeedSchedId() != null) {
+            feedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), savedHorse.getId());
+        }
         return HorseMapper.toDTO(savedHorse);
     }
 
@@ -156,8 +166,16 @@ public class HorseController {
 
     @PatchMapping("/requests/{id}/approve")
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public HorseDTO approveHorseRequest(@PathVariable Long id) {
-        Horse horse = horseService.approveHorseRequest(id);
+    public HorseDTO approveHorseRequest(@PathVariable Long id, @RequestBody(required = false) HorseApprovalDTO dto) {
+        if (dto == null || dto.getStableId() == null) {
+            throw new RuntimeException("Istálló megadása kötelező.");
+        }
+        Stable stable = stableService.getStableById(dto.getStableId())
+            .orElseThrow(() -> new RuntimeException("Istálló nem található."));
+        Horse horse = horseService.approveHorseRequest(id, stable);
+        if (dto.getFeedSchedId() != null) {
+            feedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), horse.getId());
+        }
         return HorseMapper.toDTO(horse);
     }
 

@@ -16,8 +16,13 @@ public final class HorseMapper {
         dto.setOwnerName(horse.getOwner().getUserLname() + " "
             + horse.getOwner().getUserFname());
         dto.setOwnerId(horse.getOwner().getId());
-        dto.setStableName(horse.getStable().getStableName());
-        dto.setStableId(horse.getStable().getId());
+        if (horse.getStable() != null) {
+            dto.setStableName(horse.getStable().getStableName());
+            dto.setStableId(horse.getStable().getId());
+        } else {
+            dto.setStableName(null);
+            dto.setStableId(null);
+        }
         dto.setMicrochipNum(horse.getMicrochipNum());
         dto.setPassportNum(horse.getPassportNum());
         dto.setAdditional(horse.getAdditional());

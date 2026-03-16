@@ -31,6 +31,15 @@ public class FeedSchedChangeRequest {
     @Column(name = "requested_at", nullable = false)
     private LocalDateTime requestedAt;
 
+    @Column(name = "requested_morning", nullable = true)
+    private Boolean requestedMorning;
+
+    @Column(name = "requested_noon", nullable = true)
+    private Boolean requestedNoon;
+
+    @Column(name = "requested_evening", nullable = true)
+    private Boolean requestedEvening;
+
     @Column(name = "requested_horse_ids", nullable = true, columnDefinition = "TEXT")
     private String requestedHorseIds;
 

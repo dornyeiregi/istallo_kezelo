@@ -16,7 +16,6 @@ import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
-import edu.pte.ttk.istallo_kezelo.model.enums.FeedTime;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import edu.pte.ttk.istallo_kezelo.model.enums.Sex;
@@ -97,7 +96,7 @@ final class ControllerTestSupport {
         FeedSched feedSched = new FeedSched();
         ReflectionTestUtils.setField(feedSched, "id", id);
         feedSched.setDescription(description);
-        feedSched.setFeedTime(FeedTime.MORNING);
+        feedSched.setFeedMorning(true);
         return feedSched;
     }
 

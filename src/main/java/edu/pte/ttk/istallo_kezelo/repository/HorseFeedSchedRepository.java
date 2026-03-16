@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface HorseFeedSchedRepository extends JpaRepository<HorseFeedSched, Long> {
     boolean existsByFeedSchedAndHorse(FeedSched feedSched, Horse horse);
     void deleteByHorse_IdAndFeedSched_Id(Long horseId, Long feedSchedId);
+    void deleteByHorse_Id(Long horseId);
     List<HorseFeedSched> findByFeedSched_Id(Long feedSchedId);
     List<HorseFeedSched> findByHorse_Id(Long horseId);
     int countByFeedSchedId(Long feedSchedid);
