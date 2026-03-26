@@ -13,6 +13,7 @@ public final class ItemMapper {
         dto.setName(item.getName());
         dto.setItemType(item.getItemType());
         dto.setItemCategory(item.getItemCategory());
+        dto.setFeedUnitAmount(item.getFeedUnitAmount());
         return dto;
     }
 }

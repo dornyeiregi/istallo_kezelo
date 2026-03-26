@@ -48,6 +48,9 @@ public class Horse {
     @Column(name = "is_active")
     private Boolean isActive = Boolean.TRUE;
 
+    @Column(name = "is_pending")
+    private Boolean isPending = Boolean.FALSE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "stable_id", nullable = true)
     private Stable stable;

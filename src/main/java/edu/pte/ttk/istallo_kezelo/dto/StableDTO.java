@@ -11,5 +11,7 @@ import lombok.NoArgsConstructor;
 public class StableDTO {
     private Long stableId;
     private String stableName;
+    private Double strawUsageKg;
+    private List<StableItemDTO> stableItems;
     public List<HorseDTO> horses;
 }

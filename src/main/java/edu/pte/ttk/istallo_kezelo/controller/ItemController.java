@@ -32,6 +32,7 @@ public class ItemController {
         item.setName(dto.getName());
         item.setItemType(dto.getItemType());
         item.setItemCategory(dto.getItemCategory());
+        item.setFeedUnitAmount(dto.getFeedUnitAmount());
         Item saved = itemService.createItem(item);
         return ItemMapper.toDTO(saved);
     }

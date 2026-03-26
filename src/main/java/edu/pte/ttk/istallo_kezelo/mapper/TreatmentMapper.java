@@ -12,6 +12,8 @@ public final class TreatmentMapper {
         dto.setTreatmentId(treatment.getId());
         dto.setTreatmentName(treatment.getTreatmentName());
         dto.setDescription(treatment.getDescription());
+        dto.setFrequencyUnit(treatment.getFrequencyUnit());
+        dto.setFrequencyValue(treatment.getFrequencyValue());
         dto.setDate(treatment.getDate());
         dto.setHorseIds(treatment.getHorsesTreated().stream()
                 .map(link -> link.getHorse().getId())

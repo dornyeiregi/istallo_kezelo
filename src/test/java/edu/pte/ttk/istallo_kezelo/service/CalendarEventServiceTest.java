@@ -42,7 +42,7 @@ class CalendarEventServiceTest {
         when(horseRepository.findById(2L)).thenReturn(Optional.of(horse));
         when(calendarEventRepository.save(any(CalendarEvent.class))).thenReturn(savedEvent);
 
-        CalendarEventDTO result = calendarEventService.createEvent(2L, EventType.SHOT, LocalDate.of(2026, 4, 5), 99L);
+        CalendarEventDTO result = calendarEventService.createEvent(2L, EventType.SHOT, LocalDate.of(2026, 4, 5), 99L, null);
 
         assertEquals(10L, result.getId());
         assertEquals(2L, result.getHorseId());

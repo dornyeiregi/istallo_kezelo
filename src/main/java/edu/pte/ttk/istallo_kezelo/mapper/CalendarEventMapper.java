@@ -16,6 +16,7 @@ public final class CalendarEventMapper {
         dto.setEventType(event.getEventType());
         dto.setEventDate(event.getEventDate());
         dto.setRelatedEntityId(event.getRelatedEntityId());
+        dto.setDescription(event.getDescription());
         return dto;
     }
 }

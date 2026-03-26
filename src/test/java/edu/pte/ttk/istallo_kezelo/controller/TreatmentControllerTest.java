@@ -34,7 +34,15 @@ class TreatmentControllerTest {
     @Test
     void createTreatment_returnsMappedDto() {
         Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
-        TreatmentDTO dto = new TreatmentDTO(null, "Sebkezeles", "Leiras", LocalDate.of(2026, 2, 1), List.of(1L));
+        TreatmentDTO dto = new TreatmentDTO(
+                null,
+                "Sebkezeles",
+                "Leiras",
+                2,
+                "HET",
+                LocalDate.of(2026, 2, 1),
+                List.of(1L)
+        );
         Treatment treatment = ControllerTestSupport.treatment(2L, "Sebkezeles");
         Horse horse = ControllerTestSupport.horse(1L, "Csillag", ControllerTestSupport.user(3L, "anna", "Nagy", "Anna"), ControllerTestSupport.stable(4L, "A"));
         HorseTreatment link = ControllerTestSupport.horseTreatment(horse, treatment);

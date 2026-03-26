@@ -13,6 +13,8 @@ public class TreatmentDTO {
     private Long treatmentId;
     private String treatmentName;
     private String description;
+    private Integer frequencyValue;
+    private String frequencyUnit;
     private LocalDate date;
     private List<Long> horseIds;
 }

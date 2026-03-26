@@ -31,7 +31,7 @@ class ItemControllerTest {
 
     @Test
     void createItem_returnsMappedDto() {
-        ItemDTO dto = new ItemDTO(null, "Hay", ItemType.FEED, ItemCategory.CONSUMABLE);
+        ItemDTO dto = new ItemDTO(null, "Hay", ItemType.FEED, ItemCategory.CONSUMABLE, 10.0);
         Item saved = ControllerTestSupport.item(1L, "Hay");
         when(itemService.createItem(any(Item.class))).thenReturn(saved);
 

@@ -13,7 +13,8 @@ public final class HorseFarrierAppMapper {
         dto.setFarrierAppId(link.getFarrierApp().getId());
         dto.setHorseName(link.getHorse().getHorseName());
         dto.setAppointmentDate(link.getFarrierApp().getAppointmentDate());
-        dto.setShoes(link.getFarrierApp().getShoes());
+        dto.setShoeCount(link.getShoeCount());
+        dto.setNote(link.getNote());
         return dto;
     }
 }

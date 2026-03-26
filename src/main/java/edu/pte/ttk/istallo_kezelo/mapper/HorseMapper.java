@@ -27,6 +27,7 @@ public final class HorseMapper {
         dto.setPassportNum(horse.getPassportNum());
         dto.setAdditional(horse.getAdditional());
         dto.setIsActive(horse.getIsActive());
+        dto.setIsPending(horse.getIsPending());
         return dto;
     }
 }

@@ -53,7 +53,11 @@ spring.datasource.password=your_password   # saját Postgres jelszavad
 
 2. A backend indítása terminálból:
 ```
-mvn spring-boot:run
+Localhost:
+mvn -Dspring-boot.run.profiles=local spring-boot:run
+
+LAN:
+mvn -Dspring-boot.run.profiles=lan spring-boot:run
 ```
 
 3. Az alkalmazás alapértelmezés szerint a `http://localhost:8080` címen érhető el.

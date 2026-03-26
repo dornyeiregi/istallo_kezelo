@@ -33,27 +33,29 @@ public class TreatmentController {
         Treatment treatment = new Treatment();
         treatment.setTreatmentName(dto.getTreatmentName());
         treatment.setDescription(dto.getDescription());
+        treatment.setFrequencyUnit(dto.getFrequencyUnit());
+        treatment.setFrequencyValue(dto.getFrequencyValue());
         treatment.setDate(dto.getDate());
         Treatment saved = treatmentService.saveTreatment(treatment, dto.getHorseIds(), auth);
         return TreatmentMapper.toDTO(saved);
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<TreatmentDTO> getAllTreatments(Authentication auth) {
         List<Treatment> treatments = treatmentService.getAllTreatments(auth);
         return treatments.stream().map(TreatmentMapper::toDTO).toList();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public TreatmentDTO getTreatmentById(@PathVariable Long id, Authentication auth) {
         Treatment treatment = treatmentService.getTreatmentById(id, auth);
         return TreatmentMapper.toDTO(treatment);
     }
 
     @GetMapping("/horseId/{horseId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<TreatmentDTO> getAllTreatmentsOfHorseById(@PathVariable Long horseId, Authentication auth) {
         List<Treatment> treatments = treatmentService.getTreatmentsByHorseId(horseId, auth);
         return treatments.stream().map(TreatmentMapper::toDTO).toList();

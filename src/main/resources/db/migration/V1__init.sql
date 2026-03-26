@@ -15,14 +15,16 @@ CREATE TABLE app_user (
 
 CREATE TABLE stable (
     stable_id BIGSERIAL PRIMARY KEY,
-    stable_name VARCHAR(255) NOT NULL UNIQUE
+    stable_name VARCHAR(255) NOT NULL UNIQUE,
+    straw_usage_kg NUMERIC
 );
 
 CREATE TABLE item (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     item_type VARCHAR(50) NOT NULL,
-    item_category VARCHAR(20) NOT NULL
+    item_category VARCHAR(20) NOT NULL,
+    feed_unit_amount NUMERIC
 );
 
 CREATE TABLE feed_sched (
@@ -37,6 +39,8 @@ CREATE TABLE farrier_app (
     farrier_app_id BIGSERIAL PRIMARY KEY,
     farrier_name VARCHAR(255),
     farrier_phone VARCHAR(50),
+    frequency_value INTEGER,
+    frequency_unit VARCHAR(50),
     date DATE NOT NULL,
     shoes BOOLEAN NOT NULL
 );
@@ -45,6 +49,8 @@ CREATE TABLE treatment (
     treatment_id BIGSERIAL PRIMARY KEY,
     treatment_name VARCHAR(255) NOT NULL,
     description TEXT,
+    frequency_value INTEGER,
+    frequency_unit VARCHAR(50),
     date DATE NOT NULL
 );
 
@@ -65,6 +71,7 @@ CREATE TABLE horse (
     microchip_num VARCHAR(255) UNIQUE,
     additional TEXT,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    is_pending BOOLEAN NOT NULL DEFAULT FALSE,
     stable_id BIGINT REFERENCES stable (stable_id),
     user_id BIGINT NOT NULL REFERENCES app_user (user_id)
 );
@@ -74,7 +81,8 @@ CREATE TABLE calendar_event (
     horse_id BIGINT NOT NULL REFERENCES horse (id),
     event_type VARCHAR(30) NOT NULL,
     event_date DATE NOT NULL,
-    related_entity_id BIGINT
+    related_entity_id BIGINT,
+    description TEXT
 );
 
 CREATE INDEX idx_calendar_event_horse_id ON calendar_event (horse_id);
@@ -103,11 +111,23 @@ CREATE INDEX idx_horse_feed_sched_feed_sched_id ON horse_feed_sched (feed_sched_
 CREATE TABLE horse_farrier_app (
     id BIGSERIAL PRIMARY KEY,
     horse_id BIGINT NOT NULL REFERENCES horse (id),
-    farrier_app_id BIGINT NOT NULL REFERENCES farrier_app (farrier_app_id)
+    farrier_app_id BIGINT NOT NULL REFERENCES farrier_app (farrier_app_id),
+    shoe_count SMALLINT NOT NULL DEFAULT 0,
+    note TEXT
 );
 
 CREATE INDEX idx_horse_farrier_app_horse_id ON horse_farrier_app (horse_id);
 CREATE INDEX idx_horse_farrier_app_farrier_app_id ON horse_farrier_app (farrier_app_id);
+
+CREATE TABLE stable_item (
+    id BIGSERIAL PRIMARY KEY,
+    stable_id BIGINT NOT NULL REFERENCES stable (stable_id),
+    item_id BIGINT NOT NULL REFERENCES item (id),
+    usage_kg NUMERIC NOT NULL
+);
+
+CREATE INDEX idx_stable_item_stable_id ON stable_item (stable_id);
+CREATE INDEX idx_stable_item_item_id ON stable_item (item_id);
 
 CREATE TABLE horse_treatment (
     id BIGSERIAL PRIMARY KEY,
@@ -145,16 +165,29 @@ CREATE TABLE feed_sched_change_request (
     requested_morning BOOLEAN,
     requested_noon BOOLEAN,
     requested_evening BOOLEAN,
+    requested_description TEXT,
     requested_horse_ids TEXT,
-    requested_item_ids TEXT
+    requested_item_ids TEXT,
+    requested_item_amounts TEXT
 );
 
 CREATE INDEX idx_feed_sched_change_request_feed_sched ON feed_sched_change_request (feed_sched_id);
 CREATE INDEX idx_feed_sched_change_request_requested_at ON feed_sched_change_request (requested_at);
 
+CREATE TABLE app_setting (
+    setting_key VARCHAR(100) PRIMARY KEY,
+    bool_value BOOLEAN NOT NULL
+);
+
 -----------------------------------------------------------------------
 -- 3. ALAPÉRTELMEZETT ADMIN FELHASZNÁLÓ LÉTREHOZÁSA
 -----------------------------------------------------------------------
+
+INSERT INTO app_setting (setting_key, bool_value) VALUES
+    ('EMPLOYEE_VIEW_SHOTS', FALSE),
+    ('EMPLOYEE_VIEW_TREATMENTS', FALSE),
+    ('EMPLOYEE_VIEW_FARRIER_APPS', FALSE)
+ON CONFLICT (setting_key) DO NOTHING;
 
 INSERT INTO app_user (username, user_lname, user_fname, email, phone, password_hash, user_type)
 VALUES (

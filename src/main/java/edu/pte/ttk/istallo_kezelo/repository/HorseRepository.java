@@ -15,6 +15,7 @@ public interface HorseRepository extends JpaRepository<Horse, Long> {
     List<Horse> findByOwner(User user);
     List<Horse> findByIsActiveTrueOrIsActiveIsNull();
     List<Horse> findByIsActiveFalse();
+    List<Horse> findByIsPendingTrue();
     List<Horse> findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(User owner, User ownerForNull);
-    List<Horse> findByOwnerAndIsActiveFalse(User owner);
+    List<Horse> findByOwnerAndIsPendingTrue(User owner);
 }

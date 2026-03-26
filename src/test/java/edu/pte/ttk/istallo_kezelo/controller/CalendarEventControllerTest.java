@@ -28,9 +28,9 @@ class CalendarEventControllerTest {
 
     @Test
     void createEvent_returnsCreatedEvent() {
-        CalendarEventDTO dto = new CalendarEventDTO(null, 7L, null, null, EventType.SHOT, LocalDate.of(2026, 3, 10), 9L);
-        CalendarEventDTO created = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, dto.getEventDate(), 9L);
-        when(calendarEventService.createEvent(7L, EventType.SHOT, dto.getEventDate(), 9L)).thenReturn(created);
+        CalendarEventDTO dto = new CalendarEventDTO(null, 7L, null, null, EventType.SHOT, LocalDate.of(2026, 3, 10), 9L, null);
+        CalendarEventDTO created = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, dto.getEventDate(), 9L, null);
+        when(calendarEventService.createEvent(7L, EventType.SHOT, dto.getEventDate(), 9L, null)).thenReturn(created);
 
         CalendarEventDTO result = calendarEventController.createEvent(dto, ControllerTestSupport.auth("anna", "ROLE_OWNER"));
 
@@ -50,7 +50,7 @@ class CalendarEventControllerTest {
 
     @Test
     void getEventById_returnsEvent() {
-        CalendarEventDTO expected = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, LocalDate.of(2026, 3, 10), 9L);
+        CalendarEventDTO expected = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, LocalDate.of(2026, 3, 10), 9L, null);
         when(calendarEventService.getById(1L)).thenReturn(expected);
 
         CalendarEventDTO result = calendarEventController.getEventById(1L, ControllerTestSupport.auth("anna", "ROLE_OWNER"));
@@ -62,10 +62,11 @@ class CalendarEventControllerTest {
     void getAllEvents_returnsEventsFromService() {
         LocalDate start = LocalDate.of(2026, 3, 1);
         LocalDate end = LocalDate.of(2026, 3, 31);
-        List<CalendarEventDTO> expected = List.of(new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, start, 9L));
-        when(calendarEventService.getAllEvents(start, end)).thenReturn(expected);
+        var auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        List<CalendarEventDTO> expected = List.of(new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, start, 9L, null));
+        when(calendarEventService.getAllEventsForAuth(start, end, auth)).thenReturn(expected);
 
-        List<CalendarEventDTO> result = calendarEventController.getAllEvents(start, end, ControllerTestSupport.auth("anna", "ROLE_OWNER"));
+        List<CalendarEventDTO> result = calendarEventController.getAllEvents(start, end, auth);
 
         assertEquals(expected, result);
     }
@@ -74,7 +75,7 @@ class CalendarEventControllerTest {
     void getHorseEvents_usesRangeServiceWhenDatesProvided() {
         LocalDate start = LocalDate.of(2026, 3, 1);
         LocalDate end = LocalDate.of(2026, 3, 31);
-        List<CalendarEventDTO> expected = List.of(new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, start, 9L));
+        List<CalendarEventDTO> expected = List.of(new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.SHOT, start, 9L, null));
         when(calendarEventService.getHorseEventsInRange(7L, start, end)).thenReturn(expected);
 
         List<CalendarEventDTO> result = calendarEventController.getHorseEvents(7L, start, end, ControllerTestSupport.auth("anna", "ROLE_OWNER"));
@@ -91,9 +92,9 @@ class CalendarEventControllerTest {
 
     @Test
     void updateEventPartially_returnsUpdatedEvent() {
-        CalendarEventDTO dto = new CalendarEventDTO(null, null, null, null, EventType.TREATMENT, LocalDate.of(2026, 4, 1), 5L);
-        CalendarEventDTO updated = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.TREATMENT, dto.getEventDate(), 5L);
-        when(calendarEventService.updateEvent(1L, EventType.TREATMENT, dto.getEventDate(), 5L)).thenReturn(updated);
+        CalendarEventDTO dto = new CalendarEventDTO(null, null, null, null, EventType.TREATMENT, LocalDate.of(2026, 4, 1), 5L, null);
+        CalendarEventDTO updated = new CalendarEventDTO(1L, 7L, "Csillag", 3L, EventType.TREATMENT, dto.getEventDate(), 5L, null);
+        when(calendarEventService.updateEvent(1L, EventType.TREATMENT, dto.getEventDate(), 5L, null)).thenReturn(updated);
 
         CalendarEventDTO result = calendarEventController.updateEventPartially(1L, dto, ControllerTestSupport.auth("admin", "ROLE_ADMIN"));
 

@@ -31,7 +31,7 @@ class StableControllerTest {
     void createStable_returnsMappedDto() {
         when(stableService.saveStable(any(Stable.class))).thenReturn(ControllerTestSupport.stable(1L, "A"));
 
-        StableDTO result = stableController.createStable(new StableDTO(null, "A", List.of()));
+        StableDTO result = stableController.createStable(new StableDTO(null, "A", null, null, List.of()));
 
         assertEquals(1L, result.getStableId());
         ArgumentCaptor<Stable> captor = ArgumentCaptor.forClass(Stable.class);
@@ -55,7 +55,7 @@ class StableControllerTest {
         when(stableService.getStableById(1L)).thenReturn(Optional.of(stable));
         when(stableService.saveStable(stable)).thenReturn(stable);
 
-        StableDTO result = stableController.updateStablePartially(1L, new StableDTO(null, "B", null));
+        StableDTO result = stableController.updateStablePartially(1L, new StableDTO(null, "B", null, null, null));
 
         assertEquals("B", result.getStableName());
     }

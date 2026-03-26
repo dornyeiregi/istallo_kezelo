@@ -29,6 +29,14 @@ public interface CalendarEventRepository extends JpaRepository<CalendarEvent, Lo
 
     List<CalendarEvent> findByEventDateBetweenOrderByEventDateAsc(LocalDate start, LocalDate end);
 
+    List<CalendarEvent> findByHorse_Owner_UsernameOrderByEventDateAsc(String username);
+
+    List<CalendarEvent> findByHorse_Owner_UsernameAndEventDateBetweenOrderByEventDateAsc(
+        String username,
+        LocalDate start,
+        LocalDate end
+    );
+
     Optional<CalendarEvent> findByEventTypeAndRelatedEntityId(EventType eventType, Long relatedEntityId);
 
     Optional<CalendarEvent> findByEventTypeAndRelatedEntityIdAndHorse_Id(

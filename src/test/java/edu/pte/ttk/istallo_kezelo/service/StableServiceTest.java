@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.model.Stable;
+import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StableRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,12 @@ class StableServiceTest {
 
     @Mock
     private StableRepository stableRepository;
+
+    @Mock
+    private StorageService storageService;
+
+    @Mock
+    private ItemRepository itemRepository;
 
     @InjectMocks
     private StableService stableService;

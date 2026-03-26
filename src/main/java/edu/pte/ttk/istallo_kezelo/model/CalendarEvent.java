@@ -35,6 +35,9 @@ public class CalendarEvent {
     @Column(name = "related_entity_id")
     private Long relatedEntityId;
 
+    @Column(name = "description")
+    private String description;
+
     public CalendarEvent(Horse horse, EventType eventType, LocalDate eventDate) {
         this.horse = horse;
         this.eventType = eventType;

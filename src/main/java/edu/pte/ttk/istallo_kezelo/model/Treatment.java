@@ -28,6 +28,12 @@ public class Treatment {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "frequency_value")
+    private Integer frequencyValue;
+
+    @Column(name = "frequency_unit")
+    private String frequencyUnit;
+
     @Column(name = "date", nullable = false)
     private LocalDate date;
 

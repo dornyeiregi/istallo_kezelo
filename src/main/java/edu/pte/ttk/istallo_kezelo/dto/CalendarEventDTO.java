@@ -17,4 +17,5 @@ public class CalendarEventDTO {
     private EventType eventType;
     private LocalDate eventDate;
     private Long relatedEntityId;
+    private String description;
 }

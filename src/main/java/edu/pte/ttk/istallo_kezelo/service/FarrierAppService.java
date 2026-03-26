@@ -13,6 +13,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
+import edu.pte.ttk.istallo_kezelo.dto.FarrierHorseDTO;
 import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
@@ -24,16 +25,19 @@ public class FarrierAppService {
     private final HorseRepository horseRepository;
     private final UserRepository userRepository;
     private final CalendarEventService calendarEventService;
+    private final SettingsService settingsService;
 
     public FarrierAppService(FarrierAppRepository farrierAppRepository,
                              HorseRepository horseRepository,
                              UserRepository userRepository,
                              AuthController authController,
-                             CalendarEventService calendarEventService) {
+                             CalendarEventService calendarEventService,
+                             SettingsService settingsService) {
         this.farrierAppRepository = farrierAppRepository; 
         this.horseRepository = horseRepository;
         this.userRepository = userRepository;
         this.calendarEventService = calendarEventService;
+        this.settingsService = settingsService;
     }
 
     @Transactional
@@ -43,54 +47,69 @@ public class FarrierAppService {
         farrierApp.setAppointmentDate(dto.getAppointmentDate());
         farrierApp.setFarrierName(dto.getFarrierName());
         farrierApp.setFarrierPhone(dto.getFarrierPhone());
-        farrierApp.setShoes(dto.getShoes());
+        farrierApp.setShoes(dto.getShoes() != null ? dto.getShoes() : Boolean.FALSE);
+        farrierApp.setFrequencyUnit(dto.getFrequencyUnit());
+        farrierApp.setFrequencyValue(dto.getFrequencyValue());
         farrierApp = farrierAppRepository.save(farrierApp);
-        if (dto.getHorseIds() != null) {
+        if (dto.getHorseDetails() != null && !dto.getHorseDetails().isEmpty()) {
+            for (FarrierHorseDTO detail : dto.getHorseDetails()) {
+                Long horseId = detail.getHorseId();
+                if (horseId == null) continue;
+                checkHorseOwnership(auth, horseId);
+                addHorseToFarrierApp(farrierApp.getId(), horseId, detail.getShoeCount(), detail.getNote(), dto.getShoes());
+            }
+        } else if (dto.getHorseIds() != null) {
             for (Long horseId : dto.getHorseIds()) {
                 checkHorseOwnership(auth, horseId);
-                addHorseToFarrierApp(farrierApp.getId(), horseId);
+                addHorseToFarrierApp(farrierApp.getId(), horseId, null, null, dto.getShoes());
             }
         }
         return farrierApp;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getAllFarrierApps(Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         List<FarrierApp> all = farrierAppRepository.findAll();
         return filterFarrierAppsForOwner(all, auth);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public FarrierApp getFarrierAppById(Long id, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         FarrierApp app = farrierAppRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található."));
-        if (!isAdmin(auth) && app.getHorses_done().stream()
+        if (!isAdminOrEmployee(auth) && app.getHorses_done().stream()
             .noneMatch(link -> link.getHorse().getOwner().getUsername().equals(auth.getName()))) {
                 throw new RuntimeException("Nincs jogosultságod ehhez a patkolás megetkintéséhez.");
         }
         return app;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByDate(LocalDate date, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         List<FarrierApp> all = farrierAppRepository.findByAppointmentDate(date);
         return filterFarrierAppsForOwner(all, auth);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByFarrierName(String farrierName, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         List<FarrierApp> all = farrierAppRepository.findByFarrierName(farrierName);
         return filterFarrierAppsForOwner(all, auth);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByHorseName(String horseName, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         List<FarrierApp> all = farrierAppRepository.findByHorsesDone_Horse_HorseName(horseName);
         return filterFarrierAppsForOwner(all, auth);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppByHorseId(Long horseId, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
         List<FarrierApp> all = farrierAppRepository.findAll().stream()
                 .filter(app -> app.getHorses_done().stream()
                         .anyMatch(horseApp -> horseApp.getHorse().getId().equals(horseId)))
@@ -116,6 +135,17 @@ public class FarrierAppService {
                     }
                 }
             }
+            if (dto.getHorseDetails() != null) {
+                for (FarrierHorseDTO detail : dto.getHorseDetails()) {
+                    if (detail.getHorseId() == null) continue;
+                    Horse horse = horseRepository.findById(detail.getHorseId())
+                        .orElseThrow(() -> new RuntimeException("Ló nem található."));
+
+                    if (!horse.getOwner().getUsername().equals(username)) {
+                        throw new RuntimeException("Csak saját lovakhoz lehet hozzáadni patkolást.");
+                    }
+                }
+            }
         }
         if(dto.getAppointmentDate() != null) {
             existingFarrierApp.setAppointmentDate(dto.getAppointmentDate());
@@ -129,6 +159,12 @@ public class FarrierAppService {
         if(dto.getShoes() != null) {
             existingFarrierApp.setShoes(dto.getShoes());
         }
+        if(dto.getFrequencyUnit() != null) {
+            existingFarrierApp.setFrequencyUnit(dto.getFrequencyUnit());
+        }
+        if(dto.getFrequencyValue() != null) {
+            existingFarrierApp.setFrequencyValue(dto.getFrequencyValue());
+        }
         if(dto.getHorseIds() != null) {
             existingFarrierApp.getHorses_done().clear();
 
@@ -139,6 +175,24 @@ public class FarrierAppService {
                 HorseFarrierApp link = new HorseFarrierApp();
                 link.setHorse(horse);
                 link.setFarrierApp(existingFarrierApp);
+                link.setShoeCount(normalizeShoeCount(null, dto.getShoes()));
+                existingFarrierApp.getHorses_done().add(link);
+            }
+        }
+        if (dto.getHorseDetails() != null) {
+            existingFarrierApp.getHorses_done().clear();
+
+            for (FarrierHorseDTO detail : dto.getHorseDetails()) {
+                Long horseId = detail.getHorseId();
+                if (horseId == null) continue;
+                Horse horse = horseRepository.findById(horseId)
+                    .orElseThrow(() -> new RuntimeException("Ló nem található"));
+
+                HorseFarrierApp link = new HorseFarrierApp();
+                link.setHorse(horse);
+                link.setFarrierApp(existingFarrierApp);
+                link.setShoeCount(normalizeShoeCount(detail.getShoeCount(), dto.getShoes()));
+                link.setNote(detail.getNote());
                 existingFarrierApp.getHorses_done().add(link);
             }
         }
@@ -147,12 +201,13 @@ public class FarrierAppService {
         calendarEventService.deleteFromDomain(EventType.FARRIERAPP, existingFarrierApp.getId());
         for (HorseFarrierApp link : existingFarrierApp.getHorses_done()) {
             Horse horse = link.getHorse();
-            calendarEventService.createEvent(
-                    horse.getId(),
-                    EventType.FARRIERAPP,
-                    existingFarrierApp.getAppointmentDate(),
-                    existingFarrierApp.getId()
-            );
+        calendarEventService.createEvent(
+                horse.getId(),
+                EventType.FARRIERAPP,
+                existingFarrierApp.getAppointmentDate(),
+                existingFarrierApp.getId(),
+                null
+        );
         }
     }
 
@@ -165,6 +220,11 @@ public class FarrierAppService {
 
     @Transactional
     public void addHorseToFarrierApp(Long id, Long horseId) {
+        addHorseToFarrierApp(id, horseId, null, null, null);
+    }
+
+    @Transactional
+    public void addHorseToFarrierApp(Long id, Long horseId, Integer shoeCount, String note, Boolean shoesFallback) {
         FarrierApp farrierApp = farrierAppRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található"));
         Horse horse = horseRepository.findById(horseId)
@@ -173,13 +233,16 @@ public class FarrierAppService {
         HorseFarrierApp link = new HorseFarrierApp();
         link.setHorse(horse);
         link.setFarrierApp(farrierApp);
+        link.setShoeCount(normalizeShoeCount(shoeCount, shoesFallback));
+        link.setNote(note);
         farrierApp.getHorses_done().add(link);
         farrierAppRepository.save(farrierApp);
         calendarEventService.createEvent(
                 horse.getId(),
                 EventType.FARRIERAPP,
                 farrierApp.getAppointmentDate(),
-                farrierApp.getId()
+                farrierApp.getId(),
+                null
         );
     }
 
@@ -197,7 +260,7 @@ public class FarrierAppService {
     private List<FarrierApp> filterFarrierAppsForOwner(List<FarrierApp> allApps, Authentication auth) {
         if (auth == null) return allApps;
         String username = auth.getName();
-        if (isAdmin(auth)) {
+        if (isAdminOrEmployee(auth)) {
             return allApps;
         }
         return allApps.stream().filter(app -> app.getHorses_done().stream()
@@ -207,5 +270,24 @@ public class FarrierAppService {
     private boolean isAdmin(Authentication auth) {
         return auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean isEmployee(Authentication auth) {
+        return auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
+    }
+
+    private boolean isAdminOrEmployee(Authentication auth) {
+        return isAdmin(auth) || isEmployee(auth);
+    }
+
+    private int normalizeShoeCount(Integer shoeCount, Boolean shoesFallback) {
+        if (shoeCount == null) {
+            return Boolean.TRUE.equals(shoesFallback) ? 4 : 0;
+        }
+        if (shoeCount == 0 || shoeCount == 2 || shoeCount == 4) {
+            return shoeCount;
+        }
+        throw new RuntimeException("Érvénytelen patkó darabszám. Lehetséges értékek: 0, 2, 4.");
     }
 }

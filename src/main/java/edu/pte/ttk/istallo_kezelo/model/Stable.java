@@ -24,6 +24,12 @@ public class Stable {
     @Column(name = "stable_name", nullable = false, unique = true)
     private String stableName;
 
+    @Column(name = "straw_usage_kg")
+    private Double strawUsageKg;
+
+    @OneToMany(mappedBy = "stable", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StableItem> stableItems = new ArrayList<>();
+
     @OneToMany(mappedBy = "stable", cascade = CascadeType.ALL, orphanRemoval = true)
     List<Horse> horses = new ArrayList<>();
 

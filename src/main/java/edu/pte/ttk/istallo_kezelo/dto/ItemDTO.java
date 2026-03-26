@@ -14,4 +14,5 @@ public class ItemDTO {
     private String name;
     private ItemType itemType;
     private ItemCategory itemCategory;
+    private Double feedUnitAmount;
 }

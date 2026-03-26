@@ -4,5 +4,7 @@ public enum ItemType {
     HAY,
     FEED,
     SUPPLEMENT,
-    MACHINE
+    MACHINE,
+    ACCESSORY,
+    BEDDING
 }

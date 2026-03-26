@@ -12,6 +12,7 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.User;
+import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedChangeRequestRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
@@ -73,6 +74,20 @@ public class FeedSchedService {
         return feedSched;
     }
 
+    @Transactional
+    public FeedSchedChangeRequest createFeedSchedRequest(FeedSchedDTO dto, Authentication auth) {
+        if (!isAnyTimeSelected(dto)) {
+            throw new RuntimeException("Etetési időpont megadása kötelező.");
+        }
+        FeedSched feedSched = new FeedSched();
+        feedSched.setFeedMorning(false);
+        feedSched.setFeedNoon(false);
+        feedSched.setFeedEvening(false);
+        feedSched.setDescription(null);
+        FeedSched created = feedSchedRepository.save(feedSched);
+        return createChangeRequest(created.getId(), dto, auth);
+    }
+
     public List<FeedSched> getAllFeedScheds(){
         return feedSchedRepository.findAll();
     }
@@ -112,8 +127,28 @@ public class FeedSchedService {
         request.setRequestedMorning(dto.getFeedMorning());
         request.setRequestedNoon(dto.getFeedNoon());
         request.setRequestedEvening(dto.getFeedEvening());
+        request.setRequestedDescription(dto.getDescription());
         request.setRequestedHorseIds(joinIds(dto.getHorseIds()));
-        request.setRequestedItemIds(joinIds(dto.getItemIds()));
+        if (dto.getItems() != null && !dto.getItems().isEmpty()) {
+            for (FeedSchedItemAmountDTO item : dto.getItems()) {
+                Item existing = itemRepository.findById(item.getItemId())
+                    .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+                ensureNotBedding(existing);
+            }
+            request.setRequestedItemAmounts(joinItemAmounts(dto.getItems()));
+            request.setRequestedItemIds(joinIds(
+                dto.getItems().stream().map(FeedSchedItemAmountDTO::getItemId).toList()
+            ));
+        } else {
+            if (dto.getItemIds() != null) {
+                for (Long itemId : dto.getItemIds()) {
+                    Item existing = itemRepository.findById(itemId)
+                        .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+                    ensureNotBedding(existing);
+                }
+            }
+            request.setRequestedItemIds(joinIds(dto.getItemIds()));
+        }
         return feedSchedChangeRequestRepository.save(request);
     }
 
@@ -156,6 +191,7 @@ public class FeedSchedService {
                     }
                     Item item = itemRepository.findById(itemDto.getItemId())
                         .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+                    ensureNotBedding(item);
 
                     FeedSchedItem link = new FeedSchedItem();
                     link.setItem(item);
@@ -167,6 +203,7 @@ public class FeedSchedService {
                 for (Long itemId : dto.getItemIds()) {
                     Item item = itemRepository.findById(itemId)
                         .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+                    ensureNotBedding(item);
                     FeedSchedItem link = new FeedSchedItem();
                     link.setItem(item);
                     link.setFeedSched(existingFeedSched);
@@ -230,6 +267,7 @@ public class FeedSchedService {
             .orElseThrow(() -> new RuntimeException("Etetési napló nem található."));
         Item item = itemRepository.findById(itemId)
             .orElseThrow(() -> new RuntimeException("Takarmány nem található."));
+        ensureNotBedding(item);
         FeedSchedItem link = new FeedSchedItem();
         link.setItem(item);
         link.setFeedSched(feedSched);
@@ -243,6 +281,13 @@ public class FeedSchedService {
         return feedSchedChangeRequestRepository.findAllByOrderByRequestedAtDesc();
     }
 
+    public List<FeedSchedChangeRequest> getMyChangeRequests(Authentication auth) {
+        if (auth == null) return java.util.List.of();
+        User user = userRepository.findByUsername(auth.getName());
+        if (user == null) return java.util.List.of();
+        return feedSchedChangeRequestRepository.findAllByRequestedBy_IdOrderByRequestedAtDesc(user.getId());
+    }
+
     @Transactional
     public FeedSched approveChangeRequest(Long requestId) {
         FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
@@ -251,8 +296,14 @@ public class FeedSchedService {
         dto.setFeedMorning(request.getRequestedMorning());
         dto.setFeedNoon(request.getRequestedNoon());
         dto.setFeedEvening(request.getRequestedEvening());
+        dto.setDescription(request.getRequestedDescription());
         dto.setHorseIds(parseIds(request.getRequestedHorseIds()));
-        dto.setItemIds(parseIds(request.getRequestedItemIds()));
+        List<FeedSchedItemAmountDTO> requestedItems = parseItemAmounts(request.getRequestedItemAmounts());
+        if (!requestedItems.isEmpty()) {
+            dto.setItems(requestedItems);
+        } else {
+            dto.setItemIds(parseIds(request.getRequestedItemIds()));
+        }
         FeedSched updated = applyFeedSchedUpdate(request.getFeedSched().getId(), dto);
         feedSchedChangeRequestRepository.delete(request);
         return updated;
@@ -270,9 +321,25 @@ public class FeedSchedService {
             .anyMatch(a -> a.getAuthority().equals("ROLE_" + role));
     }
 
+    private void ensureNotBedding(Item item) {
+        if (item.getItemType() == ItemType.BEDDING) {
+            throw new RuntimeException("Etetéshez alom típusú tétel nem választható.");
+        }
+    }
+
     private String joinIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) return null;
         return ids.stream().map(String::valueOf).collect(java.util.stream.Collectors.joining(","));
+    }
+
+    private String joinItemAmounts(List<FeedSchedItemAmountDTO> items) {
+        if (items == null || items.isEmpty()) return null;
+        return items.stream()
+            .map(item -> {
+                String amount = item.getAmount() != null ? item.getAmount().toString() : "";
+                return item.getItemId() + ":" + amount;
+            })
+            .collect(java.util.stream.Collectors.joining(","));
     }
 
     private boolean isAnyTimeSelected(FeedSchedDTO dto) {
@@ -287,6 +354,23 @@ public class FeedSchedService {
             .map(String::trim)
             .filter(s -> !s.isBlank())
             .map(Long::valueOf)
+            .toList();
+    }
+
+    public List<FeedSchedItemAmountDTO> parseItemAmounts(String csv) {
+        if (csv == null || csv.isBlank()) return java.util.List.of();
+        return java.util.Arrays.stream(csv.split(","))
+            .map(String::trim)
+            .filter(s -> !s.isBlank())
+            .map(pair -> {
+                String[] parts = pair.split(":", 2);
+                Long itemId = Long.valueOf(parts[0].trim());
+                Double amount = null;
+                if (parts.length > 1 && !parts[1].isBlank()) {
+                    amount = Double.valueOf(parts[1].trim());
+                }
+                return new FeedSchedItemAmountDTO(itemId, amount);
+            })
             .toList();
     }
 }

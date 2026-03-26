@@ -39,7 +39,17 @@ class FarrierAppControllerTest {
         HorseFarrierApp link = ControllerTestSupport.horseFarrierApp(horse, farrierApp);
         farrierApp.getHorses_done().add(link);
 
-        FarrierAppDTO dto = new FarrierAppDTO(null, "Kovacs Bela", "555", LocalDate.of(2026, 3, 1), true, List.of(3L));
+        FarrierAppDTO dto = new FarrierAppDTO(
+                null,
+                "Kovacs Bela",
+                "555",
+                LocalDate.of(2026, 3, 1),
+                6,
+                "HONAP",
+                true,
+                List.of(3L),
+                null
+        );
         when(farrierAppService.createFarrierApp(dto, ControllerTestSupport.auth("anna", "ROLE_OWNER"))).thenReturn(farrierApp);
 
         FarrierAppDTO result = farrierAppController.createFarrierApp(dto, ControllerTestSupport.auth("anna", "ROLE_OWNER")).getBody();

@@ -23,5 +23,6 @@ public class HorseDTO {
     private String passportNum;
     private String additional;
     private Boolean isActive;
+    private Boolean isPending;
     private Long feedSchedId;
 }

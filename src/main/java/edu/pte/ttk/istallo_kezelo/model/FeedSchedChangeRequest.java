@@ -40,9 +40,15 @@ public class FeedSchedChangeRequest {
     @Column(name = "requested_evening", nullable = true)
     private Boolean requestedEvening;
 
+    @Column(name = "requested_description", nullable = true, columnDefinition = "TEXT")
+    private String requestedDescription;
+
     @Column(name = "requested_horse_ids", nullable = true, columnDefinition = "TEXT")
     private String requestedHorseIds;
 
     @Column(name = "requested_item_ids", nullable = true, columnDefinition = "TEXT")
     private String requestedItemIds;
+
+    @Column(name = "requested_item_amounts", nullable = true, columnDefinition = "TEXT")
+    private String requestedItemAmounts;
 }

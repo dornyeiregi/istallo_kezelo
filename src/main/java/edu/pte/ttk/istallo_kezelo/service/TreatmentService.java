@@ -26,17 +26,20 @@ public class TreatmentService {
     private final UserRepository userRepository;
     private final HorseRepository horseRepository;
     private final CalendarEventService calendarEventService;
+    private final SettingsService settingsService;
 
     public TreatmentService(TreatmentRepository treatmentRepository,
                             HorseTreatmentRepository horseTreatmentRepository,
                             UserRepository userRepository,
                             HorseRepository horseRepository,
-                            CalendarEventService calendarEventService) {
+                            CalendarEventService calendarEventService,
+                            SettingsService settingsService) {
         this.treatmentRepository = treatmentRepository;
         this.horseTreatmentRepository = horseTreatmentRepository;
         this.userRepository = userRepository;
         this.horseRepository = horseRepository;
         this.calendarEventService = calendarEventService;
+        this.settingsService = settingsService;
     }
 
     @Transactional
@@ -67,17 +70,19 @@ public class TreatmentService {
         return saved;
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<Treatment> getAllTreatments(Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_TREATMENTS);
         List<Treatment> all = treatmentRepository.findAll();
         return filterTreatmentsForOwner(all, auth);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public Treatment getTreatmentById(Long id, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_TREATMENTS);
         Treatment treatment = treatmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Kezelés nem található."));
-        if (!isAdmin(auth) && treatment.getHorsesTreated().stream()
+        if (!isAdminOrEmployee(auth) && treatment.getHorsesTreated().stream()
                 .noneMatch(link -> link.getHorse().getOwner().getUsername().equals(auth.getName()))) {
             throw new RuntimeException("Nincs jogosultságod ehhez a kezeléshez.");
         }
@@ -85,16 +90,18 @@ public class TreatmentService {
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<Treatment> getTreatmentsByHorseId(Long horseId, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_TREATMENTS);
         checkHorseOwnership(auth, horseId);
         List<HorseTreatment> treatments = horseTreatmentRepository.findByHorse_Id(horseId);
         return treatments.stream().map(HorseTreatment::getTreatment).toList();
     }
 
     @Transactional(readOnly = true)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<Treatment> getTreatmentsByHorseName(String horseName, Authentication auth) {
+        settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_TREATMENTS);
         Horse horse = horseRepository.findByHorseName(horseName);
         if (horse == null) {
             throw new RuntimeException("Ló nem található.");
@@ -116,6 +123,8 @@ public class TreatmentService {
         if (updatedTreatment.getTreatmentName() != null) treatment.setTreatmentName(updatedTreatment.getTreatmentName());
         if (updatedTreatment.getDescription() != null) treatment.setDescription(updatedTreatment.getDescription());
         if (updatedTreatment.getDate() != null) treatment.setDate(updatedTreatment.getDate());
+        if (updatedTreatment.getFrequencyUnit() != null) treatment.setFrequencyUnit(updatedTreatment.getFrequencyUnit());
+        if (updatedTreatment.getFrequencyValue() != null) treatment.setFrequencyValue(updatedTreatment.getFrequencyValue());
         if (updatedTreatment.getHorseIds() != null) {
             Set<Long> desiredHorseIds = new HashSet<>(updatedTreatment.getHorseIds());
             Set<Long> existingHorseIds = treatment.getHorsesTreated().stream()
@@ -175,7 +184,7 @@ public class TreatmentService {
     }
 
     private void checkHorseOwnership(Authentication auth, Long horseId) {
-        if (auth == null || isAdmin(auth)) return;
+        if (auth == null || isAdminOrEmployee(auth)) return;
         String username = auth.getName();
         User currentUser = userRepository.findByUsername(username);
         Horse horse = horseRepository.findById(horseId)
@@ -186,7 +195,7 @@ public class TreatmentService {
     }
 
     private List<Treatment> filterTreatmentsForOwner(List<Treatment> all, Authentication auth) {
-        if (auth == null || isAdmin(auth)) return all;
+        if (auth == null || isAdminOrEmployee(auth)) return all;
         String username = auth.getName();
         return all.stream()
                 .filter(treatment -> treatment.getHorsesTreated().stream()
@@ -197,5 +206,14 @@ public class TreatmentService {
     private boolean isAdmin(Authentication auth) {
         return auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+    }
+
+    private boolean isEmployee(Authentication auth) {
+        return auth != null && auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_EMPLOYEE"));
+    }
+
+    private boolean isAdminOrEmployee(Authentication auth) {
+        return isAdmin(auth) || isEmployee(auth);
     }
 }

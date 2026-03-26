@@ -43,7 +43,7 @@ public class ShotController {
 
 
     // Összes oltás lekérdezése
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping()
     public List<ShotDTO> getAllShots(Authentication auth) {
         List<Shot> shots = shotService.getAllShots(auth);
@@ -51,14 +51,14 @@ public class ShotController {
     }
 
     // Oltás lekérdezése id alapján
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping("/{shotId}")
     public ShotDTO getShotById(@PathVariable Long shotId, Authentication auth) {
         return ShotMapper.toDTO(shotService.getShotById(shotId, auth));
     }
 
     // Ló összes oltásának lekérdezése id alapján
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping("/horseId/{horseId}")
     public List<ShotDTO> getAllShotsOfHorseById(@PathVariable Long horseId, Authentication auth) {
         List<Shot> shots = shotService.getShotsByHorseId(horseId, auth);

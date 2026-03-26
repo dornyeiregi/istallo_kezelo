@@ -25,4 +25,10 @@ public class HorseFarrierApp {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "farrier_app_id", nullable = false)
     private FarrierApp farrierApp;
+
+    @Column(name = "shoe_count", nullable = false)
+    private Integer shoeCount = 0;
+
+    @Column(name = "note")
+    private String note;
 }

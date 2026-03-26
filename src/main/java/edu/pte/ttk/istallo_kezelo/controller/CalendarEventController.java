@@ -36,7 +36,8 @@ public class CalendarEventController {
                 dto.getHorseId(),
                 dto.getEventType(),
                 dto.getEventDate(),
-                dto.getRelatedEntityId()
+                dto.getRelatedEntityId(),
+                dto.getDescription()
         );
     }
 
@@ -55,7 +56,7 @@ public class CalendarEventController {
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
             Authentication auth
     ) {
-        return calendarEventService.getAllEvents(start, end);
+        return calendarEventService.getAllEventsForAuth(start, end, auth);
     }
 
     @GetMapping("/horse/{horseId}")
@@ -101,7 +102,8 @@ public class CalendarEventController {
                 eventId,
                 dto.getEventType(),
                 dto.getEventDate(),
-                dto.getRelatedEntityId()
+                dto.getRelatedEntityId(),
+                dto.getDescription()
         );
     }
 

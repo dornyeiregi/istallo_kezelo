@@ -35,27 +35,27 @@ public class FarrierAppController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierAppDTO> getAllFarrierApps(Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getAllFarrierApps(auth);
-        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
+        return farrierApps.stream().map(app -> toDTOForAuth(app, auth)).toList();
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public FarrierAppDTO getFarrierAppById(@PathVariable Long id, Authentication auth) {
         FarrierApp farrierApp = farrierAppService.getFarrierAppById(id, auth);
         if (farrierApp == null) {
             throw new RuntimeException("Patkolás nem található.");
         }
-        return FarrierAppMapper.toDTO(farrierApp);
+        return toDTOForAuth(farrierApp, auth);
     }
 
     @GetMapping("/horseId/{horseId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
         List<FarrierApp> farrierApps = farrierAppService.getFarrierAppByHorseId(horseId, auth);
-        return farrierApps.stream().map(FarrierAppMapper::toDTO).toList();
+        return farrierApps.stream().map(app -> toDTOForAuth(app, auth)).toList();
     }
 
     @PatchMapping("/{id}")
@@ -70,5 +70,18 @@ public class FarrierAppController {
     public ResponseEntity<String> deleteFarrierApp(@PathVariable Long id) {
         farrierAppService.deleteFarrierApp(id);
         return ResponseEntity.ok("Patkolás sikeresen törölve.");
+    }
+
+    private FarrierAppDTO toDTOForAuth(FarrierApp farrierApp, Authentication auth) {
+        if (auth == null) {
+            return FarrierAppMapper.toDTO(farrierApp);
+        }
+        boolean isAdminOrEmployee = auth.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")
+                        || a.getAuthority().equals("ROLE_EMPLOYEE"));
+        if (isAdminOrEmployee) {
+            return FarrierAppMapper.toDTO(farrierApp);
+        }
+        return FarrierAppMapper.toDTOForOwner(farrierApp, auth.getName());
     }
 }

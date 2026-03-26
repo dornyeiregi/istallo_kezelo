@@ -34,6 +34,9 @@ public class Item {
     @Column(name = "item_category", nullable = false)
     private ItemCategory itemCategory;
 
+    @Column(name = "feed_unit_amount")
+    private Double feedUnitAmount;
+
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FeedSchedItem> feedSchedItems = new ArrayList<>();
 

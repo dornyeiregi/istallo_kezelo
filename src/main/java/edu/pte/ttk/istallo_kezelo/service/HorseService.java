@@ -85,9 +85,11 @@ public class HorseService {
         User user = userRepository.findByUsername(auth.getName());
         if (user.getUserType().name().equals("ADMIN")
                 || user.getUserType().name().equals("EMPLOYEE")) {
-            return horseRepository.findByIsActiveTrueOrIsActiveIsNull();
+            return horseRepository.findByIsActiveTrueOrIsActiveIsNull()
+                .stream().filter(h -> !Boolean.TRUE.equals(h.getIsPending())).toList();
         }
-        return horseRepository.findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(user, user);
+        return horseRepository.findByOwnerAndIsActiveTrueOrOwnerAndIsActiveIsNull(user, user)
+            .stream().filter(h -> !Boolean.TRUE.equals(h.getIsPending())).toList();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE', 'OWNER')")
@@ -180,23 +182,35 @@ public class HorseService {
         Horse horse = horseRepository.findById(horseId)
             .orElseThrow(() -> new RuntimeException("A ló nem található."));
         horse.setIsActive(Boolean.FALSE);
+        horse.setIsPending(Boolean.FALSE);
+        return horseRepository.save(horse);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public Horse activateHorseById(Long horseId) {
+        Horse horse = horseRepository.findById(horseId)
+            .orElseThrow(() -> new RuntimeException("A ló nem található."));
+        horse.setIsActive(Boolean.TRUE);
+        horse.setIsPending(Boolean.FALSE);
         return horseRepository.save(horse);
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<Horse> getInactiveHorses() {
-        return horseRepository.findByIsActiveFalse();
+        return horseRepository.findByIsActiveFalse().stream()
+            .filter(h -> !Boolean.TRUE.equals(h.getIsPending())).toList();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<Horse> getPendingHorses() {
-        return horseRepository.findByIsActiveFalse();
+        return horseRepository.findByIsPendingTrue();
     }
 
     @PreAuthorize("hasAnyRole('OWNER')")
     public List<Horse> getPendingHorsesForOwner(Authentication auth) {
         User user = userRepository.findByUsername(auth.getName());
-        return horseRepository.findByOwnerAndIsActiveFalse(user);
+        return horseRepository.findByOwnerAndIsPendingTrue(user);
     }
 
     @Transactional
@@ -209,6 +223,7 @@ public class HorseService {
         }
         horse.setStable(stable);
         horse.setIsActive(Boolean.TRUE);
+        horse.setIsPending(Boolean.FALSE);
         return horseRepository.save(horse);
     }
 

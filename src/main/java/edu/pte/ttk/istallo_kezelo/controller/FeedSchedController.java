@@ -32,9 +32,15 @@ public class FeedSchedController {
     }
 
     @PostMapping
-    public ResponseEntity<FeedSchedDTO> createFeedSched(@RequestBody FeedSchedDTO dto) {
+    public ResponseEntity<String> createFeedSched(@RequestBody FeedSchedDTO dto, Authentication auth) {
+        boolean isOwner = auth != null && auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_OWNER"));
+        if (isOwner) {
+            feedSchedService.createFeedSchedRequest(dto, auth);
+            return ResponseEntity.accepted().body("Kérés elküldve. Jóváhagyás után lép életbe.");
+        }
         FeedSched createdFeedSched = feedSchedService.createFeedSched(dto);
-        return ResponseEntity.ok(FeedSchedMapper.toDTO(createdFeedSched));
+        return ResponseEntity.ok("Etetési napló sikeresen létrehozva.");
     }
 
     @GetMapping
@@ -82,7 +88,22 @@ public class FeedSchedController {
             .map(r -> FeedSchedChangeRequestMapper.toDTO(
                 r,
                 feedSchedService.parseIds(r.getRequestedHorseIds()),
-                feedSchedService.parseIds(r.getRequestedItemIds())
+                feedSchedService.parseIds(r.getRequestedItemIds()),
+                feedSchedService.parseItemAmounts(r.getRequestedItemAmounts())
+            ))
+            .toList();
+    }
+
+    @GetMapping("/requests/mine")
+    @PreAuthorize("hasAnyAuthority('OWNER', 'ROLE_OWNER')")
+    public List<FeedSchedChangeRequestDTO> getMyChangeRequests(Authentication auth) {
+        List<FeedSchedChangeRequest> requests = feedSchedService.getMyChangeRequests(auth);
+        return requests.stream()
+            .map(r -> FeedSchedChangeRequestMapper.toDTO(
+                r,
+                feedSchedService.parseIds(r.getRequestedHorseIds()),
+                feedSchedService.parseIds(r.getRequestedItemIds()),
+                feedSchedService.parseItemAmounts(r.getRequestedItemAmounts())
             ))
             .toList();
     }

@@ -12,4 +12,8 @@ public class StorageDTO {
     private Double amountInUse;
     private Double amountStored;
     private Long itemId;
+    private String itemName;
+    private Integer daysRemaining;
+    private String warningLevel;
+    private java.time.LocalDate lastChecked;
 }

@@ -10,6 +10,7 @@ import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
+import edu.pte.ttk.istallo_kezelo.repository.StableRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class StorageServiceTest {
 
     @Mock
     private HorseFeedSchedRepository horseFeedSchedRepository;
+
+    @Mock
+    private StableRepository stableRepository;
 
     @InjectMocks
     private StorageService storageService;

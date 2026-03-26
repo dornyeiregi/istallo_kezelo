@@ -38,6 +38,12 @@ public class HorseFarrierAppService {
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseFarrierApp addHorseToFarrierApp(Long farrierAppId, Long horseId, Authentication auth){
+        return addHorseToFarrierApp(farrierAppId, horseId, null, null, auth);
+    }
+
+    @Transactional
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    public HorseFarrierApp addHorseToFarrierApp(Long farrierAppId, Long horseId, Integer shoeCount, String note, Authentication auth){
         checkHorseOwnership(auth, horseId);
         FarrierApp app = farrierAppRepository.findById(farrierAppId)
             .orElseThrow(() -> new RuntimeException("Patkolás nem található."));
@@ -50,6 +56,8 @@ public class HorseFarrierAppService {
         HorseFarrierApp link = new HorseFarrierApp();
         link.setFarrierApp(app);
         link.setHorse(horse);
+        link.setShoeCount(normalizeShoeCount(shoeCount, app.getShoes()));
+        link.setNote(note);
         HorseFarrierApp saved = horseFarrierAppRepository.save(link);
         calendarEventService.syncFromDomain(
                 horse,
@@ -128,5 +136,15 @@ public class HorseFarrierAppService {
         return all.stream()
                 .filter(link -> link.getHorse().getOwner().getUsername().equals(username))
                 .toList();
+    }
+
+    private int normalizeShoeCount(Integer shoeCount, Boolean shoesFallback) {
+        if (shoeCount == null) {
+            return Boolean.TRUE.equals(shoesFallback) ? 4 : 0;
+        }
+        if (shoeCount == 0 || shoeCount == 2 || shoeCount == 4) {
+            return shoeCount;
+        }
+        throw new RuntimeException("Érvénytelen patkó darabszám. Lehetséges értékek: 0, 2, 4.");
     }
 }

@@ -14,6 +14,9 @@ public class FarrierAppDTO {
     private String farrierName;
     private String farrierPhone;
     private LocalDate appointmentDate;
+    private Integer frequencyValue;
+    private String frequencyUnit;
     private Boolean shoes;
     private List<Long> horseIds;
+    private List<FarrierHorseDTO> horseDetails;
 }

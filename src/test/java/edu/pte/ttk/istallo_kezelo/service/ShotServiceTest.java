@@ -58,6 +58,6 @@ class ShotServiceTest {
         Shot result = shotService.saveShot(shot, List.of(2L), auth);
 
         assertEquals(1, result.getHorses_treated().size());
-        verify(calendarEventService).createEvent(2L, EventType.SHOT, shot.getDate(), 4L);
+        verify(calendarEventService).createEvent(2L, EventType.SHOT, shot.getDate(), 4L, null);
     }
 }

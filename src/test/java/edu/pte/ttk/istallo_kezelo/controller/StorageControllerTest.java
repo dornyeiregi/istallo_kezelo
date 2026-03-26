@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
+import edu.pte.ttk.istallo_kezelo.service.StorageConsumptionService;
 import edu.pte.ttk.istallo_kezelo.service.StorageService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,9 @@ class StorageControllerTest {
     @Mock
     private StorageService storageService;
 
+    @Mock
+    private StorageConsumptionService storageConsumptionService;
+
     @InjectMocks
     private StorageController storageController;
 
@@ -29,7 +33,7 @@ class StorageControllerTest {
     void addStorage_returnsMappedDto() {
         Item item = ControllerTestSupport.item(2L, "Hay");
         Storage storage = ControllerTestSupport.storage(1L, item, 20.0, 5.0);
-        StorageDTO dto = new StorageDTO(null, null, 20.0, 2L);
+        StorageDTO dto = new StorageDTO(null, null, 20.0, 2L, null, null, null, null);
         when(storageService.createStorage(dto)).thenReturn(storage);
 
         StorageDTO result = storageController.addStorage(dto);
@@ -46,6 +50,20 @@ class StorageControllerTest {
 
         assertEquals(1, result.size());
         assertEquals(1L, result.get(0).getStorageId());
+        verify(storageConsumptionService).reduceConsumablesDaily();
+    }
+
+    @Test
+    void getStorageAlerts_filtersWarnings() {
+        Item item = ControllerTestSupport.item(2L, "Hay");
+        Storage storage = ControllerTestSupport.storage(1L, item, 10.0, 1.0);
+        when(storageService.getAllStorages()).thenReturn(List.of(storage));
+
+        List<StorageDTO> result = storageController.getStorageAlerts();
+
+        assertEquals(1, result.size());
+        assertEquals("YELLOW", result.get(0).getWarningLevel());
+        verify(storageConsumptionService).reduceConsumablesDaily();
     }
 
     @Test

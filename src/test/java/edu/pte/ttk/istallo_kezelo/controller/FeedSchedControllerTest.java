@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
-import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemAmountDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.service.FeedSchedService;
@@ -18,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
+import org.springframework.http.ResponseEntity;
 
 @ExtendWith(MockitoExtension.class)
 class FeedSchedControllerTest {
@@ -39,14 +39,14 @@ class FeedSchedControllerTest {
 
         FeedSchedDTO dto = new FeedSchedDTO();
         dto.setDescription("Morning");
+        when(authentication.getAuthorities()).thenReturn(List.of());
         when(feedSchedService.createFeedSched(dto)).thenReturn(feedSched);
 
-        FeedSchedDTO result = feedSchedController.createFeedSched(dto).getBody();
+        ResponseEntity<String> response = feedSchedController.createFeedSched(dto, authentication);
 
-        assertEquals(1L, result.getFeedSchedId());
-        assertEquals("Morning", result.getDescription());
-        assertEquals(List.of(5L), result.getItemIds());
-        assertEquals(List.of(new FeedSchedItemAmountDTO(5L, 3.5)), result.getItems());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Etetési napló sikeresen létrehozva.", response.getBody());
+        verify(feedSchedService).createFeedSched(dto);
     }
 
     @Test

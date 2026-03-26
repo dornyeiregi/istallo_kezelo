@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.Authentication;
 import edu.pte.ttk.istallo_kezelo.dto.CalendarEventDTO;
 import edu.pte.ttk.istallo_kezelo.mapper.CalendarEventMapper;
 import edu.pte.ttk.istallo_kezelo.model.CalendarEvent;
@@ -29,11 +30,13 @@ public class CalendarEventService {
     public CalendarEventDTO createEvent(Long horseId,
                                         EventType eventType,
                                         LocalDate eventDate,
-                                        Long relatedEntityId) {
+                                        Long relatedEntityId,
+                                        String description) {
         Horse horse = horseRepository.findById(horseId)
                 .orElseThrow(() -> new EntityNotFoundException("Ló nem található: " + horseId));
         CalendarEvent event = new CalendarEvent(horse, eventType, eventDate);
         event.setRelatedEntityId(relatedEntityId);
+        event.setDescription(description);
         CalendarEvent saved = calendarEventRepository.save(event);
         return CalendarEventMapper.toDTO(saved);
     }
@@ -100,6 +103,26 @@ public class CalendarEventService {
     }
 
     @Transactional(readOnly = true)
+    public List<CalendarEventDTO> getAllEventsForAuth(LocalDate start, LocalDate end, Authentication auth) {
+        if (auth == null || isAdminOrEmployee(auth)) {
+            return getAllEvents(start, end);
+        }
+        String username = auth.getName();
+        if (start != null && end != null) {
+            return calendarEventRepository
+                .findByHorse_Owner_UsernameAndEventDateBetweenOrderByEventDateAsc(username, start, end)
+                .stream()
+                .map(CalendarEventMapper::toDTO)
+                .toList();
+        }
+        return calendarEventRepository
+            .findByHorse_Owner_UsernameOrderByEventDateAsc(username)
+            .stream()
+            .map(CalendarEventMapper::toDTO)
+            .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CalendarEventDTO> getHorseEventsInRange(Long horseId,
                                                         LocalDate start,
                                                         LocalDate end) {
@@ -124,13 +147,17 @@ public class CalendarEventService {
     public CalendarEventDTO updateEvent(Long eventId,
                                         EventType eventType,
                                         LocalDate eventDate,
-                                        Long relatedEntityId) {
+                                        Long relatedEntityId,
+                                        String description) {
         CalendarEvent event = calendarEventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Esemény nem található: " + eventId));
         if (eventType != null) event.setEventType(eventType);
         if (eventDate != null) event.setEventDate(eventDate);
         if (relatedEntityId != null) {
             event.setRelatedEntityId(relatedEntityId);
+        }
+        if (description != null) {
+            event.setDescription(description);
         }
         return CalendarEventMapper.toDTO(calendarEventRepository.save(event));
     }
@@ -149,5 +176,11 @@ public class CalendarEventService {
             throw new EntityNotFoundException("Esemény nem található: " + eventId);
         }
         calendarEventRepository.deleteById(eventId);
+    }
+
+    private boolean isAdminOrEmployee(Authentication auth) {
+        if (auth == null) return false;
+        return auth.getAuthorities().stream()
+            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN") || a.getAuthority().equals("ROLE_EMPLOYEE"));
     }
 }

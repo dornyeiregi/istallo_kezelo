@@ -8,4 +8,5 @@ import edu.pte.ttk.istallo_kezelo.model.FeedSchedChangeRequest;
 @Repository
 public interface FeedSchedChangeRequestRepository extends JpaRepository<FeedSchedChangeRequest, Long> {
     List<FeedSchedChangeRequest> findAllByOrderByRequestedAtDesc();
+    List<FeedSchedChangeRequest> findAllByRequestedBy_IdOrderByRequestedAtDesc(Long requestedById);
 }

@@ -37,7 +37,6 @@ public class HorseController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public HorseDTO createHorse(@RequestBody HorseDTO dto, Authentication auth) {
         boolean isAdmin = hasRole(auth, "ADMIN");
-        boolean isOwner = hasRole(auth, "OWNER");
         User owner;
         if (!isAdmin) {
             owner = userService.getUserByUsername(auth.getName(), auth);
@@ -68,7 +67,8 @@ public class HorseController {
         horse.setMicrochipNum(dto.getMicrochipNum());
         horse.setPassportNum(dto.getPassportNum());
         horse.setAdditional(dto.getAdditional());
-        horse.setIsActive(isAdmin);
+        horse.setIsActive(isAdmin ? Boolean.TRUE : Boolean.FALSE);
+        horse.setIsPending(!isAdmin);
         Horse savedHorse = horseService.saveHorse(horse);
         if (isAdmin && dto.getFeedSchedId() != null) {
             feedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), savedHorse.getId());
@@ -97,6 +97,13 @@ public class HorseController {
         if (hasRole(auth, "OWNER") && !horse.getOwner().getUsername().equals(auth.getName())) {
             throw new RuntimeException("Nincs jogosultsága más lovait megtekinteni.");
         }
+        return HorseMapper.toDTO(horse);
+    }
+
+    @GetMapping("/byName/{horseName}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    public HorseDTO getHorseByName(@PathVariable String horseName, Authentication auth) {
+        Horse horse = horseService.getHorseByName(horseName, auth);
         return HorseMapper.toDTO(horse);
     }
 
@@ -139,6 +146,13 @@ public class HorseController {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public HorseDTO deactivateHorse(@PathVariable Long id) {
         Horse horse = horseService.deactivateHorseById(id);
+        return HorseMapper.toDTO(horse);
+    }
+
+    @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public HorseDTO activateHorse(@PathVariable Long id) {
+        Horse horse = horseService.activateHorseById(id);
         return HorseMapper.toDTO(horse);
     }
 

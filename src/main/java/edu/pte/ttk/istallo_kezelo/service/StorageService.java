@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.service;
 
 import java.util.List;
+import java.util.Objects;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,9 +9,11 @@ import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
+import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
+import edu.pte.ttk.istallo_kezelo.repository.StableRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 
 @Service
@@ -19,15 +22,18 @@ public class StorageService {
     private final ItemRepository itemRepository;
     private final FeedSchedItemRepository feedSchedItemRepository;
     private final HorseFeedSchedRepository horseFeedSchedRepository;
+    private final StableRepository stableRepository;
 
     public StorageService(StorageRepository storageRepository,
                           ItemRepository itemRepository,
                           FeedSchedItemRepository feedSchedItemRepository,
-                          HorseFeedSchedRepository horseFeedSchedRepository) {
+                          HorseFeedSchedRepository horseFeedSchedRepository,
+                          StableRepository stableRepository) {
         this.storageRepository = storageRepository;
         this.itemRepository = itemRepository;
         this.feedSchedItemRepository = feedSchedItemRepository;
         this.horseFeedSchedRepository = horseFeedSchedRepository;
+        this.stableRepository = stableRepository;
     }
 
     @Transactional
@@ -35,6 +41,9 @@ public class StorageService {
     public Storage createStorage(StorageDTO dto){
         Item item = itemRepository.findById(dto.getItemId())
             .orElseThrow(() -> new RuntimeException("Tétel nem található."));
+        if (dto.getAmountStored() != null && dto.getAmountStored() < 0) {
+            throw new RuntimeException("A tárolt mennyiség nem lehet negatív.");
+        }
         Storage storage = new Storage();
         storage.setAmountInUse(0.0);
         storage.setAmountStored(dto.getAmountStored());
@@ -64,6 +73,9 @@ public class StorageService {
         Storage existingStorage = storageRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Tároló nem található."));
         if (dto.getAmountStored() != null) {
+            if (dto.getAmountStored() < 0) {
+                throw new RuntimeException("A tárolt mennyiség nem lehet negatív.");
+            }
             existingStorage.setAmountStored(dto.getAmountStored());
         }        
         return storageRepository.save(existingStorage);
@@ -80,12 +92,7 @@ public class StorageService {
         if (storage == null) {
             return;
         }
-        List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
-        double totalInUse = 0;
-        for (FeedSchedItem link : links) {
-            Long feedSchedId = link.getFeedSched().getId();
-            totalInUse += link.getAmount() * horseFeedSchedRepository.countActiveByFeedSchedId(feedSchedId);
-        }
+        double totalInUse = calculateAmountInUse(storage.getItem());
         storage.setAmountInUse(totalInUse);
         storageRepository.save(storage);
     }
@@ -94,15 +101,40 @@ public class StorageService {
     public void syncAllAmountsInUse() {
         List<Storage> storages = storageRepository.findAll();
         for (Storage storage : storages) {
-            Long itemId = storage.getItem().getId();
-            List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
-            double totalInUse = 0;
-            for (FeedSchedItem link : links) {
-                Long feedSchedId = link.getFeedSched().getId();
-                totalInUse += link.getAmount() * horseFeedSchedRepository.countActiveByFeedSchedId(feedSchedId);
+            Item item = storage.getItem();
+            if (item.getItemType() == ItemType.BEDDING) {
+                storage.setAmountInUse(beddingUsageForItem(item.getId()));
+                continue;
             }
-            storage.setAmountInUse(totalInUse);
+            storage.setAmountInUse(calculateFeedAmountInUse(item.getId()));
         }
         storageRepository.saveAll(storages);
+    }
+
+    private double calculateAmountInUse(Item item) {
+        if (item.getItemType() == ItemType.BEDDING) {
+            return beddingUsageForItem(item.getId());
+        }
+        return calculateFeedAmountInUse(item.getId());
+    }
+
+    private double calculateFeedAmountInUse(Long itemId) {
+        List<FeedSchedItem> links = feedSchedItemRepository.findByItem_Id(itemId);
+        double totalInUse = 0;
+        for (FeedSchedItem link : links) {
+            Long feedSchedId = link.getFeedSched().getId();
+            totalInUse += link.getAmount() * horseFeedSchedRepository.countActiveByFeedSchedId(feedSchedId);
+        }
+        return totalInUse;
+    }
+
+    private double beddingUsageForItem(Long itemId) {
+        return stableRepository.findAll().stream()
+            .flatMap(stable -> stable.getStableItems().stream())
+            .filter(link -> link.getItem().getId().equals(itemId))
+            .map(link -> link.getUsageKg())
+            .filter(Objects::nonNull)
+            .mapToDouble(Double::doubleValue)
+            .sum();
     }
 }

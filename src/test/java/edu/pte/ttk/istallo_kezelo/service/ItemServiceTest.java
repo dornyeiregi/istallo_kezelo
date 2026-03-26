@@ -28,7 +28,7 @@ class ItemServiceTest {
     @Test
     void updateItem_updatesProvidedFields() {
         Item item = ServiceTestSupport.item(1L, "Old");
-        ItemDTO dto = new ItemDTO(1L, "New", ItemType.SUPPLEMENT, ItemCategory.CONSUMABLE);
+        ItemDTO dto = new ItemDTO(1L, "New", ItemType.SUPPLEMENT, ItemCategory.CONSUMABLE, 5.0);
 
         when(itemRepository.findById(1L)).thenReturn(Optional.of(item));
         when(itemRepository.save(item)).thenReturn(item);

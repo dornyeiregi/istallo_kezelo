@@ -22,7 +22,13 @@ public class HorseFarrierAppController {
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PostMapping
     public HorseFarrierAppDTO addHorseToFarrierApp(@RequestBody HorseFarrierAppDTO dto, Authentication auth) {
-        HorseFarrierApp link = horseFarrierAppService.addHorseToFarrierApp(dto.getFarrierAppId(), dto.getHorseId(), auth);
+        HorseFarrierApp link = horseFarrierAppService.addHorseToFarrierApp(
+            dto.getFarrierAppId(),
+            dto.getHorseId(),
+            dto.getShoeCount(),
+            dto.getNote(),
+            auth
+        );
         return HorseFarrierAppMapper.toDTO(link);
     }
 
