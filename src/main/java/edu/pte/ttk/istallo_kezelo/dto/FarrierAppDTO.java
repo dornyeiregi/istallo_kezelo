@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) FarrierApp adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class FarrierAppDTO {
     private Long farrierAppId;
     private String farrierName;
@@ -19,4 +20,10 @@ public class FarrierAppDTO {
     private Boolean shoes;
     private List<Long> horseIds;
     private List<FarrierHorseDTO> horseDetails;
+
+    /**
+     * Üres konstruktor a szerializáláshoz.
+     */
+    public FarrierAppDTO() {
+    }
 }

@@ -18,6 +18,9 @@ import edu.pte.ttk.istallo_kezelo.repository.FarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Patkolási időpontok kezelésére szolgáló alkalmazásszolgáltatás.
+ */
 @Service
 public class FarrierAppService {
 
@@ -27,6 +30,16 @@ public class FarrierAppService {
     private final CalendarEventService calendarEventService;
     private final SettingsService settingsService;
 
+    /**
+     * Létrehozza a szolgáltatást a szükséges függőségekkel.
+     *
+     * @param farrierAppRepository patkolás repository
+     * @param horseRepository      ló repository
+     * @param userRepository       felhasználó repository
+     * @param authController       hitelesítési vezérlő (nem használt, DI miatt)
+     * @param calendarEventService naptári esemény szolgáltatás
+     * @param settingsService      beállítás szolgáltatás
+     */
     public FarrierAppService(FarrierAppRepository farrierAppRepository,
                              HorseRepository horseRepository,
                              UserRepository userRepository,
@@ -40,6 +53,13 @@ public class FarrierAppService {
         this.settingsService = settingsService;
     }
 
+    /**
+     * Új patkolási időpont létrehozása és lovak hozzárendelése.
+     *
+     * @param dto  patkolás adatai
+     * @param auth hitelesítési adatok
+     * @return létrehozott patkolás
+     */
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public FarrierApp createFarrierApp(FarrierAppDTO dto, Authentication auth) {
@@ -67,6 +87,12 @@ public class FarrierAppService {
         return farrierApp;
     }
 
+    /**
+     * Patkolások listázása jogosultság ellenőrzéssel.
+     *
+     * @param auth hitelesítési adatok
+     * @return patkolások listája
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getAllFarrierApps(Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -74,6 +100,13 @@ public class FarrierAppService {
         return filterFarrierAppsForOwner(all, auth);
     }
 
+    /**
+     * Patkolás lekérése azonosító alapján.
+     *
+     * @param id   patkolás azonosító
+     * @param auth hitelesítési adatok
+     * @return patkolás
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public FarrierApp getFarrierAppById(Long id, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -86,6 +119,13 @@ public class FarrierAppService {
         return app;
     }
 
+    /**
+     * Patkolások lekérése dátum alapján.
+     *
+     * @param date dátum
+     * @param auth hitelesítési adatok
+     * @return patkolások listája
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByDate(LocalDate date, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -93,6 +133,13 @@ public class FarrierAppService {
         return filterFarrierAppsForOwner(all, auth);
     }
 
+    /**
+     * Patkolások lekérése patkoló neve alapján.
+     *
+     * @param farrierName patkoló neve
+     * @param auth        hitelesítési adatok
+     * @return patkolások listája
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByFarrierName(String farrierName, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -100,6 +147,13 @@ public class FarrierAppService {
         return filterFarrierAppsForOwner(all, auth);
     }
 
+    /**
+     * Patkolások lekérése ló neve alapján.
+     *
+     * @param horseName ló neve
+     * @param auth      hitelesítési adatok
+     * @return patkolások listája
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppsByHorseName(String horseName, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -107,6 +161,13 @@ public class FarrierAppService {
         return filterFarrierAppsForOwner(all, auth);
     }
 
+    /**
+     * Patkolások lekérése ló azonosító alapján.
+     *
+     * @param horseId ló azonosító
+     * @param auth    hitelesítési adatok
+     * @return patkolások listája
+     */
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierApp> getFarrierAppByHorseId(Long horseId, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_FARRIER_APPS);
@@ -117,6 +178,13 @@ public class FarrierAppService {
         return filterFarrierAppsForOwner(all, auth);
     }
 
+    /**
+     * Patkolás adatainak frissítése.
+     *
+     * @param id   patkolás azonosító
+     * @param dto  módosítási adatok
+     * @param auth hitelesítési adatok
+     */
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void updateFarrierApp(Long id, FarrierAppDTO dto, Authentication auth) {
@@ -211,6 +279,11 @@ public class FarrierAppService {
         }
     }
 
+    /**
+     * Patkolás törlése.
+     *
+     * @param id patkolás azonosító
+     */
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteFarrierApp(Long id) {
@@ -218,11 +291,26 @@ public class FarrierAppService {
         calendarEventService.deleteFromDomain(EventType.FARRIERAPP, id);
     }
 
+    /**
+     * Ló hozzáadása patkoláshoz alapértelmezett értékekkel.
+     *
+     * @param id      patkolás azonosító
+     * @param horseId ló azonosító
+     */
     @Transactional
     public void addHorseToFarrierApp(Long id, Long horseId) {
         addHorseToFarrierApp(id, horseId, null, null, null);
     }
 
+    /**
+     * Ló hozzáadása patkoláshoz részletes adatokkal.
+     *
+     * @param id            patkolás azonosító
+     * @param horseId       ló azonosító
+     * @param shoeCount     patkók száma
+     * @param note          megjegyzés
+     * @param shoesFallback alapértelmezett patkó beállítás
+     */
     @Transactional
     public void addHorseToFarrierApp(Long id, Long horseId, Integer shoeCount, String note, Boolean shoesFallback) {
         FarrierApp farrierApp = farrierAppRepository.findById(id)

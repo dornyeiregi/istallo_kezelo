@@ -9,11 +9,20 @@ import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+/**
+ * Felhasználó részletek betöltése a Spring Security számára.
+ */
 @Service
 public class CustomUserDetailsService  implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
-    
+
+    /**
+     * Üres konstruktor a Spring komponenshez.
+     */
+    public CustomUserDetailsService() {
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);

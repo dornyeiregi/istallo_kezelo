@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás ló–oltás kapcsolathoz.
+ */
 @Getter
 @Setter
 @Entity

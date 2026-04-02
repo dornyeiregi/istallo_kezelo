@@ -5,6 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) HorseShot adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

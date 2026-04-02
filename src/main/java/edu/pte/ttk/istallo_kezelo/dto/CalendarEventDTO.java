@@ -4,11 +4,12 @@ import java.time.LocalDate;
 import edu.pte.ttk.istallo_kezelo.model.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) CalendarEvent adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class CalendarEventDTO {
     private Long id;
     private Long horseId;
@@ -18,4 +19,10 @@ public class CalendarEventDTO {
     private LocalDate eventDate;
     private Long relatedEntityId;
     private String description;
+
+    /**
+     * Üres konstruktor a szerializáláshoz.
+     */
+    public CalendarEventDTO() {
+    }
 }

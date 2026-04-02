@@ -18,6 +18,9 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+/**
+ * REST controller for storage CRUD and sync endpoints.
+ */
 @RestController
 @RequestMapping("/api/storages")
 public class StorageController {

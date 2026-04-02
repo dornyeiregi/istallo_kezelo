@@ -3,13 +3,14 @@ package edu.pte.ttk.istallo_kezelo.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás etetési ütemterv és tételek összekapcsolásához mennyiséggel.
+ */
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "feed_sched_item")
 public class FeedSchedItem {
@@ -28,4 +29,10 @@ public class FeedSchedItem {
 
     @Column(name = "amount", nullable = false)
     private Double amount;
+
+    /**
+     * Üres konstruktor a JPA-hoz.
+     */
+    public FeedSchedItem() {
+    }
 }

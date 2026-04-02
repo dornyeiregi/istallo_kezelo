@@ -21,6 +21,9 @@ import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 
 
+/**
+ * Etetési ütemtervek és módosítási kérelmek kezelésére szolgáló szolgáltatás.
+ */
 @Service
 public class FeedSchedService {
 
@@ -30,21 +33,41 @@ public class FeedSchedService {
     private final ItemRepository itemRepository;
     private final StorageService storageService;
     private final UserRepository userRepository;
+    private final MailService mailService;
 
+    /**
+     * Létrehozza a szolgáltatást a szükséges repository-kkal.
+     *
+     * @param feedSchedRepository              etetési ütemterv repository
+     * @param feedSchedChangeRequestRepository változtatási kérelmek repository
+     * @param horseRepository                  ló repository
+     * @param itemRepository                   tétel repository
+     * @param storageService                   tároló szolgáltatás
+     * @param userRepository                   felhasználó repository
+     * @param mailService                      e-mail szolgáltatás
+     */
     public FeedSchedService(FeedSchedRepository feedSchedRepository,
                             FeedSchedChangeRequestRepository feedSchedChangeRequestRepository,
                             HorseRepository horseRepository,
                             ItemRepository itemRepository,
                             StorageService storageService,
-                            UserRepository userRepository) {
+                            UserRepository userRepository,
+                            MailService mailService) {
         this.feedSchedRepository = feedSchedRepository;
         this.feedSchedChangeRequestRepository = feedSchedChangeRequestRepository;
         this.horseRepository = horseRepository;
         this.itemRepository = itemRepository;
         this.storageService = storageService;
         this.userRepository = userRepository;
+        this.mailService = mailService;
     }
 
+    /**
+     * Etetési ütemterv létrehozása.
+     *
+     * @param dto ütemterv adatok
+     * @return létrehozott ütemterv
+     */
     @Transactional
     public FeedSched createFeedSched(FeedSchedDTO dto) {
         if (!isAnyTimeSelected(dto)) {
@@ -74,6 +97,13 @@ public class FeedSchedService {
         return feedSched;
     }
 
+    /**
+     * Etetési ütemterv létrehozás kérelemként (owner számára).
+     *
+     * @param dto  ütemterv adatok
+     * @param auth hitelesítési adatok
+     * @return mentett kérelem
+     */
     @Transactional
     public FeedSchedChangeRequest createFeedSchedRequest(FeedSchedDTO dto, Authentication auth) {
         if (!isAnyTimeSelected(dto)) {
@@ -88,23 +118,54 @@ public class FeedSchedService {
         return createChangeRequest(created.getId(), dto, auth);
     }
 
+    /**
+     * Összes etetési ütemterv lekérése.
+     *
+     * @return ütemtervek listája
+     */
     public List<FeedSched> getAllFeedScheds(){
         return feedSchedRepository.findAll();
     }
 
+    /**
+     * Etetési ütemterv lekérése azonosító alapján.
+     *
+     * @param id ütemterv azonosító
+     * @return ütemterv
+     */
     public FeedSched getFeedSchedById(Long id){
         return feedSchedRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Ló nem található."));
     }
 
+    /**
+     * Etetési ütemtervek lekérése ló azonosító alapján.
+     *
+     * @param id ló azonosító
+     * @return ütemtervek listája
+     */
     public List<FeedSched> getFeedSchedByHorseId(Long id){
         return feedSchedRepository.findByHorseFeedScheds_Horse_Id(id);
     }
 
+    /**
+     * Etetési ütemtervek lekérése ló név alapján.
+     *
+     * @param horseName ló neve
+     * @return ütemtervek listája
+     */
     public List<FeedSched> getFeedSchedByHorseName(String horseName){
         return feedSchedRepository.findByHorseFeedScheds_Horse_HorseName(horseName);   
     }
 
+    /**
+     * Etetési ütemterv frissítése (owner esetén kérelemként).
+     *
+     * @param id   ütemterv azonosító
+     * @param dto  módosítási adatok
+     * @param auth hitelesítési adatok
+     * @return igaz, ha közvetlenül alkalmazva lett
+     */
     @Transactional
     public boolean updateFeedSched(Long id, FeedSchedDTO dto, Authentication auth){
         if (auth != null && hasRole(auth, "OWNER")) {
@@ -115,6 +176,14 @@ public class FeedSchedService {
         return true;
     }
 
+    /**
+     * Változtatási kérelem létrehozása meglévő ütemtervre.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @param dto         módosítási adatok
+     * @param auth        hitelesítési adatok
+     * @return mentett kérelem
+     */
     @Transactional
     public FeedSchedChangeRequest createChangeRequest(Long feedSchedId, FeedSchedDTO dto, Authentication auth) {
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
@@ -149,9 +218,18 @@ public class FeedSchedService {
             }
             request.setRequestedItemIds(joinIds(dto.getItemIds()));
         }
-        return feedSchedChangeRequestRepository.save(request);
+        FeedSchedChangeRequest saved = feedSchedChangeRequestRepository.save(request);
+        mailService.sendToAdmins("Etetési módosítási kérés", "Új etetési módosítási kérés érkezett.");
+        return saved;
     }
 
+    /**
+     * Etetési ütemterv tényleges frissítése.
+     *
+     * @param id  ütemterv azonosító
+     * @param dto módosítási adatok
+     * @return frissített ütemterv
+     */
     @Transactional
     public FeedSched applyFeedSchedUpdate(Long id, FeedSchedDTO dto){
         FeedSched existingFeedSched = feedSchedRepository.findById(id)
@@ -227,6 +305,11 @@ public class FeedSchedService {
         return saved;
     }
 
+    /**
+     * Etetési ütemterv törlése.
+     *
+     * @param id ütemterv azonosító
+     */
     @Transactional
     public void deleteFeedSched(Long id){
         FeedSched feedSched = feedSchedRepository.findById(id)
@@ -242,6 +325,12 @@ public class FeedSchedService {
         }
     }
 
+    /**
+     * Ló hozzáadása etetési ütemtervhez.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @param horseId     ló azonosító
+     */
     @Transactional
     public void addHorseToFeedSched(Long feedSchedId, Long horseId) {
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
@@ -258,6 +347,13 @@ public class FeedSchedService {
         }
     }
 
+    /**
+     * Tétel hozzáadása etetési ütemtervhez.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @param itemId      tétel azonosító
+     * @param amount      mennyiség
+     */
     @Transactional
     public void addItemToFeedSched(Long feedSchedId, Long itemId, Double amount) {
         if (amount == null) {
@@ -277,10 +373,21 @@ public class FeedSchedService {
         storageService.syncAmountInUseForItem(itemId);
     }
 
+    /**
+     * Összes változtatási kérelem lekérése.
+     *
+     * @return kérelmek listája
+     */
     public List<FeedSchedChangeRequest> getAllChangeRequests() {
         return feedSchedChangeRequestRepository.findAllByOrderByRequestedAtDesc();
     }
 
+    /**
+     * Saját változtatási kérelmek lekérése.
+     *
+     * @param auth hitelesítési adatok
+     * @return kérelmek listája
+     */
     public List<FeedSchedChangeRequest> getMyChangeRequests(Authentication auth) {
         if (auth == null) return java.util.List.of();
         User user = userRepository.findByUsername(auth.getName());
@@ -288,6 +395,12 @@ public class FeedSchedService {
         return feedSchedChangeRequestRepository.findAllByRequestedBy_IdOrderByRequestedAtDesc(user.getId());
     }
 
+    /**
+     * Változtatási kérelem jóváhagyása és alkalmazása.
+     *
+     * @param requestId kérelem azonosító
+     * @return frissített ütemterv
+     */
     @Transactional
     public FeedSched approveChangeRequest(Long requestId) {
         FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
@@ -309,6 +422,11 @@ public class FeedSchedService {
         return updated;
     }
 
+    /**
+     * Változtatási kérelem elutasítása.
+     *
+     * @param requestId kérelem azonosító
+     */
     @Transactional
     public void rejectChangeRequest(Long requestId) {
         FeedSchedChangeRequest request = feedSchedChangeRequestRepository.findById(requestId)
@@ -348,6 +466,12 @@ public class FeedSchedService {
             || Boolean.TRUE.equals(dto.getFeedEvening());
     }
 
+    /**
+     * CSV azonosító lista feldolgozása Long listává.
+     *
+     * @param csv vesszővel elválasztott lista
+     * @return azonosítók listája
+     */
     public List<Long> parseIds(String csv) {
         if (csv == null || csv.isBlank()) return java.util.List.of();
         return java.util.Arrays.stream(csv.split(","))
@@ -357,6 +481,12 @@ public class FeedSchedService {
             .toList();
     }
 
+    /**
+     * CSV tétel:mennyiség lista feldolgozása.
+     *
+     * @param csv vesszővel elválasztott lista
+     * @return tétel-mennyiség lista
+     */
     public List<FeedSchedItemAmountDTO> parseItemAmounts(String csv) {
         if (csv == null || csv.isBlank()) return java.util.List.of();
         return java.util.Arrays.stream(csv.split(","))

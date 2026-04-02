@@ -7,6 +7,9 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 
+/**
+ * Spring Data repository a(z) HorseShot entitásokhoz.
+ */
 @Repository
 public interface HorseShotRepository extends JpaRepository<HorseShot, Long> {
     List<HorseShot> findByHorse_Id(Long horseId);

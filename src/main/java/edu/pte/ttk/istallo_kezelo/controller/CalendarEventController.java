@@ -10,16 +10,31 @@ import org.springframework.web.bind.annotation.*;
 import edu.pte.ttk.istallo_kezelo.dto.CalendarEventDTO;
 import edu.pte.ttk.istallo_kezelo.service.CalendarEventService;
 
+/**
+ * Naptári események lekérdezésére és módosítására szolgáló vezérlő.
+ */
 @RestController
 @RequestMapping("/api/calendar-events")
 public class CalendarEventController {
 
     private final CalendarEventService calendarEventService;
 
+    /**
+     * Létrehozza a vezérlőt a szükséges szolgáltatással.
+     *
+     * @param calendarEventService naptári esemény szolgáltatás
+     */
     public CalendarEventController(CalendarEventService calendarEventService) {
         this.calendarEventService = calendarEventService;
     }
 
+    /**
+     * Létrehoz egy naptári eseményt.
+     *
+     * @param dto  esemény adatai
+     * @param auth hitelesítési adatok
+     * @return létrehozott esemény DTO
+     */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO createEvent(@RequestBody CalendarEventDTO dto, Authentication auth) {
@@ -41,12 +56,27 @@ public class CalendarEventController {
         );
     }
 
+    /**
+     * Esemény lekérése azonosító alapján.
+     *
+     * @param eventId esemény azonosító
+     * @param auth    hitelesítési adatok
+     * @return esemény DTO
+     */
     @GetMapping("/{eventId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO getEventById(@PathVariable Long eventId, Authentication auth) {
         return calendarEventService.getById(eventId);
     }
 
+    /**
+     * Események listázása (opcionális dátum intervallummal).
+     *
+     * @param start kezdő dátum (opcionális)
+     * @param end   záró dátum (opcionális)
+     * @param auth  hitelesítési adatok
+     * @return események listája
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<CalendarEventDTO> getAllEvents(
@@ -59,6 +89,15 @@ public class CalendarEventController {
         return calendarEventService.getAllEventsForAuth(start, end, auth);
     }
 
+    /**
+     * Egy adott ló eseményeinek lekérése (opcionális dátum intervallummal).
+     *
+     * @param horseId ló azonosító
+     * @param start   kezdő dátum (opcionális)
+     * @param end     záró dátum (opcionális)
+     * @param auth    hitelesítési adatok
+     * @return események listája
+     */
     @GetMapping("/horse/{horseId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<CalendarEventDTO> getHorseEvents(
@@ -75,6 +114,15 @@ public class CalendarEventController {
         return calendarEventService.getHorseEvents(horseId);
     }
 
+    /**
+     * Istálló eseményeinek lekérése megadott dátumtartományban.
+     *
+     * @param stableId istálló azonosító
+     * @param start    kezdő dátum
+     * @param end      záró dátum
+     * @param auth     hitelesítési adatok
+     * @return események listája
+     */
     @GetMapping("/stable/{stableId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'EMPLOYEE')")
     public List<CalendarEventDTO> getStableEventsInRange(
@@ -91,6 +139,14 @@ public class CalendarEventController {
         return calendarEventService.getStableEventsInRange(stableId, start, end);
     }
 
+    /**
+     * Esemény részleges frissítése.
+     *
+     * @param eventId esemény azonosító
+     * @param dto     módosítási adatok
+     * @param auth    hitelesítési adatok
+     * @return frissített esemény DTO
+     */
     @PatchMapping("/{eventId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public CalendarEventDTO updateEventPartially(
@@ -107,6 +163,12 @@ public class CalendarEventController {
         );
     }
 
+    /**
+     * Esemény törlése azonosító alapján.
+     *
+     * @param eventId esemény azonosító
+     * @return üres OK válasz
+     */
     @DeleteMapping("/{eventId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public ResponseEntity<?> deleteEvent(@PathVariable Long eventId) {

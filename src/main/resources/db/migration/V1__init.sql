@@ -171,6 +171,16 @@ CREATE TABLE feed_sched_change_request (
     requested_item_amounts TEXT
 );
 
+CREATE TABLE notification_log (
+    notification_id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    entity_id BIGINT NOT NULL,
+    horse_id BIGINT,
+    days_before INTEGER NOT NULL,
+    sent_at TIMESTAMP NOT NULL,
+    CONSTRAINT uk_notification_unique UNIQUE (event_type, entity_id, horse_id, days_before)
+);
+
 CREATE INDEX idx_feed_sched_change_request_feed_sched ON feed_sched_change_request (feed_sched_id);
 CREATE INDEX idx_feed_sched_change_request_requested_at ON feed_sched_change_request (requested_at);
 

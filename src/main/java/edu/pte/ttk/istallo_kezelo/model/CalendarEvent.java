@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás egy lóhoz és domain objektumhoz kötött naptári eseményhez.
+ */
 @Getter
 @Setter
 @Entity
@@ -38,6 +41,13 @@ public class CalendarEvent {
     @Column(name = "description")
     private String description;
 
+    /**
+     * Létrehoz egy eseményt ló, típus és dátum alapján.
+     *
+     * @param horse     érintett ló
+     * @param eventType esemény típusa
+     * @param eventDate esemény dátuma
+     */
     public CalendarEvent(Horse horse, EventType eventType, LocalDate eventDate) {
         this.horse = horse;
         this.eventType = eventType;

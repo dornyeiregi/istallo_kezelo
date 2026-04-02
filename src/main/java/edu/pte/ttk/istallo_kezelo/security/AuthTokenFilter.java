@@ -5,7 +5,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,13 +17,26 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@AllArgsConstructor
+/**
+ * JWT authentication filter that populates the security context.
+ */
 @Component
 public class AuthTokenFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtils;
 
     private final CustomUserDetailsService userDetailsService;
+
+    /**
+     * Létrehozza a szűrőt a szükséges szolgáltatásokkal.
+     *
+     * @param jwtUtils JWT segéd
+     * @param userDetailsService felhasználó részletek szolgáltatás
+     */
+    public AuthTokenFilter(JwtUtil jwtUtils, CustomUserDetailsService userDetailsService) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,

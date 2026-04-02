@@ -27,6 +27,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.util.ReflectionTestUtils;
 
+/**
+ * Test class for HorseController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class HorseControllerTest {
 

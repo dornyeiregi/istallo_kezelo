@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) HorseFeedSched adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

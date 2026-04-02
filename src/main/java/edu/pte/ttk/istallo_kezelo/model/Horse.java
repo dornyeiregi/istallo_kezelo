@@ -12,6 +12,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entity representing a horse and its core profile data.
+ */
 @Getter
 @Setter
 @Entity
@@ -72,41 +75,65 @@ public class Horse {
     @OneToMany(mappedBy = "horse", orphanRemoval = true)
     private List<HorseTreatment> treatments = new ArrayList<>();
 
+    /**
+     * Patkolás kapcsolását hozzáadja és beállítja a visszahivatkozást.
+     */
     public void addFarrierApp(HorseFarrierApp app) {
         farrierApps.add(app);
         app.setHorse(this);
     }
 
+    /**
+     * Patkolás kapcsolást eltávolítja és törli a visszahivatkozást.
+     */
     public void removeFarrierApp(HorseFarrierApp app) {
         farrierApps.remove(app);
         app.setHorse(null);
     }
 
+    /**
+     * Etetési ütemterv kapcsolást hozzáadja és beállítja a visszahivatkozást.
+     */
     public void addFeedSched(HorseFeedSched sched) {
         feedScheds.add(sched);
         sched.setHorse(this);
     }
 
+    /**
+     * Etetési ütemterv kapcsolást eltávolítja és törli a visszahivatkozást.
+     */
     public void removeFeedSched(HorseFeedSched sched) {
         feedScheds.remove(sched);
         sched.setHorse(null);
     }
 
+    /**
+     * Oltás kapcsolást hozzáadja és beállítja a visszahivatkozást.
+     */
     public void addShot(HorseShot shot) {
         shots.add(shot);
         shot.setHorse(this);
     }
 
+    /**
+     * Oltás kapcsolást eltávolítja és törli a visszahivatkozást.
+     */
     public void removeShot(HorseShot shot) {
         shots.remove(shot);
         shot.setHorse(null);
     }
 
+    /**
+     * Kezelés kapcsolást hozzáadja és beállítja a visszahivatkozást.
+     */
     public void addTreatment(HorseTreatment treatment) {
         treatments.add(treatment);
         treatment.setHorse(this);
     }
 
+    /**
+     * Kezelés kapcsolást eltávolítja és törli a visszahivatkozást.
+     */
     public void removeTreatment(HorseTreatment treatment) {
         treatments.remove(treatment);
         treatment.setHorse(null);

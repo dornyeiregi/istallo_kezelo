@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.UserDTO;
 import edu.pte.ttk.istallo_kezelo.model.User;
 
+/**
+ * Mapper segédosztály a(z) User konverziókhoz.
+ */
 public final class UserMapper {
 
     private UserMapper() {}

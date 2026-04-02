@@ -7,6 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás készletnyilvántartáshoz tételenként.
+ */
 @Getter
 @Setter
 @Entity

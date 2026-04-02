@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.TreatmentDTO;
 import edu.pte.ttk.istallo_kezelo.model.Treatment;
 
+/**
+ * Mapper segédosztály a(z) Treatment konverziókhoz.
+ */
 public final class TreatmentMapper {
 
     private TreatmentMapper() {}

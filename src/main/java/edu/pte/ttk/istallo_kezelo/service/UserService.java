@@ -10,6 +10,9 @@ import edu.pte.ttk.istallo_kezelo.model.User;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Application service for user CRUD with authorization checks.
+ */
 @Service
 public class UserService {
 
@@ -71,6 +74,12 @@ public class UserService {
         }
         User user = userRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Felhasználó nem található."));
+        if (updatedUser.getEmail() != null && !updatedUser.getEmail().isBlank()) {
+            User existingByEmail = userRepository.findByEmail(updatedUser.getEmail());
+            if (existingByEmail != null && !existingByEmail.getId().equals(id)) {
+                throw new RuntimeException("Ez az email cím már használatban van.");
+            }
+        }
         user.setUsername(updatedUser.getUsername());
         user.setUserLname(updatedUser.getUserLname());
         user.setUserFname(updatedUser.getUserFname());

@@ -4,6 +4,9 @@ import edu.pte.ttk.istallo_kezelo.dto.StableItemDTO;
 import edu.pte.ttk.istallo_kezelo.dto.StableDTO;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 
+/**
+ * Mapper segédosztály a(z) Stable konverziókhoz.
+ */
 public final class StableMapper {
 
     private StableMapper() {}

@@ -6,13 +6,14 @@ import java.util.List;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * Patkolási időpontok JPA entitása és alapadatai.
+ */
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "farrier_app")
 public class FarrierApp {
@@ -31,10 +32,10 @@ public class FarrierApp {
     @Column(name = "date", nullable = false)
     private LocalDate appointmentDate;
 
-    @Column(name = "frequency_value")
+    @Column(name = "frequency_value", nullable = true)
     private Integer frequencyValue;
 
-    @Column(name = "frequency_unit")
+    @Column(name = "frequency_unit", nullable = true)
     private String frequencyUnit;
 
     @Column(name = "shoes", nullable = false)
@@ -43,7 +44,18 @@ public class FarrierApp {
     @OneToMany(mappedBy = "farrierApp", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorseFarrierApp> horsesDone = new ArrayList<>();
 
+    /**
+     * Visszaadja az időponthoz kapcsolt lovak listáját.
+     *
+     * @return kapcsolt lovak listája
+     */
     public List<HorseFarrierApp> getHorses_done() {
         return horsesDone;
+    }
+
+    /**
+     * Üres konstruktor a JPA-hoz.
+     */
+    public FarrierApp() {
     }
 }

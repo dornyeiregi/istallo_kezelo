@@ -6,13 +6,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entity for application-level boolean settings.
+ */
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "app_setting")
 public class AppSetting {
@@ -23,4 +24,10 @@ public class AppSetting {
 
     @Column(name = "bool_value", nullable = false)
     private Boolean boolValue;
+
+    /**
+     * Üres konstruktor a JPA-hoz.
+     */
+    public AppSetting() {
+    }
 }

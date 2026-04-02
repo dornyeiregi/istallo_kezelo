@@ -11,6 +11,9 @@ import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Application service for stable CRUD and bedding usage updates.
+ */
 @Service
 public class StableService {
 

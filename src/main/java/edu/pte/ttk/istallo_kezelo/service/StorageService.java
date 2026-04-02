@@ -16,6 +16,9 @@ import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StableRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StorageRepository;
 
+/**
+ * Application service for storage CRUD and in-use calculations.
+ */
 @Service
 public class StorageService {
     private final StorageRepository storageRepository;
@@ -23,17 +26,20 @@ public class StorageService {
     private final FeedSchedItemRepository feedSchedItemRepository;
     private final HorseFeedSchedRepository horseFeedSchedRepository;
     private final StableRepository stableRepository;
+    private final StorageAlertService storageAlertService;
 
     public StorageService(StorageRepository storageRepository,
                           ItemRepository itemRepository,
                           FeedSchedItemRepository feedSchedItemRepository,
                           HorseFeedSchedRepository horseFeedSchedRepository,
-                          StableRepository stableRepository) {
+                          StableRepository stableRepository,
+                          StorageAlertService storageAlertService) {
         this.storageRepository = storageRepository;
         this.itemRepository = itemRepository;
         this.feedSchedItemRepository = feedSchedItemRepository;
         this.horseFeedSchedRepository = horseFeedSchedRepository;
         this.stableRepository = stableRepository;
+        this.storageAlertService = storageAlertService;
     }
 
     @Transactional
@@ -78,7 +84,9 @@ public class StorageService {
             }
             existingStorage.setAmountStored(dto.getAmountStored());
         }        
-        return storageRepository.save(existingStorage);
+        Storage saved = storageRepository.save(existingStorage);
+        storageAlertService.notifyLowStock(List.of(saved));
+        return saved;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN')")

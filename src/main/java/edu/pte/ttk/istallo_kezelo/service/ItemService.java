@@ -9,6 +9,9 @@ import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 
+/**
+ * Application service for item CRUD and validation.
+ */
 @Service
 public class ItemService {
     private final ItemRepository itemRepository;

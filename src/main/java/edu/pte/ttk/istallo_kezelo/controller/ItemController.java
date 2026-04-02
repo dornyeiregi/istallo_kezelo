@@ -16,6 +16,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * REST controller for item CRUD and item lookups.
+ */
 @RestController
 @RequestMapping("/api/items")
 public class ItemController {

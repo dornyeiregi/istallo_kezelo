@@ -7,6 +7,9 @@ import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 
+/**
+ * Spring Data repository a(z) Storage entitásokhoz.
+ */
 @Repository
 public interface StorageRepository extends JpaRepository<Storage, Long> {
     Storage findByItem_Id(Long itemId);

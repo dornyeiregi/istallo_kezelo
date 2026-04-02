@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) Storage adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

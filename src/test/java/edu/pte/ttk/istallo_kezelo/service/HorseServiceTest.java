@@ -24,6 +24,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
+/**
+ * Test class for HorseService behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class HorseServiceTest {
 

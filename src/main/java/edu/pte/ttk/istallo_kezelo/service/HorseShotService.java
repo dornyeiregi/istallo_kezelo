@@ -15,6 +15,9 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Application service for linking horses to shots.
+ */
 @Service
 public class HorseShotService {
     private final HorseRepository horseRepository;

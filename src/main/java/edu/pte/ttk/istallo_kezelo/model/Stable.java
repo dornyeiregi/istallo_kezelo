@@ -8,6 +8,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás istállóhoz és alomhasználati beállításokhoz.
+ */
 @Getter
 @Setter
 @Entity

@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) SignupRequest adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

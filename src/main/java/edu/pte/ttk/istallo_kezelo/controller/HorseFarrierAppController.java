@@ -9,6 +9,9 @@ import edu.pte.ttk.istallo_kezelo.mapper.HorseFarrierAppMapper;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 import edu.pte.ttk.istallo_kezelo.service.HorseFarrierAppService;
 
+/**
+ * REST controller for horse-farrier appointment links.
+ */
 @RestController
 @RequestMapping("/api/horseFarrierApps")
 public class HorseFarrierAppController {

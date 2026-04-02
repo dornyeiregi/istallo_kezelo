@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * REST controller for shot CRUD and related queries.
+ */
 @RestController
 @RequestMapping("/api/shots")
 public class ShotController {
@@ -26,7 +29,6 @@ public class ShotController {
         this.shotService = shotService;
     }
 
-    // Új oltás létrehozása
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PostMapping()
     public ShotDTO createShot(@RequestBody ShotDTO dto, Authentication auth) {
@@ -42,7 +44,6 @@ public class ShotController {
     }
 
 
-    // Összes oltás lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping()
     public List<ShotDTO> getAllShots(Authentication auth) {
@@ -50,14 +51,12 @@ public class ShotController {
         return (shots).stream().map(ShotMapper::toDTO).toList();
     }
 
-    // Oltás lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping("/{shotId}")
     public ShotDTO getShotById(@PathVariable Long shotId, Authentication auth) {
         return ShotMapper.toDTO(shotService.getShotById(shotId, auth));
     }
 
-    // Ló összes oltásának lekérdezése id alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     @GetMapping("/horseId/{horseId}")
     public List<ShotDTO> getAllShotsOfHorseById(@PathVariable Long horseId, Authentication auth) {
@@ -65,7 +64,6 @@ public class ShotController {
         return shots.stream().map(ShotMapper::toDTO).toList(); 
     }
     
-    // Oltás frissítése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     @PatchMapping("/{shotId}")
     public ResponseEntity<String> updateShot (@PathVariable Long shotId, @RequestBody ShotDTO dto, Authentication auth){
@@ -73,7 +71,6 @@ public class ShotController {
         return ResponseEntity.ok("Oltás sikeresen frissítve.");
     }
 
-    // Oltás törlése
     @PreAuthorize("hasAnyRole('ADMIN')")
     @DeleteMapping("/{shotId}")
     public ResponseEntity<String> deleteShot(@PathVariable Long shotId, Authentication auth){

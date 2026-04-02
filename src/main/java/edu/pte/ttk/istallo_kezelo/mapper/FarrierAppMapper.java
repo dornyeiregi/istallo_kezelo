@@ -4,14 +4,33 @@ import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.dto.FarrierHorseDTO;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 
+/**
+ * Mapper segédosztály a(z) FarrierApp konverziókhoz.
+ */
 public final class FarrierAppMapper {
 
+    /**
+     * Statikus segédosztály, példányosítása nem engedélyezett.
+     */
     private FarrierAppMapper() {}
 
+    /**
+     * FarrierApp entitás DTO-vá alakítása.
+     *
+     * @param farrierApp patkolás entitás
+     * @return DTO
+     */
     public static FarrierAppDTO toDTO(FarrierApp farrierApp) {
         return toDTOWithHorseFilter(farrierApp, null);
     }
 
+    /**
+     * FarrierApp entitás DTO-vá alakítása tulajdonos nézethez.
+     *
+     * @param farrierApp    patkolás entitás
+     * @param ownerUsername tulajdonos felhasználónév
+     * @return DTO
+     */
     public static FarrierAppDTO toDTOForOwner(FarrierApp farrierApp, String ownerUsername) {
         return toDTOWithHorseFilter(farrierApp, ownerUsername);
     }

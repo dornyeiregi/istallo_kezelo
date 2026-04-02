@@ -17,16 +17,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+/**
+ * Patkolási időpontok végpontjai.
+ */
 @RestController
 @RequestMapping("/api/farrierApps")
 public class FarrierAppController {
 
     private final FarrierAppService farrierAppService;
 
+    /**
+     * Létrehozza a vezérlőt a szükséges szolgáltatással.
+     *
+     * @param farrierAppService patkolás szolgáltatás
+     */
     public FarrierAppController(FarrierAppService farrierAppService) {
         this.farrierAppService = farrierAppService;
     }
 
+    /**
+     * Új patkolási időpont létrehozása.
+     *
+     * @param dto  patkolás adatai
+     * @param auth hitelesítési adatok
+     * @return létrehozott patkolás DTO
+     */
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<FarrierAppDTO> createFarrierApp(@RequestBody FarrierAppDTO dto, Authentication auth) {
@@ -34,6 +49,12 @@ public class FarrierAppController {
         return ResponseEntity.ok(FarrierAppMapper.toDTO(created));
     }
 
+    /**
+     * Patkolások listázása a jogosultságoknak megfelelően.
+     *
+     * @param auth hitelesítési adatok
+     * @return patkolások listája
+     */
     @GetMapping
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierAppDTO> getAllFarrierApps(Authentication auth) {
@@ -41,6 +62,13 @@ public class FarrierAppController {
         return farrierApps.stream().map(app -> toDTOForAuth(app, auth)).toList();
     }
 
+    /**
+     * Patkolás lekérése azonosító alapján.
+     *
+     * @param id   patkolás azonosító
+     * @param auth hitelesítési adatok
+     * @return patkolás DTO
+     */
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public FarrierAppDTO getFarrierAppById(@PathVariable Long id, Authentication auth) {
@@ -51,6 +79,13 @@ public class FarrierAppController {
         return toDTOForAuth(farrierApp, auth);
     }
 
+    /**
+     * Patkolások lekérése ló azonosító alapján.
+     *
+     * @param horseId ló azonosító
+     * @param auth    hitelesítési adatok
+     * @return patkolások listája
+     */
     @GetMapping("/horseId/{horseId}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
     public List<FarrierAppDTO> getFarrierAppsByHorseId(@PathVariable Long horseId, Authentication auth) {
@@ -58,6 +93,14 @@ public class FarrierAppController {
         return farrierApps.stream().map(app -> toDTOForAuth(app, auth)).toList();
     }
 
+    /**
+     * Patkolás adatainak frissítése.
+     *
+     * @param id   patkolás azonosító
+     * @param dto  módosítási adatok
+     * @param auth hitelesítési adatok
+     * @return státusz üzenet
+     */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<String> updateFarrierApp(@PathVariable Long id, @RequestBody FarrierAppDTO dto, Authentication auth) {
@@ -65,6 +108,12 @@ public class FarrierAppController {
         return ResponseEntity.ok("Patkolás sikeresen frissítve.");
     }
     
+    /**
+     * Patkolás törlése azonosító alapján.
+     *
+     * @param id patkolás azonosító
+     * @return státusz üzenet
+     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteFarrierApp(@PathVariable Long id) {

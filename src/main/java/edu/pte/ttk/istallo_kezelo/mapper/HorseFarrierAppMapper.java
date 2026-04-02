@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.HorseFarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 
+/**
+ * Mapper segédosztály a(z) HorseFarrierApp konverziókhoz.
+ */
 public final class HorseFarrierAppMapper {
 
     private HorseFarrierAppMapper() {}

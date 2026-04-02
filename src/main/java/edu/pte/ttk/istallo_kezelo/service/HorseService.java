@@ -24,6 +24,9 @@ import edu.pte.ttk.istallo_kezelo.model.User;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Application service for horse CRUD, activation, and related cleanup.
+ */
 @Service
 public class HorseService {
 

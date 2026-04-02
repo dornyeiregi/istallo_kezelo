@@ -21,6 +21,9 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ShotRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Application service for managing shots and horse-shot links.
+ */
 @Service
 public class ShotService {
 
@@ -30,24 +33,29 @@ public class ShotService {
     private final UserRepository userRepository;
     private final CalendarEventService calendarEventService;
     private final SettingsService settingsService;
+    private final EventReminderService eventReminderService;
 
     public ShotService(ShotRepository shotRepository,
                        HorseShotRepository horseShotRepository,
                        HorseRepository horseRepository,
                        UserRepository userRepository,
                        CalendarEventService calendarEventService,
-                       SettingsService settingsService) {
+                       SettingsService settingsService,
+                       EventReminderService eventReminderService) {
         this.shotRepository = shotRepository;
         this.horseShotRepository = horseShotRepository;
         this.horseRepository = horseRepository;
         this.userRepository = userRepository;
         this.calendarEventService = calendarEventService;
         this.settingsService = settingsService;
+        this.eventReminderService = eventReminderService;
     }
 
-    // Új oltás létrehozása
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    /**
+     * Oltást hoz létre és a megadott lovakhoz kapcsolja, naptári eseményeket készítve.
+     */
     public Shot saveShot(Shot shot, List<Long> horseIds, Authentication auth) {
 
         Shot saved = shotRepository.save(shot);
@@ -78,19 +86,24 @@ public class ShotService {
                 );
             }
         }
+        eventReminderService.sendRemindersNow();
         return saved;
     }
 
-    // Összes oltás lekérdezése
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    /**
+     * Visszaadja a felhasználó számára látható oltásokat szerepkör szerinti szűréssel.
+     */
     public List<Shot> getAllShots(Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_SHOTS);
         List<Shot> all = shotRepository.findAll();
         return filterShotsForOwner(all, auth);
     }
 
-    // Oltás lekérdezése ID alapján
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    /**
+     * Visszaad egy oltást azonosító alapján jogosultság-ellenőrzéssel.
+     */
     public Shot getShotById(Long shotId, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_SHOTS);
         Shot shot = shotRepository.findById(shotId)
@@ -103,9 +116,11 @@ public class ShotService {
         return shot;
     }
 
-    // Ló összes oltásának lekérdezése ID alapján
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    /**
+     * Visszaadja az adott lóhoz tartozó oltásokat azonosító alapján, jogosultság-ellenőrzéssel.
+     */
     public List<Shot> getShotsByHorseId(Long horseId, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_SHOTS);
         checkHorseOwnership(auth, horseId);
@@ -113,9 +128,11 @@ public class ShotService {
         return horseShots.stream().map(HorseShot::getShot).toList();
     }
 
-    // Ló összes oltásának lekérdezése név alapján
     @Transactional(readOnly = true)
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER', 'EMPLOYEE')")
+    /**
+     * Visszaadja az adott nevű lóhoz tartozó oltásokat jogosultság-ellenőrzéssel.
+     */
     public List<Shot> getShotsByHorseName(String horseName, Authentication auth) {
         settingsService.assertEmployeeAccess(auth, SettingsService.EMPLOYEE_VIEW_SHOTS);
         Horse horse = horseRepository.findByHorseName(horseName);
@@ -129,9 +146,11 @@ public class ShotService {
         return horseShots.stream().map(HorseShot::getShot).toList();
     }
 
-    // Oltás frissítése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
+    /**
+     * Oltást és kapcsolt lovakat frissít tulajdonosi jogosultságok figyelembevételével.
+     */
     public Shot updateShot(Long shotId, ShotDTO updatedShot, Authentication auth) {
         Shot shot = shotRepository.findById(shotId)
                 .orElseThrow(() -> new RuntimeException("Oltás nem található."));
@@ -282,7 +301,6 @@ public class ShotService {
         return saved;
     }
 
-    // Oltás törlése
     @Transactional
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public void deleteShotById(Long shotId, Authentication auth) {
@@ -301,7 +319,6 @@ public class ShotService {
         calendarEventService.deleteFromDomain(EventType.SHOT, shotId);
     }
 
-    // Helper – OWNER csak a saját lovait módosíthatja
     private void checkHorseOwnership(Authentication auth, Long horseId) {
         if (auth == null || isAdminOrEmployee(auth)) return;
 
@@ -315,7 +332,6 @@ public class ShotService {
         }
     }
 
-    // Helper – OWNER-szűrés minden GET metódushoz
     private List<Shot> filterShotsForOwner(List<Shot> allShots, Authentication auth) {
         if (auth == null || isAdminOrEmployee(auth)) return allShots;
 
@@ -327,7 +343,6 @@ public class ShotService {
                 .toList();
     }
 
-    // Helper – ADMIN-e az adott felhasználó
     private boolean isAdmin(Authentication auth) {
         return auth != null && auth.getAuthorities().stream()
                 .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));

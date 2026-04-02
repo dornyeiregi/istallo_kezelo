@@ -9,6 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import java.util.List;
 
+/**
+ * REST controller for user profile endpoints.
+ */
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -68,7 +71,7 @@ public class UserController {
         if (dto.getEmail() != null) { existingUser.setEmail(dto.getEmail());}
         if (dto.getPhone() != null) { existingUser.setPhone(dto.getPhone());}
         if (dto.getUsername() != null) {existingUser.setUsername(dto.getUsername());}
-        User savedUser = userService.saveUser(existingUser);
+        User savedUser = userService.updateUser(existingUser.getId(), existingUser, auth);
         return UserMapper.toDTO(savedUser);
     }
 

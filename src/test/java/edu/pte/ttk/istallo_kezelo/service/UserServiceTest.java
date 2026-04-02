@@ -14,6 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Test class for UserService behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
 

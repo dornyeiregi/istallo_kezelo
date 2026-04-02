@@ -11,6 +11,9 @@ import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseFeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 
+/**
+ * Application service for linking horses to feed schedules.
+ */
 @Service
 public class HorseFeedSchedService {
     private final FeedSchedRepository feedSchedRepository;

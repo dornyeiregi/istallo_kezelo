@@ -26,6 +26,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * Test class for AuthController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 

@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) Treatment adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

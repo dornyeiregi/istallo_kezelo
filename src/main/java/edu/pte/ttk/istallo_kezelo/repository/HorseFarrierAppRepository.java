@@ -7,6 +7,9 @@ import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
 
+/**
+ * Spring Data repository a(z) HorseFarrierApp entitásokhoz.
+ */
 @Repository
 public interface HorseFarrierAppRepository extends JpaRepository<HorseFarrierApp, Long> {
     void deleteByFarrierApp_IdAndHorse_Id(Long farrierAppId, Long horseId);

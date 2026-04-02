@@ -2,12 +2,13 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import java.util.List;
 
+/**
+ * Adatátviteli objektum a(z) FeedSched adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class FeedSchedDTO {
     private long feedSchedId;
     private Boolean feedMorning;
@@ -17,4 +18,10 @@ public class FeedSchedDTO {
     private List<Long> horseIds;
     private List<Long> itemIds;
     private List<FeedSchedItemAmountDTO> items;
+
+    /**
+     * Üres konstruktor a szerializáláshoz.
+     */
+    public FeedSchedDTO() {
+    }
 }

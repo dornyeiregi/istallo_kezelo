@@ -23,6 +23,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.Authentication;
 
+/**
+ * Test class for TreatmentService behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class TreatmentServiceTest {
 

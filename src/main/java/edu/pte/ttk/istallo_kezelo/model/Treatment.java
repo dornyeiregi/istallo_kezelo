@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entity representing a treatment definition and schedule metadata.
+ */
 @Getter
 @Setter
 @Entity

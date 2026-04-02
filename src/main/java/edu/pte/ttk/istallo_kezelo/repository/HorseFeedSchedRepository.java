@@ -9,6 +9,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+/**
+ * Spring Data repository for HorseFeedSched entities.
+ */
 @Repository
 public interface HorseFeedSchedRepository extends JpaRepository<HorseFeedSched, Long> {
     boolean existsByFeedSchedAndHorse(FeedSched feedSched, Horse horse);

@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.ItemDTO;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 
+/**
+ * Mapper segédosztály a(z) Item konverziókhoz.
+ */
 public final class ItemMapper {
 
     private ItemMapper() {}

@@ -3,8 +3,17 @@ package edu.pte.ttk.istallo_kezelo.config;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 
+/**
+ * JPA konverter, amely az üres stringet null értékre alakítja.
+ */
 @Converter(autoApply = true)
 public class EmptyStringToNullConverter implements AttributeConverter<String, String> {
+
+    /**
+     * Üres konstruktor a JPA konverterhez.
+     */
+    public EmptyStringToNullConverter() {
+    }
 
     @Override
     public String convertToDatabaseColumn(String attribute) {

@@ -9,14 +9,28 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Adminisztrátori felhasználókezelési végpontok vezérlője.
+ */
 @RestController
 @RequestMapping("/api/admin")
 public class AdminController {
 
     private final AdminService adminService;
 
+    /**
+     * Létrehozza a vezérlőt a szükséges szolgáltatással.
+     *
+     * @param adminService admin felhasználókezelési szolgáltatás
+     */
     public AdminController(AdminService adminService) { this.adminService = adminService; }
 
+    /**
+     * Új felhasználót hoz létre admin jogosultsággal.
+     *
+     * @param dto regisztrációs adatok
+     * @return státusz üzenet
+     */
     @PostMapping("/users")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> createUser(@RequestBody SignupRequestDTO dto) {
@@ -24,12 +38,24 @@ public class AdminController {
         return ResponseEntity.ok("Felhasználó sikeresen létrehozva.");
     }
 
+    /**
+     * Visszaadja az összes felhasználót.
+     *
+     * @return felhasználók listája
+     */
     @GetMapping("/users")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(adminService.getAllUsers());
     }
 
+    /**
+     * Frissíti a felhasználó típusát.
+     *
+     * @param id   felhasználó azonosító
+     * @param body kérés törzs (userType mezővel)
+     * @return státusz üzenet
+     */
     @PatchMapping("/update-role/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> updateUserRole(@PathVariable Long id, @RequestBody Map<String, String> body) {
@@ -42,6 +68,12 @@ public class AdminController {
         return ResponseEntity.ok("Felhasználó típusa sikeresen frissítve.");
     }
 
+    /**
+     * Törli a megadott felhasználót.
+     *
+     * @param id felhasználó azonosító
+     * @return státusz üzenet
+     */
     @DeleteMapping("/users/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> deleteUser(@PathVariable Long id) {

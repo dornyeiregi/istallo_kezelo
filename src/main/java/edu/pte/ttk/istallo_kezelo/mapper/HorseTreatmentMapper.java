@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.HorseTreatmentDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseTreatment;
 
+/**
+ * Mapper segédosztály a(z) HorseTreatment konverziókhoz.
+ */
 public final class HorseTreatmentMapper {
 
     private HorseTreatmentMapper() {}

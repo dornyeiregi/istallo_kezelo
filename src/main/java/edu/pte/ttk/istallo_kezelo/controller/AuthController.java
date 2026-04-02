@@ -16,6 +16,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * Hitelesítési és fiók műveletek végpontjai.
+ */
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -25,6 +28,14 @@ public class AuthController {
     private final PasswordEncoder encoder;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Létrehozza a hitelesítési vezérlőt a szükséges komponensekkel.
+     *
+     * @param authenticationManager authentikációs menedzser
+     * @param userRepository        felhasználó repository
+     * @param encoder               jelszó hash-elő
+     * @param jwtUtil               JWT segéd
+     */
     public  AuthController (
             AuthenticationManager authenticationManager,
             UserRepository userRepository,
@@ -37,6 +48,12 @@ public class AuthController {
         this.jwtUtil = jwtUtil;
     }
     
+    /**
+     * Bejelentkezés felhasználónév/jelszó alapján.
+     *
+     * @param user bejelentkezési adatok
+     * @return JWT és felhasználói adatok
+     */
     @PostMapping("/signin")
     public ResponseEntity<Map<String, Object>> authenticateUser(@RequestBody User user) {
         Authentication authentication = authenticationManager.authenticate(
@@ -54,6 +71,12 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Regisztrál új felhasználót, majd azonnal JWT-t ad vissza.
+     *
+     * @param request regisztrációs adatok
+     * @return JWT és felhasználói adatok
+     */
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> registerUser(@RequestBody SignupRequestDTO request) {
         System.out.println(request);
@@ -97,6 +120,13 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    /**
+     * Módosítja a bejelentkezett felhasználó jelszavát.
+     *
+     * @param request        jelszócsere kérés
+     * @param authentication hitelesítési adatok
+     * @return státusz üzenet
+     */
     @PostMapping("/change-password")
     public ResponseEntity<Map<String, Object>> changePassword(
         @RequestBody ChangePasswordRequest request,

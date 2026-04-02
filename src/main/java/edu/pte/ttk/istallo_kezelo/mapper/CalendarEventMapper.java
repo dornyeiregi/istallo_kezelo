@@ -3,10 +3,22 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.CalendarEventDTO;
 import edu.pte.ttk.istallo_kezelo.model.CalendarEvent;
 
+/**
+ * Mapper segédosztály a(z) CalendarEvent konverziókhoz.
+ */
 public final class CalendarEventMapper {
 
+    /**
+     * Statikus segédosztály, példányosítása nem engedélyezett.
+     */
     private CalendarEventMapper() {}
 
+    /**
+     * CalendarEvent entitást DTO-vá alakít.
+     *
+     * @param event naptári esemény entitás
+     * @return DTO
+     */
     public static CalendarEventDTO toDTO(CalendarEvent event) {
         CalendarEventDTO dto = new CalendarEventDTO();
         dto.setId(event.getId());

@@ -10,6 +10,9 @@ import edu.pte.ttk.istallo_kezelo.repository.FeedSchedItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 
+/**
+ * Etetési ütemterv tételek kezelésére szolgáló alkalmazásszolgáltatás.
+ */
 @Service
 public class FeedSchedItemService {
     private final FeedSchedItemRepository feedSchedItemRepository;
@@ -17,6 +20,14 @@ public class FeedSchedItemService {
     private final ItemRepository itemRepository;
     private final StorageService storageService;
 
+    /**
+     * Létrehozza a szolgáltatást a szükséges repository-kkal.
+     *
+     * @param feedSchedItemRepository etetési tétel repository
+     * @param feedSchedRepository     etetési ütemterv repository
+     * @param itemRepository          tétel repository
+     * @param storageService          tároló szolgáltatás
+     */
     public FeedSchedItemService(FeedSchedItemRepository feedSchedItemRepository,
                                 FeedSchedRepository feedSchedRepository,
                                 ItemRepository itemRepository,
@@ -27,6 +38,14 @@ public class FeedSchedItemService {
         this.storageService = storageService;
     }
 
+    /**
+     * Tétel hozzáadása etetési ütemtervhez.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @param itemId      tétel azonosító
+     * @param amount      mennyiség
+     * @return mentett kapcsolat
+     */
     @Transactional
     public FeedSchedItem addItemToFeedSched(Long feedSchedId, Long itemId, Double amount){
         FeedSched feedSched = feedSchedRepository.findById(feedSchedId)
@@ -49,23 +68,52 @@ public class FeedSchedItemService {
         return saved;
     }
 
+    /**
+     * Összes etetési tétel lekérése.
+     *
+     * @return tételek listája
+     */
     public List<FeedSchedItem> getAllFeedSchedItems(){
         return feedSchedItemRepository.findAll();
     }
 
+    /**
+     * Ütemtervhez tartozó tételek lekérése.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @return tételek listája
+     */
     public List<FeedSchedItem> getItemsForFeedSched(Long feedSchedId){
         return feedSchedItemRepository.findByFeedSched_Id(feedSchedId);
     }
 
+    /**
+     * Tételhez tartozó ütemtervi tételek lekérése.
+     *
+     * @param itemId tétel azonosító
+     * @return tételek listája
+     */
     public List<FeedSchedItem> getFeedSchedsForItem(Long itemId){
         return feedSchedItemRepository.findByItem_Id(itemId);
     }
 
+    /**
+     * Etetési tétel kapcsolat lekérése azonosító alapján.
+     *
+     * @param id kapcsolat azonosító
+     * @return kapcsolat
+     */
     public FeedSchedItem getFeedSchedItemById(Long id){
         return feedSchedItemRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Link nem található."));
     }
 
+    /**
+     * Tétel eltávolítása etetési ütemtervből.
+     *
+     * @param feedSchedId ütemterv azonosító
+     * @param itemId      tétel azonosító
+     */
     @Transactional
     public void removeItemFromFeedSched(Long feedSchedId, Long itemId){
         feedSchedItemRepository.deleteByFeedSched_IdAndItem_Id(feedSchedId, itemId);

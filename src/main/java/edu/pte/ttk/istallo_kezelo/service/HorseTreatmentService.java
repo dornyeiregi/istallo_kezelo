@@ -15,6 +15,9 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Application service for linking horses to treatments.
+ */
 @Service
 public class HorseTreatmentService {
     private final HorseTreatmentRepository horseTreatmentRepository;

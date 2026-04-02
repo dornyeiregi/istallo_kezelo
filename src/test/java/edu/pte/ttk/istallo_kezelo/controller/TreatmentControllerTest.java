@@ -22,6 +22,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 
+/**
+ * Test class for TreatmentController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class TreatmentControllerTest {
 

@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.StorageDTO;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
 
+/**
+ * Mapper segédosztály a(z) Storage konverziókhoz.
+ */
 public final class StorageMapper {
 
     private StorageMapper() {}

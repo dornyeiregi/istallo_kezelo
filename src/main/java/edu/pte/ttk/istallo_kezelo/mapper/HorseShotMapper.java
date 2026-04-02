@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.HorseShotDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseShot;
 
+/**
+ * Mapper segédosztály a(z) HorseShot konverziókhoz.
+ */
 public final class HorseShotMapper {
 
     private HorseShotMapper() {}

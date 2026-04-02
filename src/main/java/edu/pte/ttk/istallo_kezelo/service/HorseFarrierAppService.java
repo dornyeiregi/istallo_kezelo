@@ -15,6 +15,9 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseFarrierAppRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Application service for linking horses to farrier appointments.
+ */
 @Service
 public class HorseFarrierAppService {
     private final FarrierAppRepository farrierAppRepository;
@@ -22,17 +25,20 @@ public class HorseFarrierAppService {
     private final HorseFarrierAppRepository horseFarrierAppRepository;
     private final UserRepository userRepository;
     private final CalendarEventService calendarEventService;
+    private final EventReminderService eventReminderService;
 
     public HorseFarrierAppService(FarrierAppRepository farrierAppRepository, 
                                   HorseRepository horseRepository, 
                                   HorseFarrierAppRepository horseFarrierAppRepository,
                                   UserRepository userRepository,
-                                  CalendarEventService calendarEventService) {
+                                  CalendarEventService calendarEventService,
+                                  EventReminderService eventReminderService) {
         this.farrierAppRepository = farrierAppRepository;
         this.horseRepository = horseRepository;
         this.horseFarrierAppRepository = horseFarrierAppRepository;
         this.userRepository = userRepository;
         this.calendarEventService = calendarEventService;
+        this.eventReminderService = eventReminderService;
     }
 
     @Transactional
@@ -65,6 +71,7 @@ public class HorseFarrierAppService {
                 app.getAppointmentDate(),
                 app.getId()
         );
+        eventReminderService.sendRemindersNow();
         return saved;
     }
 

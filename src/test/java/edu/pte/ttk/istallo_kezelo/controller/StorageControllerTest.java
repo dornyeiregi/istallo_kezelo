@@ -17,6 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Test class for StorageController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class StorageControllerTest {
 

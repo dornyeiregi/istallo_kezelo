@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.HorseFeedSchedDTO;
 import edu.pte.ttk.istallo_kezelo.model.HorseFeedSched;
 
+/**
+ * Mapper segédosztály a(z) HorseFeedSched konverziókhoz.
+ */
 public final class HorseFeedSchedMapper {
 
     private HorseFeedSchedMapper() {}

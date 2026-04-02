@@ -14,6 +14,9 @@ import edu.pte.ttk.istallo_kezelo.repository.CalendarEventRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import jakarta.persistence.EntityNotFoundException;
 
+/**
+ * Naptári események kezelésére szolgáló alkalmazásszolgáltatás.
+ */
 @Service
 @Transactional
 public class CalendarEventService {
@@ -21,12 +24,28 @@ public class CalendarEventService {
     private final CalendarEventRepository calendarEventRepository;
     private final HorseRepository horseRepository;
 
+    /**
+     * Létrehozza a szolgáltatást a szükséges repository-kkal.
+     *
+     * @param calendarEventRepository naptári esemény repository
+     * @param horseRepository         ló repository
+     */
     public CalendarEventService(CalendarEventRepository calendarEventRepository,
                                 HorseRepository horseRepository) {
         this.calendarEventRepository = calendarEventRepository;
         this.horseRepository = horseRepository;
     }
 
+    /**
+     * Új naptári eseményt hoz létre.
+     *
+     * @param horseId        ló azonosító
+     * @param eventType      esemény típusa
+     * @param eventDate      esemény dátuma
+     * @param relatedEntityId kapcsolt entitás azonosító
+     * @param description    leírás
+     * @return létrehozott esemény DTO
+     */
     public CalendarEventDTO createEvent(Long horseId,
                                         EventType eventType,
                                         LocalDate eventDate,
@@ -41,6 +60,15 @@ public class CalendarEventService {
         return CalendarEventMapper.toDTO(saved);
     }
 
+    /**
+     * Domain objektumból szinkronizálja (létrehozza vagy frissíti) az eseményt.
+     *
+     * @param horse          ló
+     * @param eventType      esemény típusa
+     * @param eventDate      esemény dátuma
+     * @param relatedEntityId kapcsolt entitás azonosító
+     * @return mentett esemény entitás
+     */
     public CalendarEvent syncFromDomain(Horse horse,
                                         EventType eventType,
                                         LocalDate eventDate,
@@ -59,11 +87,24 @@ public class CalendarEventService {
         return calendarEventRepository.save(event);
     }
 
+    /**
+     * Törli a domain objektumhoz tartozó eseményt.
+     *
+     * @param eventType      esemény típusa
+     * @param relatedEntityId kapcsolt entitás azonosító
+     */
     public void deleteFromDomain(EventType eventType, Long relatedEntityId) {
         if (eventType == null || relatedEntityId == null) return;
         calendarEventRepository.deleteByEventTypeAndRelatedEntityId(eventType, relatedEntityId);
     }
 
+    /**
+     * Törli a domain objektumhoz és lóhoz tartozó eseményt.
+     *
+     * @param eventType      esemény típusa
+     * @param relatedEntityId kapcsolt entitás azonosító
+     * @param horseId        ló azonosító
+     */
     public void deleteFromDomain(EventType eventType, Long relatedEntityId, Long horseId) {
         if (eventType == null || relatedEntityId == null || horseId == null) return;
         calendarEventRepository.deleteByEventTypeAndRelatedEntityIdAndHorse_Id(
@@ -73,6 +114,12 @@ public class CalendarEventService {
         );
     }
 
+    /**
+     * Esemény lekérése azonosító alapján.
+     *
+     * @param eventId esemény azonosító
+     * @return esemény DTO
+     */
     @Transactional(readOnly = true)
     public CalendarEventDTO getById(Long eventId) {
         CalendarEvent event = calendarEventRepository.findById(eventId)
@@ -80,6 +127,12 @@ public class CalendarEventService {
         return CalendarEventMapper.toDTO(event);
     }
 
+    /**
+     * Egy ló összes eseményét adja vissza.
+     *
+     * @param horseId ló azonosító
+     * @return események listája
+     */
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getHorseEvents(Long horseId) {
         return calendarEventRepository.findByHorse_IdOrderByEventDateAsc(horseId)
@@ -88,6 +141,13 @@ public class CalendarEventService {
                 .toList();
     }
 
+    /**
+     * Minden eseményt visszaad opcionális dátumszűréssel.
+     *
+     * @param start kezdő dátum (opcionális)
+     * @param end   záró dátum (opcionális)
+     * @return események listája
+     */
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getAllEvents(LocalDate start, LocalDate end) {
         if (start != null && end != null) {
@@ -102,6 +162,14 @@ public class CalendarEventService {
                 .toList();
     }
 
+    /**
+     * Visszaadja az eseményeket a felhasználó jogosultságai alapján.
+     *
+     * @param start kezdő dátum (opcionális)
+     * @param end   záró dátum (opcionális)
+     * @param auth  hitelesítési adatok
+     * @return események listája
+     */
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getAllEventsForAuth(LocalDate start, LocalDate end, Authentication auth) {
         if (auth == null || isAdminOrEmployee(auth)) {
@@ -122,6 +190,14 @@ public class CalendarEventService {
             .toList();
     }
 
+    /**
+     * Egy ló eseményeinek lekérése adott dátumtartományban.
+     *
+     * @param horseId ló azonosító
+     * @param start   kezdő dátum
+     * @param end     záró dátum
+     * @return események listája
+     */
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getHorseEventsInRange(Long horseId,
                                                         LocalDate start,
@@ -133,6 +209,14 @@ public class CalendarEventService {
                 .toList();
     }
 
+    /**
+     * Istálló eseményeinek lekérése adott dátumtartományban.
+     *
+     * @param stableId istálló azonosító
+     * @param start    kezdő dátum
+     * @param end      záró dátum
+     * @return események listája
+     */
     @Transactional(readOnly = true)
     public List<CalendarEventDTO> getStableEventsInRange(Long stableId,
                                                          LocalDate start,
@@ -144,6 +228,16 @@ public class CalendarEventService {
                 .toList();
     }
 
+    /**
+     * Esemény adatainak frissítése.
+     *
+     * @param eventId         esemény azonosító
+     * @param eventType       esemény típusa (opcionális)
+     * @param eventDate       esemény dátuma (opcionális)
+     * @param relatedEntityId kapcsolt entitás azonosító (opcionális)
+     * @param description     leírás (opcionális)
+     * @return frissített esemény DTO
+     */
     public CalendarEventDTO updateEvent(Long eventId,
                                         EventType eventType,
                                         LocalDate eventDate,
@@ -162,6 +256,13 @@ public class CalendarEventService {
         return CalendarEventMapper.toDTO(calendarEventRepository.save(event));
     }
 
+    /**
+     * Eseményhez tartozó ló módosítása.
+     *
+     * @param eventId    esemény azonosító
+     * @param newHorseId új ló azonosító
+     * @return frissített esemény DTO
+     */
     public CalendarEventDTO changeHorse(Long eventId, Long newHorseId) {
         CalendarEvent event = calendarEventRepository.findById(eventId)
                 .orElseThrow(() -> new EntityNotFoundException("Esemény nem található: " + eventId));
@@ -171,6 +272,11 @@ public class CalendarEventService {
         return CalendarEventMapper.toDTO(calendarEventRepository.save(event));
     }
 
+    /**
+     * Esemény törlése.
+     *
+     * @param eventId esemény azonosító
+     */
     public void deleteEvent(Long eventId) {
         if (!calendarEventRepository.existsById(eventId)) {
             throw new EntityNotFoundException("Esemény nem található: " + eventId);

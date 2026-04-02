@@ -11,6 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Utility for generating and validating JWT tokens.
+ */
 @Component
 public class JwtUtil {
 

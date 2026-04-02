@@ -17,6 +17,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+/**
+ * REST controller for stable CRUD and bedding usage updates.
+ */
 @RestController
 @RequestMapping("/api/stables")
 public class StableController {

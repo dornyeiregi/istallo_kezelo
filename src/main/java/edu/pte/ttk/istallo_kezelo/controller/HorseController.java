@@ -10,6 +10,7 @@ import edu.pte.ttk.istallo_kezelo.service.HorseService;
 import edu.pte.ttk.istallo_kezelo.service.StableService;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
 import edu.pte.ttk.istallo_kezelo.service.FeedSchedService;
+import edu.pte.ttk.istallo_kezelo.service.MailService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,6 +18,9 @@ import org.springframework.security.core.Authentication;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * REST controller for horse CRUD and approval actions.
+ */
 @RestController
 @RequestMapping("/api/horses")
 public class HorseController {
@@ -25,12 +29,18 @@ public class HorseController {
     private final UserService userService;
     private final StableService stableService;
     private final FeedSchedService feedSchedService;
+    private final MailService mailService;
 
-    public HorseController(HorseService horseService, UserService userService, StableService stableService, FeedSchedService feedSchedService) {
+    public HorseController(HorseService horseService,
+                           UserService userService,
+                           StableService stableService,
+                           FeedSchedService feedSchedService,
+                           MailService mailService) {
         this.horseService = horseService;
         this.userService = userService;
         this.stableService = stableService;
         this.feedSchedService = feedSchedService;
+        this.mailService = mailService;
     }
 
     @PostMapping
@@ -70,6 +80,11 @@ public class HorseController {
         horse.setIsActive(isAdmin ? Boolean.TRUE : Boolean.FALSE);
         horse.setIsPending(!isAdmin);
         Horse savedHorse = horseService.saveHorse(horse);
+        if (!isAdmin) {
+            String subject = "Új ló jóváhagyásra vár";
+            String body = "Új ló kérése érkezett: " + savedHorse.getHorseName();
+            mailService.sendToAdmins(subject, body);
+        }
         if (isAdmin && dto.getFeedSchedId() != null) {
             feedSchedService.addHorseToFeedSched(dto.getFeedSchedId(), savedHorse.getId());
         }

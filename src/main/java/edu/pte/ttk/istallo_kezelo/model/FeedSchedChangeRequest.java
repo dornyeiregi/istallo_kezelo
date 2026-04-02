@@ -4,13 +4,14 @@ import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entitás etetési ütemterv módosítási kérelemhez.
+ */
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "feed_sched_change_request")
 public class FeedSchedChangeRequest {
@@ -51,4 +52,10 @@ public class FeedSchedChangeRequest {
 
     @Column(name = "requested_item_amounts", nullable = true, columnDefinition = "TEXT")
     private String requestedItemAmounts;
+
+    /**
+     * Üres konstruktor a JPA-hoz.
+     */
+    public FeedSchedChangeRequest() {
+    }
 }

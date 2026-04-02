@@ -10,6 +10,9 @@ import edu.pte.ttk.istallo_kezelo.model.enums.*;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemType;
 import lombok.Setter;
 
+/**
+ * JPA entity for stockable items such as feed, hay, supplements, or bedding.
+ */
 @Getter
 @Setter
 @Entity

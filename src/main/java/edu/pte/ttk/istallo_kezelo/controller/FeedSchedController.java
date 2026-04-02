@@ -21,16 +21,31 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 
+/**
+ * Etetési ütemtervek CRUD és változtatási kérelmek vezérlője.
+ */
 @RestController
 @RequestMapping("/api/feedScheds")
 public class FeedSchedController {
 
     private final FeedSchedService feedSchedService;
 
+    /**
+     * Létrehozza a vezérlőt a szükséges szolgáltatással.
+     *
+     * @param feedSchedService etetési ütemterv szolgáltatás
+     */
     public FeedSchedController(FeedSchedService feedSchedService){
         this.feedSchedService = feedSchedService;
     }
 
+    /**
+     * Etetési ütemterv létrehozása (owner esetén kérelemként).
+     *
+     * @param dto  ütemterv adatok
+     * @param auth hitelesítési adatok
+     * @return státusz üzenet
+     */
     @PostMapping
     public ResponseEntity<String> createFeedSched(@RequestBody FeedSchedDTO dto, Authentication auth) {
         boolean isOwner = auth != null && auth.getAuthorities().stream()
@@ -43,12 +58,23 @@ public class FeedSchedController {
         return ResponseEntity.ok("Etetési napló sikeresen létrehozva.");
     }
 
+    /**
+     * Összes etetési ütemterv lekérése.
+     *
+     * @return ütemtervek listája
+     */
     @GetMapping
     public List<FeedSchedDTO> getAllFeedScheds() {
         List<FeedSched> feedScheds = feedSchedService.getAllFeedScheds();
         return feedScheds.stream().map(FeedSchedMapper::toDTO).toList();
     }
 
+    /**
+     * Etetési ütemterv lekérése azonosító alapján.
+     *
+     * @param id ütemterv azonosító
+     * @return ütemterv DTO
+     */
     @GetMapping("/{id}")
     public FeedSchedDTO getFeedSchedById(@PathVariable Long id) {
         FeedSched feedSched = feedSchedService.getFeedSchedById(id);
@@ -58,12 +84,26 @@ public class FeedSchedController {
         return FeedSchedMapper.toDTO(feedSched);
     }
 
+    /**
+     * Etetési ütemtervek lekérése ló azonosító alapján.
+     *
+     * @param horseId ló azonosító
+     * @return ütemtervek listája
+     */
     @GetMapping("/horseId/{horseId}")
     public List<FeedSchedDTO> getFeedSchedsByHorseId(@PathVariable Long horseId) {
         List<FeedSched> feedScheds = feedSchedService.getFeedSchedByHorseId(horseId);
         return feedScheds.stream().map(FeedSchedMapper::toDTO).toList();
     }
 
+    /**
+     * Etetési ütemterv frissítése (owner esetén kérelemként).
+     *
+     * @param id   ütemterv azonosító
+     * @param dto  módosítási adatok
+     * @param auth hitelesítési adatok
+     * @return státusz üzenet
+     */
     @PatchMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'OWNER')")
     public ResponseEntity<String> updateFeedSched(@PathVariable Long id, @RequestBody FeedSchedDTO dto, Authentication auth) {
@@ -74,12 +114,23 @@ public class FeedSchedController {
         return ResponseEntity.accepted().body("Kérés elküldve. Jóváhagyás után lép életbe.");
     }
 
+    /**
+     * Etetési ütemterv törlése.
+     *
+     * @param id ütemterv azonosító
+     * @return státusz üzenet
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteFeedSched(@PathVariable Long id){
         feedSchedService.deleteFeedSched(id);
         return ResponseEntity.ok("Etetési napló sikeresen törölve.");
     }
 
+    /**
+     * Összes változtatási kérelem lekérése (admin).
+     *
+     * @return kérelmek listája
+     */
     @GetMapping("/requests")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public List<FeedSchedChangeRequestDTO> getChangeRequests() {
@@ -94,6 +145,12 @@ public class FeedSchedController {
             .toList();
     }
 
+    /**
+     * Saját változtatási kérelmek lekérése.
+     *
+     * @param auth hitelesítési adatok
+     * @return kérelmek listája
+     */
     @GetMapping("/requests/mine")
     @PreAuthorize("hasAnyAuthority('OWNER', 'ROLE_OWNER')")
     public List<FeedSchedChangeRequestDTO> getMyChangeRequests(Authentication auth) {
@@ -108,6 +165,12 @@ public class FeedSchedController {
             .toList();
     }
 
+    /**
+     * Változtatási kérelem jóváhagyása.
+     *
+     * @param id kérelem azonosító
+     * @return státusz üzenet
+     */
     @PatchMapping("/requests/{id}/approve")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> approveChangeRequest(@PathVariable Long id) {
@@ -115,6 +178,12 @@ public class FeedSchedController {
         return ResponseEntity.ok("Kérés jóváhagyva.");
     }
 
+    /**
+     * Változtatási kérelem elutasítása.
+     *
+     * @param id kérelem azonosító
+     * @return státusz üzenet
+     */
     @DeleteMapping("/requests/{id}")
     @PreAuthorize("hasAnyRole('ADMIN')")
     public ResponseEntity<String> rejectChangeRequest(@PathVariable Long id) {

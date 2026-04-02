@@ -7,8 +7,17 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import java.io.IOException;
 
+/**
+ * Hitelesítési belépési pont, amely 401-et ad vissza jogosulatlan kérésnél.
+ */
 @Component
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
+
+    /**
+     * Üres konstruktor a Spring komponenshez.
+     */
+    public AuthEntryPointJwt() {
+    }
 
     @Override
     public void commence(

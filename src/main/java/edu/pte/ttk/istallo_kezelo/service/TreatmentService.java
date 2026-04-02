@@ -18,6 +18,9 @@ import edu.pte.ttk.istallo_kezelo.repository.HorseTreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.TreatmentRepository;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 
+/**
+ * Application service for treatment management and horse links.
+ */
 @Service
 public class TreatmentService {
 
@@ -27,19 +30,22 @@ public class TreatmentService {
     private final HorseRepository horseRepository;
     private final CalendarEventService calendarEventService;
     private final SettingsService settingsService;
+    private final EventReminderService eventReminderService;
 
     public TreatmentService(TreatmentRepository treatmentRepository,
                             HorseTreatmentRepository horseTreatmentRepository,
                             UserRepository userRepository,
                             HorseRepository horseRepository,
                             CalendarEventService calendarEventService,
-                            SettingsService settingsService) {
+                            SettingsService settingsService,
+                            EventReminderService eventReminderService) {
         this.treatmentRepository = treatmentRepository;
         this.horseTreatmentRepository = horseTreatmentRepository;
         this.userRepository = userRepository;
         this.horseRepository = horseRepository;
         this.calendarEventService = calendarEventService;
         this.settingsService = settingsService;
+        this.eventReminderService = eventReminderService;
     }
 
     @Transactional
@@ -67,6 +73,7 @@ public class TreatmentService {
                 );
             }
         }
+        eventReminderService.sendRemindersNow();
         return saved;
     }
 

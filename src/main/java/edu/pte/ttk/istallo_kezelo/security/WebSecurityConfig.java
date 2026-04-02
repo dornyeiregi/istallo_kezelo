@@ -15,6 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.http.HttpMethod;
 
+/**
+ * Spring Security configuration for the API.
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
@@ -61,7 +64,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/signin", "/api/auth/signup").permitAll()
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")   // => ROLE_ADMIN
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
         );
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);

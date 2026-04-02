@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 
+/**
+ * REST controller for horse-shot links.
+ */
 @RestController
 @RequestMapping("/api/horseShots")
 public class HorseShotController {

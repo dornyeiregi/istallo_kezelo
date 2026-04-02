@@ -20,6 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
+/**
+ * Test class for ItemController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class ItemControllerTest {
 

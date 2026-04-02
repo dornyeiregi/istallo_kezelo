@@ -7,6 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 
+/**
+ * Spring Data repository a(z) Horse entitásokhoz.
+ */
 @Repository
 public interface HorseRepository extends JpaRepository<Horse, Long> {
     Horse findByHorseName(String horseName);

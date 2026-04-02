@@ -13,6 +13,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entity linking stables to bedding items and usage amounts.
+ */
 @Getter
 @Setter
 @Entity

@@ -10,6 +10,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * JPA entity representing a vaccination/shot definition and schedule metadata.
+ */
 @Getter
 @Setter
 @Entity
@@ -38,6 +41,10 @@ public class Shot {
     @OneToMany(mappedBy = "shot", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<HorseShot> horses_treated = new ArrayList<>();
 
+    /**
+     * Calculates the next due date based on the base date and frequency fields.
+     * Returns the base date if frequency is not configured.
+     */
     public LocalDate getNextShotDate(){
         ChronoUnit unit = ChronoUnit.valueOf(frequencyUnit.toUpperCase());
         return date.plus(frequencyValue, unit);

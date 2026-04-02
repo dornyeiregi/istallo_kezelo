@@ -19,6 +19,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 
+/**
+ * Test class for FeedSchedController behavior.
+ */
 @ExtendWith(MockitoExtension.class)
 class FeedSchedControllerTest {
 

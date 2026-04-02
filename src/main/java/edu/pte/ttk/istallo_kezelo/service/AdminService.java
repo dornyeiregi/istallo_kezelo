@@ -14,23 +14,44 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+/**
+ * Adminisztrátori felhasználókezelési műveletek szolgáltatása.
+ */
 @Service
 public class AdminService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Létrehozza a szolgáltatást a szükséges függőségekkel.
+     *
+     * @param userRepository felhasználó repository
+     * @param passwordEncoder jelszó hash-elő
+     */
     public AdminService(UserRepository userRepository,
                         PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Visszaadja az összes felhasználót DTO-ként.
+     *
+     * @return felhasználók listája
+     */
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
             .map(UserMapper::toDTO).toList();
     }
 
+    /**
+     * Módosítja a felhasználó típusát.
+     *
+     * @param userId  felhasználó azonosító
+     * @param newRole új szerepkód
+     * @return frissített felhasználó
+     */
     public User updateUserRole(Long userId, String newRole) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Felhasználó nem található"));
@@ -52,6 +73,11 @@ public class AdminService {
         }
     }
 
+    /**
+     * Törli a felhasználót az azonosító alapján.
+     *
+     * @param id felhasználó azonosító
+     */
     public void deleteUser(Long id) {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByUsername(currentUsername);
@@ -61,6 +87,12 @@ public class AdminService {
         userRepository.deleteById(id);
     }
 
+    /**
+     * Létrehoz egy új felhasználót a regisztrációs adatokból.
+     *
+     * @param dto regisztrációs adatok
+     * @return mentett felhasználó
+     */
     public User createUser(SignupRequestDTO dto) {
         if (userRepository.existsByUsername(dto.getUsername())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Felhasználónév már foglalt");

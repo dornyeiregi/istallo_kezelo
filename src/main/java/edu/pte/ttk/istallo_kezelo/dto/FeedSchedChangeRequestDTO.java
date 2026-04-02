@@ -2,14 +2,14 @@ package edu.pte.ttk.istallo_kezelo.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import edu.pte.ttk.istallo_kezelo.dto.FeedSchedItemAmountDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
+/**
+ * Adatátviteli objektum a(z) FeedSchedChangeRequest adatcseréhez.
+ */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class FeedSchedChangeRequestDTO {
     private Long id;
     private Long feedSchedId;
@@ -22,4 +22,10 @@ public class FeedSchedChangeRequestDTO {
     private List<Long> horseIds;
     private List<Long> itemIds;
     private List<FeedSchedItemAmountDTO> items;
+
+    /**
+     * Üres konstruktor a szerializáláshoz.
+     */
+    public FeedSchedChangeRequestDTO() {
+    }
 }

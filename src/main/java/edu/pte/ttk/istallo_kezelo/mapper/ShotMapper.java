@@ -3,6 +3,9 @@ package edu.pte.ttk.istallo_kezelo.mapper;
 import edu.pte.ttk.istallo_kezelo.dto.ShotDTO;
 import edu.pte.ttk.istallo_kezelo.model.Shot;
 
+/**
+ * Mapper segédosztály a(z) Shot konverziókhoz.
+ */
 public final class ShotMapper {
 
     private ShotMapper() {}
