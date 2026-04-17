@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.Storage;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;
@@ -30,6 +29,9 @@ class StorageConsumptionServiceTest {
     @Mock
     private StorageService storageService;
 
+    @Mock
+    private StorageAlertService storageAlertService;
+
     @InjectMocks
     private StorageConsumptionService storageConsumptionService;
 
@@ -45,6 +47,7 @@ class StorageConsumptionServiceTest {
         storageConsumptionService.reduceConsumablesDaily();
 
         verify(storageService).syncAllAmountsInUse();
+        verify(storageAlertService).notifyLowStock(List.of(storage));
         assertEquals(4.0, storage.getAmountStored());
         assertNotNull(storage.getLastReducedDate());
     }

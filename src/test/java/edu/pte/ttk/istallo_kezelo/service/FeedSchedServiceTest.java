@@ -3,12 +3,13 @@ package edu.pte.ttk.istallo_kezelo.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.dto.FeedSchedDTO;
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
+import edu.pte.ttk.istallo_kezelo.repository.FeedSchedChangeRequestRepository;
 import edu.pte.ttk.istallo_kezelo.repository.FeedSchedRepository;
 import edu.pte.ttk.istallo_kezelo.repository.HorseRepository;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
+import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +26,9 @@ class FeedSchedServiceTest {
     private FeedSchedRepository feedSchedRepository;
 
     @Mock
+    private FeedSchedChangeRequestRepository feedSchedChangeRequestRepository;
+
+    @Mock
     private HorseRepository horseRepository;
 
     @Mock
@@ -32,6 +36,12 @@ class FeedSchedServiceTest {
 
     @Mock
     private StorageService storageService;
+
+    @Mock
+    private UserRepository userRepository;
+
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private FeedSchedService feedSchedService;

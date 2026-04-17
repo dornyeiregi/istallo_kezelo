@@ -3,7 +3,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.controller.AuthController;
 import edu.pte.ttk.istallo_kezelo.dto.FarrierAppDTO;
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
@@ -38,6 +37,9 @@ class FarrierAppServiceTest {
 
     @Mock
     private CalendarEventService calendarEventService;
+
+    @Mock
+    private SettingsService settingsService;
 
     @InjectMocks
     private FarrierAppService farrierAppService;

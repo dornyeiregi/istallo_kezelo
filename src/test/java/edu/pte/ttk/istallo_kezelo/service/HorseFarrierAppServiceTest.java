@@ -3,7 +3,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.model.FarrierApp;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.HorseFarrierApp;
@@ -43,6 +42,9 @@ class HorseFarrierAppServiceTest {
     @Mock
     private CalendarEventService calendarEventService;
 
+    @Mock
+    private EventReminderService eventReminderService;
+
     @InjectMocks
     private HorseFarrierAppService horseFarrierAppService;
 
@@ -64,5 +66,6 @@ class HorseFarrierAppServiceTest {
 
         assertEquals(5L, result.getId());
         verify(calendarEventService).syncFromDomain(horse, EventType.FARRIERAPP, farrierApp.getAppointmentDate(), 4L);
+        verify(eventReminderService).sendRemindersNow();
     }
 }

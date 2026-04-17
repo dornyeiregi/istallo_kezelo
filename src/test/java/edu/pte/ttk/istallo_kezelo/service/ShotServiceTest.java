@@ -44,6 +44,12 @@ class ShotServiceTest {
     @Mock
     private CalendarEventService calendarEventService;
 
+    @Mock
+    private SettingsService settingsService;
+
+    @Mock
+    private EventReminderService eventReminderService;
+
     @InjectMocks
     private ShotService shotService;
 
@@ -62,5 +68,6 @@ class ShotServiceTest {
 
         assertEquals(1, result.getHorses_treated().size());
         verify(calendarEventService).createEvent(2L, EventType.SHOT, shot.getDate(), 4L, null);
+        verify(eventReminderService).sendRemindersNow();
     }
 }

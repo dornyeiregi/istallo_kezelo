@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseFeedSchedDTO;
@@ -78,5 +79,13 @@ class HorseFeedSchedControllerTest {
 
         assertEquals(1, result.size());
         assertEquals("Csillag", result.get(0).getHorseName());
+    }
+
+    @Test
+    void removeAllFeedSchedsForHorse_returnsOk() {
+        var response = horseFeedSchedController.removeAllFeedSchedsForHorse(5L);
+
+        assertEquals("Etetési ütemtervek eltávolítva.", response.getBody());
+        verify(horseFeedSchedService).removeAllFeedSchedsForHorse(5L);
     }
 }

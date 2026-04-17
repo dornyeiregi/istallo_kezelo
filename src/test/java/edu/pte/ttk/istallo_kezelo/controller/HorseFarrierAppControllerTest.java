@@ -38,9 +38,9 @@ class HorseFarrierAppControllerTest {
         Horse horse = ControllerTestSupport.horse(3L, "Csillag", owner, stable);
         FarrierApp farrierApp = ControllerTestSupport.farrierApp(4L, "Kovacs Bela");
         HorseFarrierApp link = ControllerTestSupport.horseFarrierApp(horse, farrierApp);
-        HorseFarrierAppDTO dto = new HorseFarrierAppDTO(3L, 4L, null, null, null, null, null);
+        HorseFarrierAppDTO dto = new HorseFarrierAppDTO(3L, 4L, null, null, null, 2, "note");
 
-        when(horseFarrierAppService.addHorseToFarrierApp(4L, 3L, auth)).thenReturn(link);
+        when(horseFarrierAppService.addHorseToFarrierApp(4L, 3L, 2, "note", auth)).thenReturn(link);
 
         HorseFarrierAppDTO result = horseFarrierAppController.addHorseToFarrierApp(dto, auth);
 

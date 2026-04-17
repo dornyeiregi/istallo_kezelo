@@ -11,7 +11,9 @@ import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.Sex;
+import edu.pte.ttk.istallo_kezelo.service.FeedSchedService;
 import edu.pte.ttk.istallo_kezelo.service.HorseService;
+import edu.pte.ttk.istallo_kezelo.service.MailService;
 import edu.pte.ttk.istallo_kezelo.service.StableService;
 import edu.pte.ttk.istallo_kezelo.service.UserService;
 import java.time.LocalDate;
@@ -41,6 +43,12 @@ class HorseControllerTest {
 
     @Mock
     private StableService stableService;
+
+    @Mock
+    private FeedSchedService feedSchedService;
+
+    @Mock
+    private MailService mailService;
 
     @InjectMocks
     private HorseController horseController;
@@ -79,6 +87,30 @@ class HorseControllerTest {
         ArgumentCaptor<Horse> captor = ArgumentCaptor.forClass(Horse.class);
         verify(horseService).saveHorse(captor.capture());
         assertEquals("HU-123", captor.getValue().getMicrochipNum());
+    }
+
+    @Test
+    void createHorse_asOwner_sendsAdminMail() {
+        Authentication auth = ControllerTestSupport.auth("owner1", "ROLE_OWNER");
+        User owner = ControllerTestSupport.user(10L, "owner1", "Nagy", "Anna");
+        HorseDTO dto = new HorseDTO();
+        dto.setHorseName("Csillag");
+        dto.setDob(LocalDate.of(2018, 5, 20));
+        dto.setSex(Sex.F);
+
+        when(userService.getUserByUsername("owner1", auth)).thenReturn(owner);
+        when(horseService.saveHorse(any(Horse.class))).thenAnswer(invocation -> {
+            Horse horse = invocation.getArgument(0);
+            ReflectionTestUtils.setField(horse, "id", 55L);
+            return horse;
+        });
+
+        HorseDTO result = horseController.createHorse(dto, auth);
+
+        assertEquals(55L, result.getId());
+        assertEquals(Boolean.TRUE, result.getIsPending());
+        assertEquals(Boolean.FALSE, result.getIsActive());
+        verify(mailService).sendToAdmins(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString());
     }
 
     @Test

@@ -2,7 +2,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.model.FeedSched;
 import edu.pte.ttk.istallo_kezelo.model.FeedSchedItem;
 import edu.pte.ttk.istallo_kezelo.model.Item;
@@ -39,6 +38,9 @@ class StorageServiceTest {
 
     @Mock
     private StableRepository stableRepository;
+
+    @Mock
+    private StorageAlertService storageAlertService;
 
     @InjectMocks
     private StorageService storageService;

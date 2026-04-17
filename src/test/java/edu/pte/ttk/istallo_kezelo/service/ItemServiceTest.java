@@ -3,7 +3,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.dto.ItemDTO;
 import edu.pte.ttk.istallo_kezelo.model.Item;
 import edu.pte.ttk.istallo_kezelo.model.enums.ItemCategory;

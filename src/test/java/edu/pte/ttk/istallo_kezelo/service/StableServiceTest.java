@@ -2,7 +2,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.repository.ItemRepository;
 import edu.pte.ttk.istallo_kezelo.repository.StableRepository;

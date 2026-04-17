@@ -82,7 +82,7 @@ class UserControllerTest {
         Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
         User user = ControllerTestSupport.user(1L, "anna", "Nagy", "Anna");
         when(userService.getUserById(1L, auth)).thenReturn(Optional.of(user));
-        when(userService.saveUser(user)).thenReturn(user);
+        when(userService.updateUser(1L, user, auth)).thenReturn(user);
 
         UserDTO dto = new UserDTO();
         dto.setEmail("new@example.com");

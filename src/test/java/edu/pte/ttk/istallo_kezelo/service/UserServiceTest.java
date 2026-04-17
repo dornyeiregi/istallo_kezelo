@@ -2,7 +2,6 @@ package edu.pte.ttk.istallo_kezelo.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
-
 import edu.pte.ttk.istallo_kezelo.model.User;
 import edu.pte.ttk.istallo_kezelo.model.enums.UserType;
 import edu.pte.ttk.istallo_kezelo.repository.UserRepository;
