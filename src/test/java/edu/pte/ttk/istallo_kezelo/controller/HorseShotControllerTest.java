@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseShotDTO;
@@ -42,5 +43,19 @@ class HorseShotControllerTest {
         assertEquals(1L, result.getHorseId());
         assertEquals(4L, result.getShotId());
         assertEquals("Tetano", result.getShotName());
+    }
+
+    @Test
+    void addShotToHorse_propagatesServiceException() {
+        Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        HorseShotDTO dto = new HorseShotDTO(1L, 4L, null, null, null, null, null);
+
+        when(horseShotService.addShotToHorse(4L, 1L, auth))
+            .thenThrow(new RuntimeException("Csak a saját lovaidhoz adhatsz vagy törölhetsz oltásokat."));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> horseShotController.addShotToHorse(dto, auth));
+
+        assertEquals("Csak a saját lovaidhoz adhatsz vagy törölhetsz oltásokat.", exception.getMessage());
     }
 }

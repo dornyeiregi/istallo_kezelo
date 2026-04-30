@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseFarrierAppDTO;
@@ -93,5 +94,19 @@ class HorseFarrierAppControllerTest {
 
         assertEquals(1, result.size());
         assertEquals("Csillag", result.get(0).getHorseName());
+    }
+
+    @Test
+    void addHorseToFarrierApp_propagatesServiceException() {
+        Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        HorseFarrierAppDTO dto = new HorseFarrierAppDTO(3L, 4L, null, null, null, 3, "note");
+
+        when(horseFarrierAppService.addHorseToFarrierApp(4L, 3L, 3, "note", auth))
+            .thenThrow(new RuntimeException("Érvénytelen patkó darabszám. Lehetséges értékek: 0, 2, 4."));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> horseFarrierAppController.addHorseToFarrierApp(dto, auth));
+
+        assertEquals("Érvénytelen patkó darabszám. Lehetséges értékek: 0, 2, 4.", exception.getMessage());
     }
 }

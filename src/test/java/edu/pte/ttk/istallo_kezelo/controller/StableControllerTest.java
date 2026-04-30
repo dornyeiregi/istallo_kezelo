@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -61,6 +62,16 @@ class StableControllerTest {
         StableDTO result = stableController.updateStablePartially(1L, new StableDTO(null, "B", null, null, null));
 
         assertEquals("B", result.getStableName());
+    }
+
+    @Test
+    void updateStablePartially_throwsWhenStableMissing() {
+        when(stableService.getStableById(1L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> stableController.updateStablePartially(1L, new StableDTO()));
+
+        assertEquals("Istálló nem található.", exception.getMessage());
     }
 
     @Test

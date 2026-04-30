@@ -180,7 +180,8 @@ class FeedSchedControllerTest {
 
     @Test
     void approveChangeRequest_returnsOk() {
-        doNothing().when(feedSchedService).approveChangeRequest(7L);
+        FeedSched updatedFeedSched = ControllerTestSupport.feedSched(7L, "Updated");
+        when(feedSchedService.approveChangeRequest(7L)).thenReturn(updatedFeedSched);
 
         var response = feedSchedController.approveChangeRequest(7L);
 

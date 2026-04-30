@@ -1,6 +1,7 @@
 package edu.pte.ttk.istallo_kezelo.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -78,6 +79,28 @@ class UserControllerTest {
     }
 
     @Test
+    void getUserById_throwsWhenMissing() {
+        Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        when(userService.getUserById(1L, auth)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> userController.getUserById(1L, auth));
+
+        assertEquals("Felhasználó nem található.", exception.getMessage());
+    }
+
+    @Test
+    void getUserByUsername_throwsWhenMissing() {
+        Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        when(userService.getUserByUsername("anna", auth)).thenReturn(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> userController.getUserByUsername("anna", auth));
+
+        assertEquals("Felhasználó nem található.", exception.getMessage());
+    }
+
+    @Test
     void updateUserPartially_returnsUpdatedUser() {
         Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
         User user = ControllerTestSupport.user(1L, "anna", "Nagy", "Anna");
@@ -92,5 +115,16 @@ class UserControllerTest {
 
         assertEquals("new@example.com", result.getEmail());
         assertEquals("999", result.getPhone());
+    }
+
+    @Test
+    void updateUserPartially_throwsWhenUserMissing() {
+        Authentication auth = ControllerTestSupport.auth("anna", "ROLE_OWNER");
+        when(userService.getUserById(1L, auth)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> userController.updateUserPartially(1L, new UserDTO(), auth));
+
+        assertEquals("Felhasználó nem található.", exception.getMessage());
     }
 }

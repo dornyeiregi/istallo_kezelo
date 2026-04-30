@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import edu.pte.ttk.istallo_kezelo.dto.HorseDTO;
+import edu.pte.ttk.istallo_kezelo.dto.HorseApprovalDTO;
 import edu.pte.ttk.istallo_kezelo.model.Horse;
 import edu.pte.ttk.istallo_kezelo.model.Stable;
 import edu.pte.ttk.istallo_kezelo.model.User;
@@ -87,6 +88,38 @@ class HorseControllerTest {
         ArgumentCaptor<Horse> captor = ArgumentCaptor.forClass(Horse.class);
         verify(horseService).saveHorse(captor.capture());
         assertEquals("HU-123", captor.getValue().getMicrochipNum());
+    }
+
+    @Test
+    void createHorse_asAdmin_throwsWhenStableMissing() {
+        Authentication auth = ControllerTestSupport.auth("admin", "ROLE_ADMIN");
+        User owner = ControllerTestSupport.user(10L, "tulaj1", "Nagy", "Anna");
+        HorseDTO dto = new HorseDTO();
+        dto.setHorseName("Csillag");
+        dto.setOwnerId(owner.getId());
+
+        when(userService.getUserById(owner.getId(), auth)).thenReturn(Optional.of(owner));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> horseController.createHorse(dto, auth));
+
+        assertEquals("Az istálló mező kitöltése kötelező.", exception.getMessage());
+    }
+
+    @Test
+    void createHorse_asAdmin_throwsWhenStableNameUnknown() {
+        Authentication auth = ControllerTestSupport.auth("admin", "ROLE_ADMIN");
+        User owner = ControllerTestSupport.user(10L, "tulaj1", "Nagy", "Anna");
+        HorseDTO dto = new HorseDTO();
+        dto.setHorseName("Csillag");
+        dto.setOwnerId(owner.getId());
+        dto.setStableName("Ismeretlen");
+
+        when(userService.getUserById(owner.getId(), auth)).thenReturn(Optional.of(owner));
+        when(stableService.getStableByName("Ismeretlen")).thenReturn(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> horseController.createHorse(dto, auth));
+
+        assertEquals("Istálló nem található név alapján: Ismeretlen", exception.getMessage());
     }
 
     @Test
@@ -192,5 +225,25 @@ class HorseControllerTest {
 
         assertEquals(1, result.size());
         assertEquals(1L, result.get(0).getId());
+    }
+
+    @Test
+    void approveHorseRequest_throwsWhenStableMissingFromRequest() {
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> horseController.approveHorseRequest(1L, null));
+
+        assertEquals("Istálló megadása kötelező.", exception.getMessage());
+    }
+
+    @Test
+    void approveHorseRequest_throwsWhenStableNotFound() {
+        HorseApprovalDTO dto = new HorseApprovalDTO();
+        dto.setStableId(99L);
+        when(stableService.getStableById(99L)).thenReturn(Optional.empty());
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+            () -> horseController.approveHorseRequest(1L, dto));
+
+        assertEquals("Istálló nem található.", exception.getMessage());
     }
 }
