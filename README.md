@@ -1,12 +1,28 @@
 # Istálló Kezelő Backend
 
-Az `istallo_kezelo` projekt az Istálló Kezelő rendszer Spring Boot alapú backendje. REST API-t biztosít a frontend számára, kezeli a hitelesítést, az üzleti logikát, valamint a PostgreSQL adatbázis kapcsolatot és a Flyway migrációkat.
+Ez a mappa a rendszer backendje. A teljes alkalmazást nem innen, hanem a frontend projektből érdemes elindítani, mert ott van a `docker-compose.yml`, ami együtt indítja:
 
-Ez a README a backend Docker-alapú használatát írja le.
+- a frontendet
+- a backendet
+- az adatbázist
 
-## Projektek klónozása
+## Mire lesz szükséged?
 
-Javasolt létrehozni egy közös mappát, például `StableManager` néven, és ebbe klónozni a frontend és a backend projektet is:
+- Docker Desktop
+- Git
+- a két projekt egymás mellett legyen ugyanabban a mappában
+
+Az elvárt mappaszerkezet:
+
+```text
+StableManager/
+  istallo_kezelo/
+  istallo_kezelo_frontend/
+```
+
+## Lépésről lépésre
+
+### 1. Klónozd le a két projektet
 
 ```bash
 mkdir StableManager
@@ -15,7 +31,141 @@ git clone <frontend-repo-url> istallo_kezelo_frontend
 git clone <backend-repo-url> istallo_kezelo
 ```
 
-Elvárt könyvtárstruktúra:
+### 2. Menj a frontend mappába
+
+```bash
+cd StableManager/istallo_kezelo_frontend
+```
+
+Innen fogod indítani az egész rendszert.
+
+### 3. Hozd létre a `.env` fájlt
+
+```bash
+cp .env.example .env
+```
+
+Ezután nyisd meg a `.env` fájlt.
+
+### 4. Írd át a `.env` fájlt
+
+A legfontosabb sorok:
+
+```env
+APP_HOST_IP=192.168.0.61
+JWT_SECRET=ide-egy-hosszu-sajat-titok
+APP_MAIL_ENABLED=false
+```
+
+Mit jelentenek?
+
+- `APP_HOST_IP`: annak a gépnek a helyi IP-címe, amelyen a Docker fut
+- `JWT_SECRET`: saját titkos kulcs, ezt mindig töltsd ki egy hosszú egyedi értékkel
+- `APP_MAIL_ENABLED=false`: ha nem akarsz email küldést használni, maradhat így
+
+### 5. Ha kell email küldés, ezt is töltsd ki
+
+Ha az alkalmazás emailt is küldjön, akkor a `.env` fájlban ezt állítsd be:
+
+```env
+APP_MAIL_ENABLED=true
+APP_MAIL_FROM=pelda@ceg.hu
+APP_MAIL_TO=
+SPRING_MAIL_USERNAME=pelda@ceg.hu
+SPRING_MAIL_PASSWORD=ide-a-sajat-app-jelszo
+```
+
+Fontos:
+
+- minden telepítő a saját email címét és saját jelszavát adja meg
+- ne ossz ki mindenkinek ugyanazt a közös email jelszót
+- `APP_MAIL_TO` maradhat üresen
+
+### 6. Indítsd el a rendszert
+
+```bash
+docker compose up --build
+```
+
+Ez első indításkor több perc is lehet.
+
+### 7. Nyisd meg a böngészőben
+
+Frontend:
+
+```text
+http://localhost:4200
+```
+
+Backend:
+
+```text
+http://localhost:8080
+```
+
+### 8. Alapértelmezett admin belépés
+
+- Felhasználónév: `admin`
+- Jelszó: `admin123`
+
+## Mit kell pontosan beírni a `.env` fájlba?
+
+Ha csak az alap működés kell email nélkül, akkor elég valami ilyesmi:
+
+```env
+APP_HOST_IP=192.168.0.61
+FRONTEND_BIND_HOST=0.0.0.0
+BACKEND_BIND_HOST=0.0.0.0
+DB_BIND_HOST=127.0.0.1
+JWT_SECRET=ide-egy-hosszu-sajat-titok
+APP_MAIL_ENABLED=false
+APP_MAIL_FROM=
+APP_MAIL_TO=
+SPRING_MAIL_USERNAME=
+SPRING_MAIL_PASSWORD=
+```
+
+Ha kell email is, akkor csak az utolsó sorokat kell kitöltened.
+
+## Leállítás
+
+Ha le akarod állítani:
+
+```bash
+docker compose down
+```
+
+Ha az adatbázis adatait is törölni akarod:
+
+```bash
+docker compose down -v
+```
+
+## Hasznos parancsok
+
+Futó konténerek:
+
+```bash
+docker compose ps
+```
+
+Backend napló:
+
+```bash
+docker compose logs -f backend
+```
+
+Összes napló:
+
+```bash
+docker compose logs -f
+```
+
+## Gyakori hibák
+
+`Nem indul el a backend`
+
+Ellenőrizd, hogy a két projekt tényleg egymás mellett van-e:
 
 ```text
 StableManager/
@@ -23,137 +173,26 @@ StableManager/
   istallo_kezelo_frontend/
 ```
 
-## A backend szerepe a Dockeres rendszerben
+`A frontend nem éri el a backendet`
 
-A backend konténer:
+Nézd meg, jól van-e beírva az `APP_HOST_IP` a `.env` fájlban.
 
-- a [Dockerfile](./Dockerfile) alapján buildelődik
-- Java 17 runtime környezetben fut
-- PostgreSQL adatbázishoz csatlakozik
-- induláskor ellenőrzi és lefuttatja a Flyway migrációkat
+`Email nem működik`
 
-Alapértelmezetten a backend a frontend projekt [docker-compose.yml](../istallo_kezelo_frontend/docker-compose.yml) fájljából indul.
+Ilyenkor általában ezek valamelyike hibás:
 
-Dockeres futtatáskor a frontend és a backend alapértelmezetten LAN-on is elérhető. Ehhez a frontend projekt `.env` fájljában meg kell adni a futtató gép helyi IP-címét.
+- `APP_MAIL_ENABLED`
+- `APP_MAIL_FROM`
+- `SPRING_MAIL_USERNAME`
+- `SPRING_MAIL_PASSWORD`
 
-## Ajánlott indítási mód
+`Port already in use`
 
-A teljes rendszer indítását nem ebből a mappából, hanem a frontend projektből érdemes végezni, mert a Compose ott fogja össze a teljes stacket:
+Valami más program már használja a `4200`, `8080` vagy `5432` portot.
 
-```bash
-cd StableManager/istallo_kezelo_frontend
-docker compose up --build
-```
-
-Ez egyszerre indítja:
-
-- a PostgreSQL adatbázist
-- a Spring Boot backendet
-- az Angular frontendet
-
-Indítás előtt ellenőrizni kell, hogy a frontend projekt `.env` fájljában a megfelelő helyi IP-cím szerepel-e. Ha szükséges, a minta alapján létrehozható:
-
-```bash
-cd StableManager/istallo_kezelo_frontend
-cp .env.example .env
-```
-
-Ezután a `.env` fájlban az `APP_HOST_IP` értékét a futtató gép saját IP-címére kell állítani, például:
-
-```env
-APP_HOST_IP=192.168.0.61
-```
-
-## Backend image build
-
-Ha csak a backend image-et szeretnéd felépíteni:
+## Ha csak a backend image kell
 
 ```bash
 cd StableManager/istallo_kezelo
 docker build -t istallo-kezelo-backend .
 ```
-
-## A backend futtatása külön konténerként
-
-Ha nem a teljes Compose stacket használod, a backend konténer külön is futtatható, de ilyenkor külső PostgreSQL adatbázist kell megadni környezeti változókkal.
-
-Példa:
-
-```bash
-docker run --rm -p 8080:8080 \
-  -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/istallo_kezelo \
-  -e SPRING_DATASOURCE_USERNAME=postgres \
-  -e SPRING_DATASOURCE_PASSWORD=pass \
-  -e APP_CORS_ALLOWED_ORIGINS=http://localhost:4200 \
-  -e APP_MAIL_ENABLED=false \
-  istallo-kezelo-backend
-```
-
-Ez a példa a host gépen futó PostgreSQL adatbázishoz kapcsolja a backendet.
-
-## Fontos környezeti változók
-
-A backend működéséhez Dockerben tipikusan ezek a változók fontosak:
-
-- `SPRING_DATASOURCE_URL`
-- `SPRING_DATASOURCE_USERNAME`
-- `SPRING_DATASOURCE_PASSWORD`
-- `APP_CORS_ALLOWED_ORIGINS`
-- `APP_MAIL_ENABLED`
-
-A Compose-os indítás során ezek automatikusan beállításra kerülnek.
-
-## Adatbázis migrációk
-
-A séma kezelését a Flyway végzi a `src/main/resources/db/migration` könyvtárból.
-
-Induláskor a backend:
-
-- csatlakozik a megadott PostgreSQL adatbázishoz
-- ellenőrzi a migrációk állapotát
-- szükség esetén lefuttatja az új migrációkat
-
-Ezért külön SQL inicializálás az alap Dockeres működéshez nem szükséges.
-
-## Elérhetőség
-
-Ha a backend a Compose részeként fut, akkor kívülről az alábbi címen érhető el:
-
-```text
-http://localhost:8080
-```
-
-A frontend a normál működés során ezt az API-t használja.
-
-## Naplók és hibakeresés
-
-Ha a teljes rendszert Compose-ból indítottad, a backend naplója így nézhető meg:
-
-```bash
-cd StableManager/istallo_kezelo_frontend
-docker compose logs -f backend
-```
-
-Állapot ellenőrzése:
-
-```bash
-docker compose ps
-```
-
-## Gyakori hibák
-
-`A backend elindul, de a frontend nem kap adatot`
-
-Leggyakoribb okok:
-
-- a PostgreSQL adatbázis üres
-- a backend más adatbázishoz csatlakozik, mint amire számítasz
-- a frontend és a backend nem ugyanazon a hostnéven érhető el a kliens szemszögéből
-
-`Kapcsolódási hiba az adatbázishoz`
-
-Ellenőrizd a `SPRING_DATASOURCE_*` változókat, illetve azt, hogy az adatbázis konténer vagy külső PostgreSQL szerver valóban elérhető-e.
-
-`CORS hiba`
-
-Ellenőrizd a frontend projekt `.env` fájljában az `APP_HOST_IP` értékét. A backend CORS beállítása ebből épül fel, ezért hibás IP-cím esetén a frontend LAN-on nem fog tudni megfelelően kommunikálni az API-val.
