@@ -57,5 +57,8 @@ build/
 hs_err_pid*
 replay_pid*
 
-# Local resource configuration and assets
-/src/main/resources/
+# Local secrets and machine-specific config
+.env
+/src/main/resources/.DS_Store
+/src/main/resources/application-local.properties
+/src/main/resources/application-lan.properties

@@ -39,13 +39,13 @@ cd StableManager/istallo_kezelo_frontend
 
 Innen fogod indítani az egész rendszert.
 
-### 3. Hozd létre a `.env` fájlt
+### 3. Nyisd meg a `.env` fájlt
 
-```bash
-cp .env.example .env
+A frontend projektben már van egy kész `.env` fájl mintaadatokkal. Ezt a fájlt nyisd meg:
+
+```text
+StableManager/istallo_kezelo_frontend/.env
 ```
-
-Ezután nyisd meg a `.env` fájlt.
 
 ### 4. Írd át a `.env` fájlt
 
@@ -54,34 +54,37 @@ A legfontosabb sorok:
 ```env
 APP_HOST_IP=192.168.0.61
 JWT_SECRET=ide-egy-hosszu-sajat-titok
-APP_MAIL_ENABLED=false
+APP_MAIL_ENABLED=true
+APP_MAIL_FROM=sajat@email.hu
+APP_MAIL_TO=
+SPRING_MAIL_HOST=smtp.gmail.com
+SPRING_MAIL_PORT=587
+SPRING_MAIL_USERNAME=sajat@email.hu
+SPRING_MAIL_PASSWORD=sajat-app-jelszo
 ```
 
 Mit jelentenek?
 
 - `APP_HOST_IP`: annak a gépnek a helyi IP-címe, amelyen a Docker fut
 - `JWT_SECRET`: saját titkos kulcs, ezt mindig töltsd ki egy hosszú egyedi értékkel
-- `APP_MAIL_ENABLED=false`: ha nem akarsz email küldést használni, maradhat így
-
-### 5. Ha kell email küldés, ezt is töltsd ki
-
-Ha az alkalmazás emailt is küldjön, akkor a `.env` fájlban ezt állítsd be:
-
-```env
-APP_MAIL_ENABLED=true
-APP_MAIL_FROM=pelda@ceg.hu
-APP_MAIL_TO=
-SPRING_MAIL_USERNAME=pelda@ceg.hu
-SPRING_MAIL_PASSWORD=ide-a-sajat-app-jelszo
-```
+- `APP_MAIL_ENABLED`: email küldés be legyen-e kapcsolva
+- `APP_MAIL_FROM`: a feladó email cím
+- `APP_MAIL_TO`: maradhat üresen
+- `SPRING_MAIL_HOST` és `SPRING_MAIL_PORT`: Gmail esetén maradhat `smtp.gmail.com` és `587`
+- `SPRING_MAIL_USERNAME`: ugyanaz legyen, mint az `APP_MAIL_FROM`
+- `SPRING_MAIL_PASSWORD`: az email fiók app jelszava vagy SMTP jelszava
 
 Fontos:
 
 - minden telepítő a saját email címét és saját jelszavát adja meg
-- ne ossz ki mindenkinek ugyanazt a közös email jelszót
-- `APP_MAIL_TO` maradhat üresen
+- az `APP_MAIL_FROM` és a `SPRING_MAIL_USERNAME` legyen ugyanaz az email cím
+- ha nem Gmailt használsz, akkor a `SPRING_MAIL_HOST` és `SPRING_MAIL_PORT` értékét is írd át
 
-### 6. Indítsd el a rendszert
+Az érzékeny adatok, például a `JWT_SECRET`, a mail felhasználónév és a mail jelszó nem a backend forráskódban vannak, hanem ebben a `.env` fájlban. A GitHub repóban csak mintaértékek vannak.
+
+### 5. Indítsd el a rendszert
+
+Terminálból:
 
 ```bash
 docker compose up --build
@@ -89,53 +92,50 @@ docker compose up --build
 
 Ez első indításkor több perc is lehet.
 
-### 7. Nyisd meg a böngészőben
+Docker Desktopból:
 
-Frontend:
+1. Nyisd meg a Docker Desktop alkalmazást.
+2. Menj a `Containers` vagy `Containers / Apps` részre.
+3. Ha a projekt már egyszer el lett indítva, keresd meg az `istallo_kezelo_frontend` compose appot vagy a hozzá tartozó konténereket.
+4. Kattints a `Start` vagy `Run` gombra.
+
+Ha a projekt még nincs betöltve a Docker Desktopba, akkor az első indítást általában egyszerűbb terminálból elvégezni a `docker compose up --build` paranccsal. Utána a következő indítások és leállítások már kényelmesen kezelhetők a Docker Desktop felületéről.
+
+### 6. Nyisd meg a böngészőben
+
+Normál használatnál a frontendet kell megnyitni:
 
 ```text
-http://localhost:4200
+http://APP_HOST_IP:4200
 ```
 
-Backend:
+A backendet általában nem kell külön megnyitni böngészőben. Az a frontend mögött fut API-ként. Csak hibakereséshez vagy teszteléshez lehet hasznos ez a cím:
 
 ```text
 http://localhost:8080
 ```
 
-### 8. Alapértelmezett admin belépés
+### 7. Alapértelmezett admin belépés
 
 - Felhasználónév: `admin`
 - Jelszó: `admin123`
 
-## Mit kell pontosan beírni a `.env` fájlba?
-
-Ha csak az alap működés kell email nélkül, akkor elég valami ilyesmi:
-
-```env
-APP_HOST_IP=192.168.0.61
-FRONTEND_BIND_HOST=0.0.0.0
-BACKEND_BIND_HOST=0.0.0.0
-DB_BIND_HOST=127.0.0.1
-JWT_SECRET=ide-egy-hosszu-sajat-titok
-APP_MAIL_ENABLED=false
-APP_MAIL_FROM=
-APP_MAIL_TO=
-SPRING_MAIL_USERNAME=
-SPRING_MAIL_PASSWORD=
-```
-
-Ha kell email is, akkor csak az utolsó sorokat kell kitöltened.
-
 ## Leállítás
 
-Ha le akarod állítani:
+Terminálból:
 
 ```bash
 docker compose down
 ```
 
-Ha az adatbázis adatait is törölni akarod:
+Docker Desktopból:
+
+1. Nyisd meg a Docker Desktop alkalmazást.
+2. Menj a `Containers` vagy `Containers / Apps` részre.
+3. Keresd meg az alkalmazás konténereit vagy a compose appot.
+4. Kattints a `Stop` gombra.
+
+Ha az adatbázis adatait is törölni akarod, azt terminálból tudod a legegyszerűbben megtenni:
 
 ```bash
 docker compose down -v
